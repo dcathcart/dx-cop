@@ -1,5 +1,5 @@
-const fs = require('fs');
-const f = fs.readFileSync('C:/Dev/salesforce/unpackaged/main/default/lwc/articleSearch/articleSearch.js-meta.xml');
+import * as fs from 'fs';
+let f = fs.readFileSync('C:/Dev/salesforce/unpackaged/main/default/lwc/articleSearch/articleSearch.js-meta.xml');
 
 let fileContents = f.toString();
 let lines = fileContents.split('\r\n');
