@@ -18,16 +18,19 @@ function fileHasTrailingWhitespace(filename: string) {
     return false;
 }
 
-const folder = 'c:/dev/salesforce/unpackaged/main/default/lwc/';
+function checkLwcMetadata(folder: string) {
+    fs.readdirSync(folder).forEach(entry => {
+        if (entry == 'jsconfig.json')
+            return;
 
-fs.readdirSync(folder).forEach(entry => {
-    if (entry == 'jsconfig.json')
-        return;
+        let jsMetaFileName = folder + entry + '/' + entry + '.js-meta.xml';
 
-    let jsMetaFileName = folder + entry + '/' + entry + '.js-meta.xml';
+        if (fileHasTrailingWhitespace(jsMetaFileName))
+            console.log("Trailing whitespace found: " + jsMetaFileName);
+        else
+            console.log("Passed: " + jsMetaFileName);
+    });
+}
 
-    if (fileHasTrailingWhitespace(jsMetaFileName))
-        console.log("Trailing whitespace found: " + jsMetaFileName);
-    else
-        console.log("Passed: " + jsMetaFileName);
-});
+const folder = 'C:/Dev/salesforce/unpackaged/main/default/lwc/';
+checkLwcMetadata(folder);
