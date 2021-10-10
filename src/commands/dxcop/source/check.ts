@@ -1,7 +1,7 @@
 import * as os from 'os';
 import * as path from 'path';
 import { flags, SfdxCommand } from '@salesforce/command';
-import { Messages, SfdxProject } from '@salesforce/core';
+import { Messages, NamedPackageDir, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 
@@ -35,19 +35,18 @@ export default class Check extends SfdxCommand {
   protected static requiresProject = true;
 
   public async run(): Promise<AnyJson> {
-    const name = (this.flags.name || 'world') as string;
-
-    const outputString = `Hello ${name}!`;
-    this.ux.log(outputString);
-
     const sfdxProject = await SfdxProject.resolve();
     const defaultPackage = sfdxProject.getDefaultPackage();
-    const lwcPath = path.join(defaultPackage.fullPath, 'main/default/lwc/');
+    this.checkLwcMetadata(defaultPackage);
+
+    // Return an object to be displayed with --json
+    return { output: 'tbc' };
+  }
+
+  public checkLwcMetadata(sfdxPackage: NamedPackageDir): void {
+    const lwcPath = path.join(sfdxPackage.fullPath, 'main/default/lwc');
 
     const lwcMetadataChecker = new LwcMetadataChecker();
     lwcMetadataChecker.checkLwcFolder(lwcPath);
-
-    // Return an object to be displayed with --json
-    return { output: outputString, outputString };
   }
 }
