@@ -1,9 +1,9 @@
-import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
+import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -44,41 +44,10 @@ export default class Check extends SfdxCommand {
     let defaultPackage = sfdxProject.getDefaultPackage();
     let lwcPath = path.join(defaultPackage.fullPath, 'main/default/lwc/');
 
-    this.checkLwcMetadata(lwcPath);
+    let lwcMetadataChecker = new LwcMetadataChecker();
+    lwcMetadataChecker.checkLwcMetadata(lwcPath);
 
     // Return an object to be displayed with --json
     return { output: outputString, outputString };
-  }
-
-  public hasTrailingWhitespace(input: string) {
-      return input != input.trimRight();
-  }
-
-  public fileHasTrailingWhitespace(filename: string) {
-      let file = fs.readFileSync(filename);
-      let fileContents = file.toString();
-      let lines = fileContents.split('\r\n');
-
-      for (let lineNo in lines) {
-          let line = lines[lineNo];
-
-          if (this.hasTrailingWhitespace(line))
-              return true;
-      }
-      return false;
-  }
-
-  public checkLwcMetadata(folder: string) {
-      fs.readdirSync(folder).forEach(entry => {
-          if (entry == 'jsconfig.json')
-              return;
-
-          let jsMetaFileName = folder + entry + '/' + entry + '.js-meta.xml';
-
-          if (this.fileHasTrailingWhitespace(jsMetaFileName))
-              console.log("Trailing whitespace found: " + jsMetaFileName);
-          else
-              console.log("Passed: " + jsMetaFileName);
-      });
   }
 }
