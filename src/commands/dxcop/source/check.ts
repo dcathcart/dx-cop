@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as os from 'os';
+import * as path from 'path';
 import { flags, SfdxCommand } from '@salesforce/command';
-import { Messages, SfdxError } from '@salesforce/core';
+import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
 // Initialize Messages with the current plugin directory
@@ -39,6 +40,12 @@ export default class Check extends SfdxCommand {
     let outputString = `Hello ${name}!`;
     this.ux.log(outputString);
 
+    let sfdxProject = await SfdxProject.resolve();
+    let defaultPackage = sfdxProject.getDefaultPackage();
+    let lwcPath = path.join(defaultPackage.fullPath, 'main/default/lwc/');
+
+    this.checkLwcMetadata(lwcPath);
+
     // Return an object to be displayed with --json
     return { output: outputString, outputString };
   }
@@ -55,7 +62,7 @@ export default class Check extends SfdxCommand {
       for (let lineNo in lines) {
           let line = lines[lineNo];
 
-          if (hasTrailingWhitespace(line))
+          if (this.hasTrailingWhitespace(line))
               return true;
       }
       return false;
@@ -68,7 +75,7 @@ export default class Check extends SfdxCommand {
 
           let jsMetaFileName = folder + entry + '/' + entry + '.js-meta.xml';
 
-          if (fileHasTrailingWhitespace(jsMetaFileName))
+          if (this.fileHasTrailingWhitespace(jsMetaFileName))
               console.log("Trailing whitespace found: " + jsMetaFileName);
           else
               console.log("Passed: " + jsMetaFileName);
