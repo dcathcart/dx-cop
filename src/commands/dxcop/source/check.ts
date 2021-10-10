@@ -37,15 +37,15 @@ export default class Check extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     const name = (this.flags.name || 'world') as string;
 
-    let outputString = `Hello ${name}!`;
+    const outputString = `Hello ${name}!`;
     this.ux.log(outputString);
 
-    let sfdxProject = await SfdxProject.resolve();
-    let defaultPackage = sfdxProject.getDefaultPackage();
-    let lwcPath = path.join(defaultPackage.fullPath, 'main/default/lwc/');
+    const sfdxProject = await SfdxProject.resolve();
+    const defaultPackage = sfdxProject.getDefaultPackage();
+    const lwcPath = path.join(defaultPackage.fullPath, 'main/default/lwc/');
 
-    let lwcMetadataChecker = new LwcMetadataChecker();
-    lwcMetadataChecker.checkLwcMetadata(lwcPath);
+    const lwcMetadataChecker = new LwcMetadataChecker();
+    lwcMetadataChecker.checkLwcFolder(lwcPath);
 
     // Return an object to be displayed with --json
     return { output: outputString, outputString };
