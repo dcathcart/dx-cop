@@ -1,19 +1,42 @@
 import * as fs from 'fs';
 import * as path from 'path';
-//import * as xml2js from 'xml2js';
-
 
 export class RecordTypeChecker {
+
+  public IGNORE_MISSING_PICKLISTS = ['PersonLeadSource', 'StageName', 'Status'];
+
   public run(): void {
-    console.log("Checking record types");
+    const objects = this.customObjects();
+    for (const obj of objects) {
+      this.checkRecordTypes(obj);
+    }
+  }
+
+  public objectsDir(): string {
+    return 'c:/dev/salesforce/unpackaged/main/default/objects/';
   }
 
   public customObjects(): string[] {
     return fs.readdirSync(this.objectsDir());
   }
 
-  public objectsDir(): string {
-    return 'c:/dev/salesforce/unpackaged/main/default/objects/';
+  public checkRecordTypes(objectName: string): void {
+    const objectPicklists = this.picklistFieldNames(objectName);
+    const requiredPicklists = objectPicklists.filter((i) => !this.IGNORE_MISSING_PICKLISTS.includes(i));
+
+    const recordTypes = this.objectRecordTypes(objectName);
+    for (const recordType of recordTypes) {
+      this.checkRecordType(objectName, recordType, requiredPicklists);
+    }
+  }
+
+  public checkRecordType(objectName: string, recordTypeName: string, requiredPicklists: string[]): void {
+    const recordTypePicklists = this.recordTypePicklistNames(objectName, recordTypeName);
+
+    const missingPicklists = requiredPicklists.filter((i) => !recordTypePicklists.includes(i));
+    if (missingPicklists.length > 0) {
+      console.log(`Record type ${objectName}.${recordTypeName} is missing picklist(s): ${missingPicklists.toString()}`);
+    }
   }
 
   // list of fields for an object - array of full paths to field metadata files
@@ -54,17 +77,4 @@ export class RecordTypeChecker {
 }
 
 const rtc = new RecordTypeChecker();
-
-const objects = rtc.customObjects();
-for (const obj of objects) {
-  const objectPicklists = rtc.picklistFieldNames(obj);
-  const recordTypes = rtc.objectRecordTypes(obj);
-  for (const recordType of recordTypes) {
-    const recordTypePicklists = rtc.recordTypePicklistNames(obj, recordType);
-
-    const missingPicklists = objectPicklists.filter((i) => !recordTypePicklists.includes(i));
-    if (missingPicklists.length > 0) {
-      console.log(`Record type ${obj}.${recordType}: missing reference to picklist(s): ${missingPicklists.toString()}`);
-    }
-  }
-}
+rtc.run();
