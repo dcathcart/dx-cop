@@ -3,7 +3,9 @@ import * as path from 'path';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, NamedPackageDir, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
+
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
+import { RecordTypeChecker } from '../../../check/RecordTypeChecker';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -38,15 +40,23 @@ export default class Check extends SfdxCommand {
     const sfdxProject = await SfdxProject.resolve();
     const defaultPackage = sfdxProject.getDefaultPackage();
     this.checkLwcMetadata(defaultPackage);
+    this.checkRecordTypeMetadata(defaultPackage);
 
     // Return an object to be displayed with --json
     return { output: 'tbc' };
   }
 
   public checkLwcMetadata(sfdxPackage: NamedPackageDir): void {
-    const lwcPath = path.join(sfdxPackage.fullPath, 'main/default/lwc');
+    const lwcPath = path.join(sfdxPackage.fullPath, 'main', 'default', 'lwc');
 
     const lwcMetadataChecker = new LwcMetadataChecker();
     lwcMetadataChecker.checkLwcFolder(lwcPath);
+  }
+
+  public checkRecordTypeMetadata(sfdxPackage: NamedPackageDir): void {
+    const baseDir = path.join(sfdxPackage.fullPath, 'main', 'default');
+
+    const recordTypeChecker = new RecordTypeChecker(baseDir);
+    recordTypeChecker.run();
   }
 }

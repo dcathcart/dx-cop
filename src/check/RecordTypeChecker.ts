@@ -2,8 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export class RecordTypeChecker {
+  private IGNORE_MISSING_PICKLISTS = ['PersonLeadSource', 'StageName', 'Status'];
+  private baseDir: string;
 
-  public IGNORE_MISSING_PICKLISTS = ['PersonLeadSource', 'StageName', 'Status'];
+  public constructor(baseDir: string) {
+    this.baseDir = baseDir;
+  }
 
   public run(): void {
     const objects = this.customObjects();
@@ -13,7 +17,7 @@ export class RecordTypeChecker {
   }
 
   public objectsDir(): string {
-    return 'c:/dev/salesforce/unpackaged/main/default/objects/';
+    return path.join(this.baseDir, 'objects');
   }
 
   public customObjects(): string[] {
@@ -75,6 +79,3 @@ export class RecordTypeChecker {
     return Array.from(matches, (match) => match[1]);
   }
 }
-
-const rtc = new RecordTypeChecker();
-rtc.run();
