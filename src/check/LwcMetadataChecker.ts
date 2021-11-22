@@ -3,16 +3,16 @@ import * as path from 'path';
 import { AnyJson } from '@salesforce/ts-types';
 
 export class LwcMetadataChecker {
-  public hasTrailingWhitespace(input: string): boolean {
-    return input !== input.trimRight();
-  }
+  public checkLwcFolder(lwcFolder: string): AnyJson {
+    const lwcs = fs.readdirSync(lwcFolder).filter((entry) => entry !== 'jsconfig.json');
+    const warnings: string[] = [];
 
-  public fileHasTrailingWhitespace(filename: string): boolean {
-    const file = fs.readFileSync(filename);
-    const fileContents = file.toString();
-    const lines = fileContents.split('\r\n');
-    const result = lines.some((line) => this.hasTrailingWhitespace(line));
-    return result;
+    lwcs.forEach((entry) => {
+      const jsMetaFileName = path.join(lwcFolder, entry, entry + '.js-meta.xml');
+      warnings.push(...this.checkJsMetaFile(jsMetaFileName));
+    });
+
+    return { warnings };
   }
 
   public checkJsMetaFile(jsMetaFilename: string): string[] {
@@ -25,15 +25,15 @@ export class LwcMetadataChecker {
     return warnings;
   }
 
-  public checkLwcFolder(lwcFolder: string): AnyJson {
-    const lwcs = fs.readdirSync(lwcFolder).filter((entry) => entry !== 'jsconfig.json');
-    const warnings: string[] = [];
+  public fileHasTrailingWhitespace(filename: string): boolean {
+    const file = fs.readFileSync(filename);
+    const fileContents = file.toString();
+    const lines = fileContents.split('\r\n');
+    const result = lines.some((line) => this.hasTrailingWhitespace(line));
+    return result;
+  }
 
-    lwcs.forEach((entry) => {
-      const jsMetaFileName = path.join(lwcFolder, entry, entry + '.js-meta.xml');
-      warnings.push(...this.checkJsMetaFile(jsMetaFileName));
-    });
-
-    return { warnings };
+  public hasTrailingWhitespace(input: string): boolean {
+    return input !== input.trimRight();
   }
 }
