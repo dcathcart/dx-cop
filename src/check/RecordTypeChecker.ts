@@ -10,11 +10,15 @@ export class RecordTypeChecker {
     this.baseDir = baseDir;
   }
 
-  public run(): void {
+  public run(): string[] {
+    const warnings: string[] = [];
+
     const objects = this.customObjects().filter((o) => !this.IGNORE_OBJECTS.includes(o));
     for (const obj of objects) {
-      this.checkRecordTypes(obj);
+      warnings.push(...this.checkRecordTypes(obj));
     }
+
+    return warnings;
   }
 
   public objectsDir(): string {
@@ -41,15 +45,18 @@ export class RecordTypeChecker {
     return fs.readdirSync(this.objectsDir());
   }
 
-  public checkRecordTypes(objectName: string): void {
+  public checkRecordTypes(objectName: string): string[] {
     const objectPicklists = this.picklistFields(objectName);
     const requiredPicklists = objectPicklists.filter((p) => this.hasValueSet(objectName, p));
     const optionalPicklists = objectPicklists.filter((p) => !this.hasValueSet(objectName, p));
 
+    const warnings: string[] = [];
     const recordTypes = this.objectRecordTypes(objectName);
     for (const recordType of recordTypes) {
-      this.checkRecordTypePicklists(objectName, recordType, requiredPicklists, optionalPicklists);
+      const result = this.checkRecordTypePicklists(objectName, recordType, requiredPicklists, optionalPicklists);
+      warnings.push(...result);
     }
+    return warnings;
   }
 
   public checkRecordTypePicklists(
@@ -57,19 +64,27 @@ export class RecordTypeChecker {
     recordTypeName: string,
     requiredPicklists: string[],
     optionalPicklists: string[]
-  ): void {
+  ): string[] {
+    const warnings: string[] = [];
+
     const recordTypePicklists = this.recordTypePicklistNames(objectName, recordTypeName);
 
     const missingPicklists = requiredPicklists.filter((p) => !recordTypePicklists.includes(p));
     if (missingPicklists.length > 0) {
-      console.log(`Record type ${objectName}.${recordTypeName} is missing picklist(s): ${missingPicklists.toString()}`);
+      warnings.push(
+        `Record type ${objectName}.${recordTypeName} is missing picklist(s): ${missingPicklists.toString()}`
+      );
     }
 
     const expectedPicklists = requiredPicklists.concat(optionalPicklists).concat(this.BONUS_EXPECTED_PICKLISTS);
     const unexpectedPicklists = recordTypePicklists.filter((p) => !expectedPicklists.includes(p));
     if (unexpectedPicklists.length > 0) {
-      console.log(`Record type ${objectName}.${recordTypeName} contains unexpected picklist(s): ${unexpectedPicklists.toString()}`);
+      warnings.push(
+        `Record type ${objectName}.${recordTypeName} contains unexpected picklist(s): ${unexpectedPicklists.toString()}`
+      );
     }
+
+    return warnings;
   }
 
   // list of fields (field names) for the given object

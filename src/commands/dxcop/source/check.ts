@@ -40,24 +40,26 @@ export default class Check extends SfdxCommand {
     const sfdxProject = await SfdxProject.resolve();
     const defaultPackage = sfdxProject.getDefaultPackage();
 
-    const result = this.checkLwcMetadata(defaultPackage);
-    this.checkRecordTypeMetadata(defaultPackage);
+    const lwcWarnings = this.checkLwcMetadata(defaultPackage);
+    const rtWarnings = this.checkRecordTypeMetadata(defaultPackage);
+
+    const warnings = lwcWarnings.concat(rtWarnings);
 
     // Return an object to be displayed with --json
-    return result;
+    return { warnings };
   }
 
-  public checkLwcMetadata(sfdxPackage: NamedPackageDir): AnyJson {
+  public checkLwcMetadata(sfdxPackage: NamedPackageDir): string[] {
     const lwcPath = path.join(sfdxPackage.fullPath, 'main', 'default', 'lwc');
 
     const lwcMetadataChecker = new LwcMetadataChecker();
     return lwcMetadataChecker.checkLwcFolder(lwcPath);
   }
 
-  public checkRecordTypeMetadata(sfdxPackage: NamedPackageDir): void {
+  public checkRecordTypeMetadata(sfdxPackage: NamedPackageDir): string[] {
     const baseDir = path.join(sfdxPackage.fullPath, 'main', 'default');
 
     const recordTypeChecker = new RecordTypeChecker(baseDir);
-    recordTypeChecker.run();
+    return recordTypeChecker.run();
   }
 }
