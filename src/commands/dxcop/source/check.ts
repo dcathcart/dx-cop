@@ -39,18 +39,19 @@ export default class Check extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     const sfdxProject = await SfdxProject.resolve();
     const defaultPackage = sfdxProject.getDefaultPackage();
-    this.checkLwcMetadata(defaultPackage);
+
+    const result = this.checkLwcMetadata(defaultPackage);
     this.checkRecordTypeMetadata(defaultPackage);
 
     // Return an object to be displayed with --json
-    return { output: 'tbc' };
+    return result;
   }
 
-  public checkLwcMetadata(sfdxPackage: NamedPackageDir): void {
+  public checkLwcMetadata(sfdxPackage: NamedPackageDir): AnyJson {
     const lwcPath = path.join(sfdxPackage.fullPath, 'main', 'default', 'lwc');
 
     const lwcMetadataChecker = new LwcMetadataChecker();
-    lwcMetadataChecker.checkLwcFolder(lwcPath);
+    return lwcMetadataChecker.checkLwcFolder(lwcPath);
   }
 
   public checkRecordTypeMetadata(sfdxPackage: NamedPackageDir): void {
