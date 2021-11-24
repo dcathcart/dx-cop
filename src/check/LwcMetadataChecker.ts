@@ -1,13 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { AnyJson } from '@salesforce/ts-types';
 
 export class LwcMetadataChecker {
   // Checks over all of the lightning web components in a given lwc folder (full path expected).
   // Right now the only check performed is for trailing whitespace. Any trailing whitespace in a .js-meta.xml file
   // can, for reasons unknown, cause even more whitespace to be added _between_ lines during a Salesforce deployment
   // (which can result in noisy diffs later when the lwc is retrieved). Best to avoid in the first place.
-  public checkLwcFolder(lwcFolder: string): AnyJson {
+  public checkLwcFolder(lwcFolder: string): string[] {
     const lwcs = fs.readdirSync(lwcFolder).filter((entry) => entry !== 'jsconfig.json');
     const warnings: string[] = [];
 
@@ -16,7 +15,7 @@ export class LwcMetadataChecker {
       warnings.push(...this.checkJsMetaFile(jsMetaFileName));
     });
 
-    return { warnings };
+    return warnings;
   }
 
   // Check a single .js-meta.xml file (full path expected).
