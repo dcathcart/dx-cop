@@ -16,7 +16,9 @@ export class RecordTypePicklistValueChecker {
 
   public constructor(baseDir: string) {
     this.baseDir = baseDir;
-    this.xmlParser = new XMLParser();
+
+    // Don't trim whitespace from values. Added to handle picklist values that end with non-breaking spaces (yes, really)
+    this.xmlParser = new XMLParser({ trimValues: false });
   }
 
   public checkAllPicklistValuesInRecordType(objectName: string, recordTypeName: string): string[] {
@@ -42,14 +44,14 @@ export class RecordTypePicklistValueChecker {
     // every picklist value referenced in the record type needs to be a valid value from the object's picklist definition
     const dodgyValues: string[] = valuesInRecordType.filter((v) => !valuesFromObject.includes(v));
 
-    return dodgyValues.map((value) => errorMessage(objectName, recordTypeName, picklistName, value));
+    return dodgyValues.map((v) => errorMessage(objectName, recordTypeName, picklistName, v));
   }
 
   public picklistValuesFromObject(picklistName: string, objectName: string): string[] {
     const fieldMetadata: any = this.parseFieldMetadata(objectName, picklistName);
     const valueSet: any = fieldMetadata.CustomField.valueSet.valueSetDefinition;
 
-    const values: string[] = toArray(valueSet.value).map((v) => unescape(v.fullName));
+    const values: string[] = toArray(valueSet.value).map((v) => decodeURIComponent(v.fullName));
     return values;
   }
 
@@ -57,7 +59,10 @@ export class RecordTypePicklistValueChecker {
     const recordTypeMetadata: any = this.parseRecordTypeMetadata(objectName, recordTypeName);
     const picklistValues: any = recordTypeMetadata.RecordType.picklistValues.filter((v) => v.picklist == picklistName)[0];
 
-    const values: string[] = toArray(picklistValues.values).map((v) => unescape(v.fullName));
+    // Important to decodeURIComponent() on <fullName> values, which are represented differently between field & record type definitions.
+    // e.g. a ' ' (non-breaking space) is represented as ' ' in field definitions, but '%C2%A0' in record type definitions.
+    // decodeURIComponent() makes them consistent for comparison purposes.
+    const values: string[] = toArray(picklistValues.values).map((v) => decodeURIComponent(v.fullName));
     return values;
   }
 
