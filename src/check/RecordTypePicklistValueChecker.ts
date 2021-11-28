@@ -10,7 +10,6 @@ function toArray(values: any): any[] {
   return values instanceof Array ? values : [values];
 }
 
-
 export class RecordTypePicklistValueChecker {
   private baseDir: string;
   private xmlParser: XMLParser;
@@ -47,22 +46,16 @@ export class RecordTypePicklistValueChecker {
   }
 
   public picklistValuesFromObject(picklistName: string, objectName: string): string[] {
-    const picklistFileName: string = this.fieldFileName(objectName, picklistName);
-    const file: Buffer = fs.readFileSync(picklistFileName);
-
-    const parsedXml: any = this.xmlParser.parse(file);
-    const valueSet: any = parsedXml.CustomField.valueSet.valueSetDefinition;
+    const fieldMetadata: any = this.parseFieldMetadata(objectName, picklistName);
+    const valueSet: any = fieldMetadata.CustomField.valueSet.valueSetDefinition;
 
     const values: string[] = toArray(valueSet.value).map((v) => unescape(v.fullName));
     return values;
   }
 
   public picklistValuesInRecordType(picklistName: string, objectName: string, recordTypeName: string): string[] {
-    const recordTypeFileName: string = this.recordTypeFileName(objectName, recordTypeName);
-    const file: Buffer = fs.readFileSync(recordTypeFileName);
-
-    const parsedXml: any = this.xmlParser.parse(file);
-    const picklistValues: any = parsedXml.RecordType.picklistValues.filter((v) => v.picklist == picklistName)[0];
+    const recordTypeMetadata: any = this.parseRecordTypeMetadata(objectName, recordTypeName);
+    const picklistValues: any = recordTypeMetadata.RecordType.picklistValues.filter((v) => v.picklist == picklistName)[0];
 
     const values: string[] = toArray(picklistValues.values).map((v) => unescape(v.fullName));
     return values;
@@ -93,12 +86,20 @@ export class RecordTypePicklistValueChecker {
   }
 
   public picklistsInRecordType(objectName: string, recordTypeName: string): string[] {
-    const recordType: any = this.parseRecordType(objectName, recordTypeName);
+    const recordType: any = this.parseRecordTypeMetadata(objectName, recordTypeName);
     const picklists: string[] = recordType.RecordType.picklistValues.map((pv) => pv.picklist);
     return picklists;
   }
 
-  public parseRecordType(objectName: string, recordTypeName: string): any {
+  // TODO: Return an AnyJson
+  public parseFieldMetadata(objectName: string, fieldName: string): any {
+    const fileName: string = this.fieldFileName(objectName, fieldName);
+    const file: Buffer = fs.readFileSync(fileName);
+    return this.xmlParser.parse(file);
+  }
+
+  // TODO: Return an AnyJson
+  public parseRecordTypeMetadata(objectName: string, recordTypeName: string): any {
     const fileName: string = this.recordTypeFileName(objectName, recordTypeName);
     const file: Buffer = fs.readFileSync(fileName);
     return this.xmlParser.parse(file);
