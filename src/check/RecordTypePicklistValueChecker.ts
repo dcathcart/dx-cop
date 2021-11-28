@@ -21,6 +21,24 @@ export class RecordTypePicklistValueChecker {
     this.xmlParser = new XMLParser({ trimValues: false });
   }
 
+  public checkAllRecordTypesForObject(objectName: string): string[] {
+    const warnings: string[] = [];
+
+    const recordTypes: string[] = this.recordTypesForObject(objectName);
+    for (const recordType of recordTypes) {
+      warnings.push(...this.checkAllPicklistValuesInRecordType(objectName, recordType));
+    }
+
+    return warnings;
+  }
+
+  public recordTypesForObject(objectName: string): string[] {
+    const recordTypesDir = this.recordTypesDir(objectName);
+    const recordTypes = fs.existsSync(recordTypesDir) ? fs.readdirSync(recordTypesDir) : [];
+
+    return recordTypes.map((rt) => path.basename(rt, '.recordType-meta.xml'));
+  }
+
   public checkAllPicklistValuesInRecordType(objectName: string, recordTypeName: string): string[] {
     const warnings: string[] = [];
 
