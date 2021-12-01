@@ -11,6 +11,7 @@ function toArray(values: any): any[] {
 }
 
 export class RecordTypePicklistValueChecker {
+  private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
   private baseDir: string;
   private xmlParser: XMLParser;
 
@@ -24,7 +25,8 @@ export class RecordTypePicklistValueChecker {
   public checkRecordTypesForAllObjects(): string[] {
     const warnings: string[] = [];
 
-    for (const objName of this.listObjects()) {
+    const objectsToCheck = this.listObjects().filter((o) => !this.IGNORE_OBJECTS.includes(o));
+    for (const objName of objectsToCheck) {
       console.log(`${objName} object`);
       warnings.push(...this.checkAllRecordTypesForObject(objName));
     }
@@ -85,13 +87,17 @@ export class RecordTypePicklistValueChecker {
     const fieldMetadata: any = this.parseFieldMetadata(objectName, picklistName);
     const valueSet: any = fieldMetadata.CustomField.valueSet.valueSetDefinition;
 
-    const values: string[] = toArray(valueSet.value).map((v) => decodeURIComponent(v.fullName));
+    const values: string[] = toArray(valueSet.value).map((v) => v.fullName);
     return values;
   }
 
   public picklistValuesInRecordType(picklistName: string, objectName: string, recordTypeName: string): string[] {
     const recordTypeMetadata: any = this.parseRecordTypeMetadata(objectName, recordTypeName);
-    const picklistValues: any = recordTypeMetadata.RecordType.picklistValues.filter((v) => v.picklist == picklistName)[0];
+    const picklistValuesArray: any = recordTypeMetadata.RecordType.picklistValues;
+    if (picklistValuesArray === undefined) {
+      return [];
+    }
+    const picklistValues: any = toArray(picklistValuesArray).filter((v) => v.picklist == picklistName)[0];
 
     // Important to decodeURIComponent() on <fullName> values, which are represented differently between field & record type definitions.
     // e.g. a ' ' (non-breaking space) is represented as ' ' in field definitions, but '%C2%A0' in record type definitions.
@@ -126,7 +132,11 @@ export class RecordTypePicklistValueChecker {
 
   public picklistsInRecordType(objectName: string, recordTypeName: string): string[] {
     const recordType: any = this.parseRecordTypeMetadata(objectName, recordTypeName);
-    const picklists: string[] = recordType.RecordType.picklistValues.map((pv) => pv.picklist);
+    const picklistValuesArray: any = recordType.RecordType.picklistValues;
+    if (picklistValuesArray === undefined) {
+      return [];
+    }
+    const picklists: string[] = toArray(picklistValuesArray).map((pv) => pv.picklist);
     return picklists;
   }
 
