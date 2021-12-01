@@ -12,6 +12,8 @@ function toArray(values: any): any[] {
 
 export class RecordTypePicklistValueChecker {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
+  private IGNORE_PICKLISTS = ['ForecastCategoryName'];
+
   private baseDir: string;
   private xmlParser: XMLParser;
 
@@ -60,8 +62,9 @@ export class RecordTypePicklistValueChecker {
   public checkAllPicklistValuesInRecordType(objectName: string, recordTypeName: string): string[] {
     const warnings: string[] = [];
 
-    const picklists: string[] = this.picklistsInRecordType(objectName, recordTypeName);
-    for (const picklist of picklists) {
+    const picklistsInRecordType: string[] = this.picklistsInRecordType(objectName, recordTypeName);
+    const picklistsToCheck: string[] = picklistsInRecordType.filter((p) => !this.IGNORE_PICKLISTS.includes(p));
+    for (const picklist of picklistsToCheck) {
       warnings.push(...this.checkPicklistValuesInRecordType(picklist, objectName, recordTypeName));
     }
 
