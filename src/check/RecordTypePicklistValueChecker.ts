@@ -95,7 +95,8 @@ export class RecordTypePicklistValueChecker {
     const fieldMetadata: any = this.parseFieldMetadata(objectName, picklistName);
     const valueSet: any = fieldMetadata.CustomField.valueSet.valueSetDefinition;
 
-    const values: string[] = toArray(valueSet.value).map((v) => this.decodeObjectPicklistValue(v.fullName.toString()));
+    const activeValues: any = toArray(valueSet.value).filter((v) => v.isActive !== false);
+    const values: string[] = activeValues.map((v) => this.decodeObjectPicklistValue(v.fullName.toString()));
     return values;
   }
 
