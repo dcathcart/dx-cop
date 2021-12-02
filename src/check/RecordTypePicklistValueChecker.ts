@@ -78,8 +78,10 @@ export class RecordTypePicklistValueChecker {
       return [];
     }
 
-    const valuesFromObject: string[] = this.picklistValuesFromObject(picklistName, objectName);
-    const valuesInRecordType: string[] = this.picklistValuesInRecordType(picklistName, objectName, recordTypeName);
+    const valuesFromObject = this.picklistValuesFromObject(picklistName, objectName).map((v) => v.toLowerCase());
+    const valuesInRecordType: string[] = this.picklistValuesInRecordType(picklistName, objectName, recordTypeName).map(
+      (v) => v.toLowerCase()
+    );
 
     // every picklist value referenced in the record type needs to be a valid value from the object's picklist definition
     const dodgyValues: string[] = valuesInRecordType.filter((v) => !valuesFromObject.includes(v));
@@ -93,8 +95,12 @@ export class RecordTypePicklistValueChecker {
 
     // HTML decoding <fullName> values because that's how Salesforce encodes them in picklist field definitions.
     // e.g. '&' is stored as '&amp;'. Note this is different from how they are encoded in record types.
-    const values: string[] = toArray(valueSet.value).map((v) => decode(v.fullName.toString()));
+    const values: string[] = toArray(valueSet.value).map((v) => this.decodeObjectPicklistValue(v.fullName.toString()));
     return values;
+  }
+
+  public decodeObjectPicklistValue(value: string): string {
+    return decode(value);
   }
 
   public picklistValuesInRecordType(picklistName: string, objectName: string, recordTypeName: string): string[] {
@@ -108,8 +114,14 @@ export class RecordTypePicklistValueChecker {
     // Important to decodeURIComponent() on <fullName> values, which are represented differently between field & record type definitions.
     // e.g. a ' ' (non-breaking space) is represented as ' ' in field definitions, but '%C2%A0' in record type definitions.
     // decodeURIComponent() makes them consistent for comparison purposes.
-    const values: string[] = toArray(picklistValues.values).map((v) => decodeURIComponent(v.fullName.toString()));
+    const values: string[] = toArray(picklistValues.values).map((v) =>
+      this.decodeRecordTypePicklistValue(v.fullName.toString())
+    );
     return values;
+  }
+
+  public decodeRecordTypePicklistValue(value: string): string {
+    return decodeURIComponent(value);
   }
 
   public objectsDir(): string {
