@@ -78,13 +78,15 @@ export class RecordTypePicklistValueChecker {
       return [];
     }
 
-    const valuesFromObject = this.picklistValuesFromObject(picklistName, objectName).map((v) => v.toLowerCase());
-    const valuesInRecordType: string[] = this.picklistValuesInRecordType(picklistName, objectName, recordTypeName).map(
-      (v) => v.toLowerCase()
-    );
+    const lowerCasedValuesFromObject = this.picklistValuesFromObject(picklistName, objectName).map((v) => v.toLowerCase());
+    const valuesInRecordType: string[] = this.picklistValuesInRecordType(picklistName, objectName, recordTypeName);
 
-    // every picklist value referenced in the record type needs to be a valid value from the object's picklist definition
-    const dodgyValues: string[] = valuesInRecordType.filter((v) => !valuesFromObject.includes(v));
+    // Every picklist value referenced in the record type needs to be a valid value from the object's picklist definition.
+    // Lower-case the values for comparison purposes, to filter out any noise from differences in casing.
+    // (Salesforce allows case differences, so we should too)
+    const dodgyValues: string[] = valuesInRecordType.filter(
+      (v) => !lowerCasedValuesFromObject.includes(v.toLowerCase())
+    );
 
     return dodgyValues.map((v) => errorMessage(objectName, recordTypeName, picklistName, v));
   }
@@ -93,13 +95,13 @@ export class RecordTypePicklistValueChecker {
     const fieldMetadata: any = this.parseFieldMetadata(objectName, picklistName);
     const valueSet: any = fieldMetadata.CustomField.valueSet.valueSetDefinition;
 
-    // HTML decoding <fullName> values because that's how Salesforce encodes them in picklist field definitions.
-    // e.g. '&' is stored as '&amp;'. Note this is different from how they are encoded in record types.
     const values: string[] = toArray(valueSet.value).map((v) => this.decodeObjectPicklistValue(v.fullName.toString()));
     return values;
   }
 
   public decodeObjectPicklistValue(value: string): string {
+    // HTML decode <fullName> values because that's how Salesforce encodes them in picklist field definitions.
+    // e.g. '&' is stored as '&amp;'. Note this is different from how they are encoded in record types.
     return decode(value);
   }
 
@@ -111,9 +113,6 @@ export class RecordTypePicklistValueChecker {
     }
     const picklistValues: any = toArray(picklistValuesArray).filter((v) => v.picklist == picklistName)[0];
 
-    // Important to decodeURIComponent() on <fullName> values, which are represented differently between field & record type definitions.
-    // e.g. a ' ' (non-breaking space) is represented as ' ' in field definitions, but '%C2%A0' in record type definitions.
-    // decodeURIComponent() makes them consistent for comparison purposes.
     const values: string[] = toArray(picklistValues.values).map((v) =>
       this.decodeRecordTypePicklistValue(v.fullName.toString())
     );
@@ -121,6 +120,9 @@ export class RecordTypePicklistValueChecker {
   }
 
   public decodeRecordTypePicklistValue(value: string): string {
+    // Picklist values (<fullName> element), are "URL-encoded" in record type definitions (note this is different from field definitions).
+    // e.g. a ' ' (non-breaking space) is represented as ' ' in field definitions, but '%C2%A0' in record type definitions.
+    // decodeURIComponent() makes them consistent for comparison purposes.
     return decodeURIComponent(value);
   }
 
