@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { XMLParser } from 'fast-xml-parser/src/fxp';
+import { decode } from 'html-entities';
 
 function errorMessage(objectName: string, recordTypeName: string, picklistName: string, picklistValue: string): string {
   return `Invalid value '${picklistValue}' found for picklist ${picklistName} in ${objectName}.${recordTypeName} record type`;
@@ -90,7 +91,9 @@ export class RecordTypePicklistValueChecker {
     const fieldMetadata: any = this.parseFieldMetadata(objectName, picklistName);
     const valueSet: any = fieldMetadata.CustomField.valueSet.valueSetDefinition;
 
-    const values: string[] = toArray(valueSet.value).map((v) => v.fullName);
+    // HTML decoding <fullName> values because that's how Salesforce encodes them in picklist field definitions.
+    // e.g. '&' is stored as '&amp;'. Note this is different from how they are encoded in record types.
+    const values: string[] = toArray(valueSet.value).map((v) => decode(v.fullName.toString()));
     return values;
   }
 
@@ -105,7 +108,7 @@ export class RecordTypePicklistValueChecker {
     // Important to decodeURIComponent() on <fullName> values, which are represented differently between field & record type definitions.
     // e.g. a ' ' (non-breaking space) is represented as ' ' in field definitions, but '%C2%A0' in record type definitions.
     // decodeURIComponent() makes them consistent for comparison purposes.
-    const values: string[] = toArray(picklistValues.values).map((v) => decodeURIComponent(v.fullName));
+    const values: string[] = toArray(picklistValues.values).map((v) => decodeURIComponent(v.fullName.toString()));
     return values;
   }
 
