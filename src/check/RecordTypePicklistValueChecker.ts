@@ -16,10 +16,12 @@ export class RecordTypePicklistValueChecker {
   private IGNORE_PICKLISTS = ['ForecastCategoryName'];
 
   private baseDir: string;
+  private metadataCache: Map<string, any>;
   private xmlParser: XMLParser;
 
   public constructor(baseDir: string) {
     this.baseDir = baseDir;
+    this.metadataCache = new Map();
 
     // Don't trim whitespace from values. Added to handle picklist values that end with non-breaking spaces (yes, really)
     this.xmlParser = new XMLParser({ trimValues: false });
@@ -172,8 +174,14 @@ export class RecordTypePicklistValueChecker {
   }
 
   public parseMetadataFile(fileName: string): any {
-    const file: Buffer = fs.readFileSync(fileName);
-    return this.xmlParser.parse(file);
+    if (this.metadataCache.has(fileName)) {
+      return this.metadataCache.get(fileName);
+    } else {
+      const file: Buffer = fs.readFileSync(fileName);
+      const parsedMetadata = this.xmlParser.parse(file);
+      this.metadataCache.set(fileName, parsedMetadata);
+      return parsedMetadata;
+    }
   }
 
   // TODO: rewrite to used parsed XML
