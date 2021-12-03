@@ -163,14 +163,15 @@ export class RecordTypePicklistValueChecker {
 
   // TODO: Return an AnyJson
   public parseFieldMetadata(objectName: string, fieldName: string): any {
-    const fileName: string = this.fieldFileName(objectName, fieldName);
-    const file: Buffer = fs.readFileSync(fileName);
-    return this.xmlParser.parse(file);
+    return this.parseMetadataFile(this.fieldFileName(objectName, fieldName));
   }
 
   // TODO: Return an AnyJson
   public parseRecordTypeMetadata(objectName: string, recordTypeName: string): any {
-    const fileName: string = this.recordTypeFileName(objectName, recordTypeName);
+    return this.parseMetadataFile(this.recordTypeFileName(objectName, recordTypeName));
+  }
+
+  public parseMetadataFile(fileName: string): any {
     const file: Buffer = fs.readFileSync(fileName);
     return this.xmlParser.parse(file);
   }
