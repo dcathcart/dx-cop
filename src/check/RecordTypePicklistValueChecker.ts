@@ -27,13 +27,17 @@ export class RecordTypePicklistValueChecker {
     this.xmlParser = new XMLParser({ trimValues: false });
   }
 
+  // Run the record type picklist value checks. Returns an array of warning messages.
+  public run(): string[] {
+    return this.checkRecordTypesForAllObjects();
+  }
+
   public checkRecordTypesForAllObjects(): string[] {
     const warnings: string[] = [];
 
     const objectsToCheck = this.listObjects().filter((o) => !this.IGNORE_OBJECTS.includes(o));
-    for (const objName of objectsToCheck) {
-      console.log(`${objName} object`);
-      warnings.push(...this.checkAllRecordTypesForObject(objName));
+    for (const objectName of objectsToCheck) {
+      warnings.push(...this.checkAllRecordTypesForObject(objectName));
     }
 
     return warnings;
@@ -48,7 +52,6 @@ export class RecordTypePicklistValueChecker {
 
     const recordTypes: string[] = this.recordTypesForObject(objectName);
     for (const recordType of recordTypes) {
-      console.log(`- ${recordType} record type`);
       warnings.push(...this.checkAllPicklistValuesInRecordType(objectName, recordType));
     }
 

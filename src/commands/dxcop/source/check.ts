@@ -6,6 +6,7 @@ import { AnyJson } from '@salesforce/ts-types';
 
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 import { RecordTypeChecker } from '../../../check/RecordTypeChecker';
+import { RecordTypePicklistValueChecker } from '../../../check/RecordTypePicklistValueChecker';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -42,8 +43,9 @@ export default class Check extends SfdxCommand {
 
     const lwcWarnings = this.checkLwcMetadata(defaultPackage);
     const rtWarnings = this.checkRecordTypeMetadata(defaultPackage);
+    const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(defaultPackage);
 
-    const warnings = lwcWarnings.concat(rtWarnings);
+    const warnings = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings);
 
     // Return an object to be displayed with --json
     return { warnings };
@@ -51,15 +53,19 @@ export default class Check extends SfdxCommand {
 
   public checkLwcMetadata(sfdxPackage: NamedPackageDir): string[] {
     const lwcPath = path.join(sfdxPackage.fullPath, 'main', 'default', 'lwc');
-
     const lwcMetadataChecker = new LwcMetadataChecker();
     return lwcMetadataChecker.checkLwcFolder(lwcPath);
   }
 
   public checkRecordTypeMetadata(sfdxPackage: NamedPackageDir): string[] {
     const baseDir = path.join(sfdxPackage.fullPath, 'main', 'default');
-
     const recordTypeChecker = new RecordTypeChecker(baseDir);
     return recordTypeChecker.run();
+  }
+
+  public checkRecordTypePicklistMetadata(sfdxPackage: NamedPackageDir): string[] {
+    const baseDir = path.join(sfdxPackage.fullPath, 'main', 'default');
+    const recordTypePicklistChecker = new RecordTypePicklistValueChecker(baseDir);
+    return recordTypePicklistChecker.run();
   }
 }
