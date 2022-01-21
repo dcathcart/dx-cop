@@ -33,12 +33,14 @@ export class LwcMetadataChecker {
   public fileHasTrailingWhitespace(filename: string): boolean {
     const file = fs.readFileSync(filename);
     const fileContents = file.toString();
-    const lines = fileContents.split('\r\n');
+    const lines = fileContents.split(/\r\n|\n|\r/); // handle DOS|Unix|old Mac line endings
     const result = lines.some((line) => this.hasTrailingWhitespace(line));
     return result;
   }
 
   public hasTrailingWhitespace(input: string): boolean {
-    return input !== input.trimRight();
+    // Only consider a string to have 'trailing' whitespace if it also contains other, non-whitespace text.
+    // Empty strings or strings that contain only whitespace will return false.
+    return input.trim() !== '' && input !== input.trimEnd();
   }
 }
