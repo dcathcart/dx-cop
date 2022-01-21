@@ -39,8 +39,6 @@ export class LwcMetadataChecker {
   }
 
   public hasTrailingWhitespace(input: string): boolean {
-    // Only consider a string to have 'trailing' whitespace if it also contains other, non-whitespace text.
-    // Empty strings or strings that contain only whitespace will return false.
-    return input.trim() !== '' && input !== input.trimEnd();
+    return input !== input.trimEnd();
   }
 }
