@@ -46,8 +46,8 @@ export default class Check extends SfdxCommand {
     const rtWarnings = this.checkRecordTypeMetadata(defaultPackage);
     const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(defaultPackage);
 
-    const metadataProblems = lwcWarnings;
-    const warnings = rtWarnings.concat(rtPicklistWarnings);
+    const metadataProblems = lwcWarnings.concat(rtWarnings);
+    const warnings = rtPicklistWarnings;
 
     // Return an object to be displayed with --json
     return { problems: metadataProblems.map((p) => p.toJSON()), warnings };
