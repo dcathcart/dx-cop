@@ -5,6 +5,7 @@ import { Messages, NamedPackageDir, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
+import { MetadataProblem } from '../../../check/MetadataProblem';
 import { RecordTypeChecker } from '../../../check/RecordTypeChecker';
 import { RecordTypePicklistValueChecker } from '../../../check/RecordTypePicklistValueChecker';
 
@@ -45,13 +46,14 @@ export default class Check extends SfdxCommand {
     const rtWarnings = this.checkRecordTypeMetadata(defaultPackage);
     const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(defaultPackage);
 
-    const warnings = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings);
+    const metadataProblems = lwcWarnings;
+    const warnings = rtWarnings.concat(rtPicklistWarnings);
 
     // Return an object to be displayed with --json
-    return { warnings };
+    return { problems: metadataProblems.map((p) => p.toJSON()), warnings };
   }
 
-  public checkLwcMetadata(sfdxPackage: NamedPackageDir): string[] {
+  public checkLwcMetadata(sfdxPackage: NamedPackageDir): MetadataProblem[] {
     const lwcPath = path.join(sfdxPackage.fullPath, 'main', 'default', 'lwc');
     const lwcMetadataChecker = new LwcMetadataChecker();
     return lwcMetadataChecker.checkLwcFolder(lwcPath);
