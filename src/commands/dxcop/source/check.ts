@@ -46,11 +46,10 @@ export default class Check extends SfdxCommand {
     const rtWarnings = this.checkRecordTypeMetadata(defaultPackage);
     const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(defaultPackage);
 
-    const metadataProblems = lwcWarnings.concat(rtWarnings);
-    const warnings = rtPicklistWarnings;
+    const metadataProblems = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings);
 
     // Return an object to be displayed with --json
-    return { problems: metadataProblems.map((p) => p.toJSON()), warnings };
+    return { problems: metadataProblems.map((p) => p.toJSON()) };
   }
 
   public checkLwcMetadata(sfdxPackage: NamedPackageDir): MetadataProblem[] {
@@ -59,13 +58,13 @@ export default class Check extends SfdxCommand {
     return lwcMetadataChecker.checkLwcFolder(lwcPath);
   }
 
-  public checkRecordTypeMetadata(sfdxPackage: NamedPackageDir): string[] {
+  public checkRecordTypeMetadata(sfdxPackage: NamedPackageDir): MetadataProblem[] {
     const baseDir = path.join(sfdxPackage.fullPath, 'main', 'default');
     const recordTypeChecker = new RecordTypeChecker(baseDir);
     return recordTypeChecker.run();
   }
 
-  public checkRecordTypePicklistMetadata(sfdxPackage: NamedPackageDir): string[] {
+  public checkRecordTypePicklistMetadata(sfdxPackage: NamedPackageDir): MetadataProblem[] {
     const baseDir = path.join(sfdxPackage.fullPath, 'main', 'default');
     const recordTypePicklistChecker = new RecordTypePicklistValueChecker(baseDir);
     return recordTypePicklistChecker.run();
