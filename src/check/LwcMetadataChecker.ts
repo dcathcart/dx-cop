@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { MetadataProblem } from './MetadataProblem';
+import { MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class LwcMetadataChecker {
   // Checks over all of the lightning web components in a given lwc folder (full path expected).
@@ -28,7 +28,7 @@ export class LwcMetadataChecker {
 
     if (this.fileHasTrailingWhitespace(jsMetaFilename)) {
       warnings.push(
-        new MetadataProblem(jsMetaFilename, 'Whitespace characters detected at the end of one or more lines.')
+        new MetadataWarning(jsMetaFilename, 'Whitespace characters detected at the end of one or more lines.')
       );
     }
 

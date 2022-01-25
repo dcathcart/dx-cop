@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { MetadataProblem } from './MetadataProblem';
+import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class RecordTypeChecker {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
@@ -78,14 +78,14 @@ export class RecordTypeChecker {
     const missingPicklists = requiredPicklists.filter((p) => !recordTypePicklists.includes(p));
     if (missingPicklists.length > 0) {
       const message = `Record type ${objectName}.${recordTypeName} is missing picklist(s): ${missingPicklists.toString()}`;
-      warnings.push(new MetadataProblem(recordTypeFileName, message));
+      warnings.push(new MetadataWarning(recordTypeFileName, message));
     }
 
     const expectedPicklists = requiredPicklists.concat(optionalPicklists).concat(this.BONUS_EXPECTED_PICKLISTS);
     const unexpectedPicklists = recordTypePicklists.filter((p) => !expectedPicklists.includes(p));
     if (unexpectedPicklists.length > 0) {
       const message = `Record type ${objectName}.${recordTypeName} contains unexpected picklist(s): ${unexpectedPicklists.toString()}`;
-      warnings.push(new MetadataProblem(recordTypeFileName, message));
+      warnings.push(new MetadataError(recordTypeFileName, message));
     }
 
     return warnings;

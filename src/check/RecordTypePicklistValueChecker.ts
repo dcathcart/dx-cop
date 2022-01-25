@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { XMLParser } from 'fast-xml-parser/src/fxp';
 import { decode } from 'html-entities';
-import { MetadataProblem } from './MetadataProblem';
+import { MetadataError, MetadataProblem } from './MetadataProblem';
 
 function toArray(values: any): any[] {
   return values instanceof Array ? values : [values];
@@ -88,18 +88,18 @@ export class RecordTypePicklistValueChecker {
     // (Salesforce allows case differences, so we should too)
     const dodgyValues: string[] = valuesInRecordType.filter((v) => !lcValuesFromObject.includes(v.toLowerCase()));
 
-    return dodgyValues.map((v) => this.metadataProblem(objectName, recordTypeName, picklistName, v));
+    return dodgyValues.map((v) => this.metadataError(objectName, recordTypeName, picklistName, v));
   }
 
-  public metadataProblem(
+  public metadataError(
     objectName: string,
     recordTypeName: string,
     picklistName: string,
     picklistValue: string
-  ): MetadataProblem {
+  ): MetadataError {
     const fileName = this.recordTypeFileName(objectName, recordTypeName);
-    const message = `Invalid value '${picklistValue}' found for picklist ${picklistName} in ${objectName}.${recordTypeName} record type`;
-    return new MetadataProblem(fileName, message);
+    const message = `Invalid value '${picklistValue}' in picklist ${picklistName}`;
+    return new MetadataError(fileName, message);
   }
 
   public picklistValuesFromObject(picklistName: string, objectName: string): string[] {
