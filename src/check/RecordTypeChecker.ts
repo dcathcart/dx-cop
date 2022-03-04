@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { RecordType } from '../metadata-browser/RecordType';
 
 export class RecordTypeChecker {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
@@ -127,10 +128,7 @@ export class RecordTypeChecker {
 
   public recordTypePicklistNames(objectName: string, recordTypeName: string): string[] {
     const pathToFile = path.join(this.objectsDir(), objectName, 'recordTypes', recordTypeName + '.recordType-meta.xml');
-    const fileContents = fs.readFileSync(pathToFile).toString();
-    const regexp = /<picklist>(.*)<\/picklist>/g;
-    const matches = fileContents.matchAll(regexp);
-
-    return Array.from(matches, (match) => match[1]);
+    const recordType = new RecordType(pathToFile);
+    return recordType.picklistFieldNames();
   }
 }

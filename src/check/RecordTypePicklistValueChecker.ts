@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { XMLParser } from 'fast-xml-parser/src/fxp';
 import { decode } from 'html-entities';
+import { RecordType } from '../metadata-browser/RecordType';
 
 function errorMessage(objectName: string, recordTypeName: string, picklistName: string, picklistValue: string): string {
   return `Invalid value '${picklistValue}' found for picklist ${picklistName} in ${objectName}.${recordTypeName} record type`;
@@ -157,13 +158,8 @@ export class RecordTypePicklistValueChecker {
   }
 
   public picklistsInRecordType(objectName: string, recordTypeName: string): string[] {
-    const recordType: any = this.parseRecordTypeMetadata(objectName, recordTypeName);
-    const picklistValuesArray: any = recordType.RecordType.picklistValues;
-    if (picklistValuesArray === undefined) {
-      return [];
-    }
-    const picklists: string[] = toArray(picklistValuesArray).map((pv) => pv.picklist);
-    return picklists;
+    const recordType = new RecordType(this.recordTypeFileName(objectName, recordTypeName));
+    return recordType.picklistFieldNames();
   }
 
   // TODO: Return an AnyJson
