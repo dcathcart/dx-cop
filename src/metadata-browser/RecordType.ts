@@ -106,15 +106,34 @@ export class RecordType extends MetadataComponent {
     if (hasJsonArray(picklistValuesElement, 'values')) {
       // multiple <values> elements
       const valuesArray: JsonArray = getJsonArray(picklistValuesElement, 'values');
-      return valuesArray.map((v) => getString(v, 'fullName'));
+      return valuesArray.map((v) => this.extractValue(v));
     } else if (hasJsonMap(picklistValuesElement, 'values')) {
       // single <values> element
       const valueMap: JsonMap = getJsonMap(picklistValuesElement, 'values');
-      const value: string = getString(valueMap, 'fullName');
+      const value: string = this.extractValue(valueMap);
       return [value];
     } else {
       // no <values> elements
       return [];
     }
+  }
+
+  // Converts the actual picklist value from a picklist value element, i.e. this:
+  // ...
+  // <values>
+  //   <fullName>ABC</fullName>
+  //   <default>false</default>
+  // </values>
+  // ...
+  // to this: 'ABC'
+  // Also decodes special characters into the representation users would see in Salesforce.
+  private extractValue(valueMap: AnyJson): string {
+    const value: string = getString(valueMap, 'fullName');
+
+    // Picklist values (<fullName> element), are "URL-encoded" in record type definitions (note this is different from field definitions).
+    // eslint-disable-next-line no-irregular-whitespace
+    // e.g. a ' ' (non-breaking space) is represented as ' ' in field definitions, but '%C2%A0' in record type definitions.
+    // decodeURIComponent() makes them consistent for comparison purposes.
+    return decodeURIComponent(value);
   }
 }
