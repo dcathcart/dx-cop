@@ -1,4 +1,12 @@
-import { hasJsonArray, getJsonArray, getJsonMap, getString, JsonArray, JsonMap } from '@salesforce/ts-types';
+import {
+  getJsonArray,
+  getJsonMap,
+  getString,
+  hasJsonArray,
+  hasJsonMap,
+  JsonArray,
+  JsonMap,
+} from '@salesforce/ts-types';
 import { MetadataComponent } from './MetadataComponent';
 
 export class RecordType extends MetadataComponent {
@@ -14,12 +22,19 @@ export class RecordType extends MetadataComponent {
   public picklistFieldNames(): string[] {
     const recordTypeElement: JsonMap = getJsonMap(this.metadata(), 'RecordType');
 
-    if (!hasJsonArray(recordTypeElement, 'picklistValues')) {
+    if (hasJsonArray(recordTypeElement, 'picklistValues')) {
+      // multiple <picklistValues> elements
+      const picklistValuesArray: JsonArray = getJsonArray(recordTypeElement, 'picklistValues');
+      const picklists: string[] = picklistValuesArray.map((p) => getString(p, 'picklist'));
+      return picklists;
+    } else if (hasJsonMap(recordTypeElement, 'picklistValues')) {
+      // single <picklistValues> element
+      const picklistValuesMap: JsonMap = getJsonMap(recordTypeElement, 'picklistValues');
+      const picklist: string = getString(picklistValuesMap, 'picklist');
+      return [picklist];
+    } else {
+      // no <picklistValues> elements
       return [];
     }
-
-    const picklistValuesArray: JsonArray = getJsonArray(recordTypeElement, 'picklistValues');
-    const picklists: string[] = picklistValuesArray.map((p) => getString(p, 'picklist'));
-    return picklists;
   }
 }
