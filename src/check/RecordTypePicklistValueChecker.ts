@@ -69,23 +69,34 @@ export class RecordTypePicklistValueChecker {
   public checkAllPicklistValuesInRecordType(objectName: string, recordTypeName: string): string[] {
     const warnings: string[] = [];
 
-    const picklistsInRecordType: string[] = this.picklistsInRecordType(objectName, recordTypeName);
-    const picklistsToCheck: string[] = picklistsInRecordType.filter((p) => !this.IGNORE_PICKLISTS.includes(p));
-    for (const picklist of picklistsToCheck) {
-      warnings.push(...this.checkPicklistValuesInRecordType(picklist, objectName, recordTypeName));
+    const recordTypeFileName = this.recordTypeFileName(objectName, recordTypeName);
+    const recordType = new RecordType(recordTypeFileName);
+    const picklistMap = recordType.picklistValues();
+
+    for (const picklistName of picklistMap.keys()) {
+      if (this.IGNORE_PICKLISTS.includes(picklistName)) continue;
+
+      warnings.push(
+        ...this.checkPicklistValuesInRecordType(objectName, recordTypeName, picklistName, picklistMap.get(picklistName))
+      );
     }
 
     return warnings;
   }
 
-  public checkPicklistValuesInRecordType(picklistName: string, objectName: string, recordTypeName: string): string[] {
+  public checkPicklistValuesInRecordType(
+    objectName: string,
+    recordTypeName: string,
+    picklistName: string,
+    valuesInRecordType: string[]
+  ): string[] {
     // standard value sets not supported for now
     if (!this.hasValueSet(objectName, picklistName)) {
       return [];
     }
 
-    const lowerCasedValuesFromObject = this.picklistValuesFromObject(picklistName, objectName).map((v) => v.toLowerCase());
-    const valuesInRecordType: string[] = this.picklistValuesInRecordType(picklistName, objectName, recordTypeName);
+    const valuesFromObject = this.picklistValuesFromObject(picklistName, objectName);
+    const lowerCasedValuesFromObject = valuesFromObject.map((v) => v.toLowerCase());
 
     // Every picklist value referenced in the record type needs to be a valid value from the object's picklist definition.
     // Lower-case the values for comparison purposes, to filter out any noise from differences in casing.
@@ -112,27 +123,6 @@ export class RecordTypePicklistValueChecker {
     return decode(value);
   }
 
-  public picklistValuesInRecordType(picklistName: string, objectName: string, recordTypeName: string): string[] {
-    const recordTypeMetadata: any = this.parseRecordTypeMetadata(objectName, recordTypeName);
-    const picklistValuesArray: any = recordTypeMetadata.RecordType.picklistValues;
-    if (picklistValuesArray === undefined) {
-      return [];
-    }
-    const picklistValues: any = toArray(picklistValuesArray).filter((v) => v.picklist == picklistName)[0];
-
-    const values: string[] = toArray(picklistValues.values).map((v) =>
-      this.decodeRecordTypePicklistValue(v.fullName.toString())
-    );
-    return values;
-  }
-
-  public decodeRecordTypePicklistValue(value: string): string {
-    // Picklist values (<fullName> element), are "URL-encoded" in record type definitions (note this is different from field definitions).
-    // e.g. a ' ' (non-breaking space) is represented as ' ' in field definitions, but '%C2%A0' in record type definitions.
-    // decodeURIComponent() makes them consistent for comparison purposes.
-    return decodeURIComponent(value);
-  }
-
   public objectsDir(): string {
     return path.join(this.baseDir, 'objects');
   }
@@ -155,11 +145,6 @@ export class RecordTypePicklistValueChecker {
 
   public recordTypeFileName(objectName: string, recordTypeName: string): string {
     return path.join(this.recordTypesDir(objectName), recordTypeName + '.recordType-meta.xml');
-  }
-
-  public picklistsInRecordType(objectName: string, recordTypeName: string): string[] {
-    const recordType = new RecordType(this.recordTypeFileName(objectName, recordTypeName));
-    return recordType.picklistFieldNames();
   }
 
   // TODO: Return an AnyJson
