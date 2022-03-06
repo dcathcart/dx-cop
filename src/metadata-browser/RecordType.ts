@@ -1,5 +1,6 @@
 import {
   AnyJson,
+  get,
   getJsonArray,
   getJsonMap,
   getString,
@@ -128,7 +129,10 @@ export class RecordType extends MetadataComponent {
   // to this: 'ABC'
   // Also decodes special characters into the representation users would see in Salesforce.
   private extractValue(valueMap: AnyJson): string {
-    const value: string = getString(valueMap, 'fullName');
+    // Use get() deliberately here instead of getString(), which returns undefined if the value is a number.
+    // We always want to treat picklist values as strings, hence the .toString()
+    // Related: XML parser has specific config to preserve leading zeros. See MetadataComponent.ts
+    const value = get(valueMap, 'fullName').toString();
 
     // Picklist values (<fullName> element), are "URL-encoded" in record type definitions (note this is different from field definitions).
     // eslint-disable-next-line no-irregular-whitespace

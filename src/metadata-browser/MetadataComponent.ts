@@ -17,8 +17,12 @@ export class MetadataComponent {
   }
 
   private parseMetadata(): JsonMap {
-    // Don't trim whitespace from values. Added to handle picklist values that end with non-breaking spaces (yes, really)
-    const xmlParser: XMLParser = new XMLParser({ trimValues: false });
+    // Don't trim whitespace from values. Added to handle picklist values that end with non-breaking spaces (yes, really).
+    // Treat values with leading zeros as strings. Same for hex values, although these are less relevant.
+    const xmlParser: XMLParser = new XMLParser({
+      trimValues: false,
+      numberParseOptions: { leadingZeros: false, hex: false },
+    });
 
     const file: Buffer = fs.readFileSync(this.metadataFileName);
     return ensureJsonMap(xmlParser.parse(file));
