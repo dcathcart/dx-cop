@@ -10,15 +10,21 @@ Integrate into your Salesforce CI jobs to keep your repo clean and find deployme
 
 ## Usage
 
+To install:
+
+`sfdx plugins:install dx-cop`
+
+To run, clone and cd into your Salesforce git repo, then
+
 `sfdx dxcop:source:check`
 
-Or, to format output as JSON:
+or to format output as JSON:
 
 `sfdx dxcop:source:check --json`
 
-There are no parameters yet; running the above command performs all known checks.
+There are no other parameters; running the above command performs all known checks.
 
-## Types of problems
+## Types of checks performed
 
 This plugin is new - please be kind! There are currently only a small number of checks, but the list is growing.
 
@@ -26,7 +32,7 @@ This plugin is new - please be kind! There are currently only a small number of 
 
 Examines record types & checks for picklist values that don't exist in the picklist field definitions. **Note**: currently does not check picklists that make use of standard value sets or global value sets.
 
-### Record types: picklist _names_
+### Record types: picklist names
 
 When you add a new picklist field to an object, Salesforce automatically adds a reference to that picklist to the metadata for every record type. This check ensures you remember to add the record type changes to git as well.
 
