@@ -13,7 +13,7 @@ export class LwcMetadataChecker {
 
     lwcs.forEach((entry) => {
       const jsMetaFileName = path.join(lwcFolder, entry, entry + '.js-meta.xml');
-      warnings.push(...this.checkJsMetaFile(jsMetaFileName));
+      warnings.push(...this.checkJsMetaFile(entry, jsMetaFileName));
     });
 
     return warnings;
@@ -23,12 +23,17 @@ export class LwcMetadataChecker {
   // Returns an array of warnings about the file.
   // (okay, so right now there will only every be zero or one warnings, because we only check for one thing,
   // i.e. trailing whitespace. Writing it this way with the future in mind)
-  public checkJsMetaFile(jsMetaFilename: string): MetadataProblem[] {
+  public checkJsMetaFile(lwcName: string, jsMetaFilename: string): MetadataProblem[] {
     const warnings: MetadataProblem[] = [];
 
     if (this.fileHasTrailingWhitespace(jsMetaFilename)) {
       warnings.push(
-        new MetadataWarning(jsMetaFilename, 'Whitespace characters detected at the end of one or more lines.')
+        new MetadataWarning(
+          lwcName,
+          'LightningComponentBundle',
+          jsMetaFilename,
+          'Whitespace characters detected at the end of one or more lines.'
+        )
       );
     }
 

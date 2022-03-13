@@ -77,15 +77,17 @@ export class RecordTypeChecker {
 
     const missingPicklists = requiredPicklists.filter((p) => !recordTypePicklists.includes(p));
     if (missingPicklists.length > 0) {
-      const message = `Record type ${objectName}.${recordTypeName} is missing picklist(s): ${missingPicklists.toString()}`;
-      warnings.push(new MetadataWarning(recordTypeFileName, message));
+      const componentName = `${objectName}.${recordTypeName}`;
+      const message = `Picklist(s) missing from record type definition: ${missingPicklists.toString()}`;
+      warnings.push(new MetadataWarning(componentName, 'RecordType', recordTypeFileName, message));
     }
 
     const expectedPicklists = requiredPicklists.concat(optionalPicklists).concat(this.BONUS_EXPECTED_PICKLISTS);
     const unexpectedPicklists = recordTypePicklists.filter((p) => !expectedPicklists.includes(p));
     if (unexpectedPicklists.length > 0) {
-      const message = `Record type ${objectName}.${recordTypeName} contains unexpected picklist(s): ${unexpectedPicklists.toString()}`;
-      warnings.push(new MetadataError(recordTypeFileName, message));
+      const componentName = `${objectName}.${recordTypeName}`;
+      const message = `Unexpected picklist(s) found in record type definition: ${unexpectedPicklists.toString()}`;
+      warnings.push(new MetadataError(componentName, 'RecordType', recordTypeFileName, message));
     }
 
     return warnings;

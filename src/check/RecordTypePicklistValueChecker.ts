@@ -74,7 +74,11 @@ export class RecordTypePicklistValueChecker {
     return warnings;
   }
 
-  public checkPicklistValuesInRecordType(picklistName: string, objectName: string, recordTypeName: string): MetadataProblem[] {
+  public checkPicklistValuesInRecordType(
+    picklistName: string,
+    objectName: string,
+    recordTypeName: string
+  ): MetadataProblem[] {
     // standard value sets not supported for now
     if (!this.hasValueSet(objectName, picklistName)) {
       return [];
@@ -97,9 +101,10 @@ export class RecordTypePicklistValueChecker {
     picklistName: string,
     picklistValue: string
   ): MetadataError {
+    const componentName = `${objectName}.${recordTypeName}`;
     const fileName = this.recordTypeFileName(objectName, recordTypeName);
     const message = `Invalid value '${picklistValue}' in picklist ${picklistName}`;
-    return new MetadataError(fileName, message);
+    return new MetadataError(componentName, 'RecordType', fileName, message);
   }
 
   public picklistValuesFromObject(picklistName: string, objectName: string): string[] {
