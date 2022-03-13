@@ -84,13 +84,16 @@ export class RecordTypePicklistValueChecker {
       return [];
     }
 
-    const lcValuesFromObject = this.picklistValuesFromObject(picklistName, objectName).map((v) => v.toLowerCase());
+    const valuesFromObject = this.picklistValuesFromObject(picklistName, objectName);
+    const lowerCasedValuesFromObject = valuesFromObject.map((v) => v.toLowerCase());
     const valuesInRecordType: string[] = this.picklistValuesInRecordType(picklistName, objectName, recordTypeName);
 
     // Every picklist value referenced in the record type needs to be a valid value from the object's picklist definition.
     // Lower-case the values for comparison purposes, to filter out any noise from differences in casing.
     // (Salesforce allows case differences, so we should too)
-    const dodgyValues: string[] = valuesInRecordType.filter((v) => !lcValuesFromObject.includes(v.toLowerCase()));
+    const dodgyValues: string[] = valuesInRecordType.filter(
+      (v) => !lowerCasedValuesFromObject.includes(v.toLowerCase())
+    );
 
     return dodgyValues.map((v) => this.metadataError(objectName, recordTypeName, picklistName, v));
   }
