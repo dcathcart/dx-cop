@@ -1,6 +1,6 @@
 import * as os from 'os';
 import * as path from 'path';
-import { flags, SfdxCommand } from '@salesforce/command';
+import { SfdxCommand } from '@salesforce/command';
 import { Messages, NamedPackageDir, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
@@ -14,26 +14,11 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('dx-cop', 'org');
+const messages = Messages.loadMessages('dx-cop', 'check');
 
 export default class Check extends SfdxCommand {
   public static description = messages.getMessage('commandDescription');
-
   public static examples = messages.getMessage('examples').split(os.EOL);
-
-  public static args = [{ name: 'file' }];
-
-  protected static flagsConfig = {
-    // flag with a value (-n, --name=VALUE)
-    name: flags.string({
-      char: 'n',
-      description: messages.getMessage('nameFlagDescription'),
-    }),
-    force: flags.boolean({
-      char: 'f',
-      description: messages.getMessage('forceFlagDescription'),
-    }),
-  };
 
   // Set this to true if your command requires a project workspace; 'requiresProject' is false by default
   protected static requiresProject = true;
