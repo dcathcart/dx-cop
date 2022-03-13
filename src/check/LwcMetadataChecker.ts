@@ -32,7 +32,7 @@ export class LwcMetadataChecker {
           lwcName,
           'LightningComponentBundle',
           jsMetaFilename,
-          'Whitespace characters detected at the end of one or more lines.'
+          'Whitespace characters detected at the end of one or more lines in .js-meta.xml file'
         )
       );
     }

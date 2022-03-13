@@ -1,6 +1,8 @@
 import { JsonMap } from '@salesforce/ts-types';
 
 export abstract class MetadataProblem {
+  public static tableOutputKeys: string[] = ['type', 'metadataType', 'name', 'problem'];
+
   protected problemType: string;
 
   private componentName: string;
@@ -15,7 +17,16 @@ export abstract class MetadataProblem {
     this.problem = problem;
   }
 
-  public toJSON(): JsonMap {
+  public tableOutput(): JsonMap {
+    return {
+      type: this.problemType,
+      metadataType: this.componentType,
+      name: this.componentName,
+      problem: this.problem,
+    };
+  }
+
+  public jsonOutput(): JsonMap {
     return {
       componentName: this.componentName,
       componentType: this.componentType,
