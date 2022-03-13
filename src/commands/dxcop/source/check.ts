@@ -48,8 +48,15 @@ export default class Check extends SfdxCommand {
 
     const metadataProblems = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings);
 
+    // Return non-zero exit code if there are any metadata problems; useful for use in CI jobs
+    // Not sure whether this is the "correct" way to set the exit code, but it works!
+    if (metadataProblems.length > 0) {
+      process.exitCode = 1;
+    }
+
     // Return an object to be displayed with --json
-    return { problems: metadataProblems.map((p) => p.toJSON()) };
+    const result = { problems: metadataProblems.map((p) => p.toJSON()) };
+    return result;
   }
 
   public checkLwcMetadata(sfdxPackage: NamedPackageDir): MetadataProblem[] {
