@@ -1,0 +1,7 @@
+{
+  "commandDescription": "Checks a metadata repository for problems",
+  "examples": [
+    "sfdx dxcop:source:check",
+    "sfdx dxcop:source:check --json"
+  ]
+}
