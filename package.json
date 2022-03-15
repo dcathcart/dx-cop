@@ -1,7 +1,7 @@
 {
   "name": "dx-cop",
   "description": "Static analysis for your Salesforce git repo",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "David Cathcart",
   "bugs": "https://github.com/dcathcart/dx-cop/issues",
   "dependencies": {
@@ -10,6 +10,8 @@
     "@oclif/errors": "^1",
     "@salesforce/command": "^3",
     "@salesforce/core": "^2",
+    "fast-xml-parser": "^4.0.6",
+    "html-entities": "^2.3.2",
     "tslib": "^2"
   },
   "devDependencies": {

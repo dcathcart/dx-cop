@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { RecordType } from '../metadata-browser/RecordType';
+import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class RecordTypeChecker {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
@@ -11,8 +12,8 @@ export class RecordTypeChecker {
     this.baseDir = baseDir;
   }
 
-  public run(): string[] {
-    const warnings: string[] = [];
+  public run(): MetadataProblem[] {
+    const warnings: MetadataProblem[] = [];
 
     const objects = this.customObjects().filter((o) => !this.IGNORE_OBJECTS.includes(o));
     for (const obj of objects) {
@@ -42,16 +43,20 @@ export class RecordTypeChecker {
     return path.join(this.objectDir(objectName), 'recordTypes');
   }
 
+  public recordTypeFileName(objectName: string, recordTypeName: string): string {
+    return path.join(this.recordTypesDir(objectName), recordTypeName + '.recordType-meta.xml');
+  }
+
   public customObjects(): string[] {
     return fs.readdirSync(this.objectsDir());
   }
 
-  public checkRecordTypes(objectName: string): string[] {
+  public checkRecordTypes(objectName: string): MetadataProblem[] {
     const objectPicklists = this.picklistFields(objectName);
     const requiredPicklists = objectPicklists.filter((p) => this.hasValueSet(objectName, p));
     const optionalPicklists = objectPicklists.filter((p) => !this.hasValueSet(objectName, p));
 
-    const warnings: string[] = [];
+    const warnings: MetadataProblem[] = [];
     const recordTypes = this.objectRecordTypes(objectName);
     for (const recordType of recordTypes) {
       const result = this.checkRecordTypePicklists(objectName, recordType, requiredPicklists, optionalPicklists);
@@ -65,24 +70,25 @@ export class RecordTypeChecker {
     recordTypeName: string,
     requiredPicklists: string[],
     optionalPicklists: string[]
-  ): string[] {
-    const warnings: string[] = [];
+  ): MetadataProblem[] {
+    const warnings: MetadataProblem[] = [];
 
+    const recordTypeFileName = this.recordTypeFileName(objectName, recordTypeName);
     const recordTypePicklists = this.recordTypePicklistNames(objectName, recordTypeName);
 
     const missingPicklists = requiredPicklists.filter((p) => !recordTypePicklists.includes(p));
     if (missingPicklists.length > 0) {
-      warnings.push(
-        `Record type ${objectName}.${recordTypeName} is missing picklist(s): ${missingPicklists.toString()}`
-      );
+      const componentName = `${objectName}.${recordTypeName}`;
+      const message = `Picklist(s) missing from record type definition: ${missingPicklists.toString()}`;
+      warnings.push(new MetadataWarning(componentName, 'RecordType', recordTypeFileName, message));
     }
 
     const expectedPicklists = requiredPicklists.concat(optionalPicklists).concat(this.BONUS_EXPECTED_PICKLISTS);
     const unexpectedPicklists = recordTypePicklists.filter((p) => !expectedPicklists.includes(p));
     if (unexpectedPicklists.length > 0) {
-      warnings.push(
-        `Record type ${objectName}.${recordTypeName} contains unexpected picklist(s): ${unexpectedPicklists.toString()}`
-      );
+      const componentName = `${objectName}.${recordTypeName}`;
+      const message = `Unexpected picklist(s) found in record type definition: ${unexpectedPicklists.toString()}`;
+      warnings.push(new MetadataError(componentName, 'RecordType', recordTypeFileName, message));
     }
 
     return warnings;
@@ -115,7 +121,6 @@ export class RecordTypeChecker {
     const fileContents = fs.readFileSync(fieldFileName).toString();
 
     const isPicklist = fileContents.includes('<type>Picklist</type>') || fileContents.includes('<type>MultiselectPicklist</type>');
-//    if (isPicklist) console.log(`${fileContents.length} : ${fieldFileName}`);
     return isPicklist;
   }
 

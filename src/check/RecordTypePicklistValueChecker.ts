@@ -3,10 +3,7 @@ import * as path from 'path';
 import { XMLParser } from 'fast-xml-parser/src/fxp';
 import { decode } from 'html-entities';
 import { RecordType } from '../metadata-browser/RecordType';
-
-function errorMessage(objectName: string, recordTypeName: string, picklistName: string, picklistValue: string): string {
-  return `Invalid value '${picklistValue}' found for picklist ${picklistName} in ${objectName}.${recordTypeName} record type`;
-}
+import { MetadataError, MetadataProblem } from './MetadataProblem';
 
 function toArray(values: any): any[] {
   return values instanceof Array ? values : [values];
@@ -29,12 +26,12 @@ export class RecordTypePicklistValueChecker {
   }
 
   // Run the record type picklist value checks. Returns an array of warning messages.
-  public run(): string[] {
+  public run(): MetadataProblem[] {
     return this.checkRecordTypesForAllObjects();
   }
 
-  public checkRecordTypesForAllObjects(): string[] {
-    const warnings: string[] = [];
+  public checkRecordTypesForAllObjects(): MetadataProblem[] {
+    const warnings: MetadataProblem[] = [];
 
     const objectsToCheck = this.listObjects().filter((o) => !this.IGNORE_OBJECTS.includes(o));
     for (const objectName of objectsToCheck) {
@@ -48,8 +45,8 @@ export class RecordTypePicklistValueChecker {
     return fs.readdirSync(this.objectsDir());
   }
 
-  public checkAllRecordTypesForObject(objectName: string): string[] {
-    const warnings: string[] = [];
+  public checkAllRecordTypesForObject(objectName: string): MetadataProblem[] {
+    const warnings: MetadataProblem[] = [];
 
     const recordTypes: string[] = this.recordTypesForObject(objectName);
     for (const recordType of recordTypes) {
@@ -66,8 +63,8 @@ export class RecordTypePicklistValueChecker {
     return recordTypes.map((rt) => path.basename(rt, '.recordType-meta.xml'));
   }
 
-  public checkAllPicklistValuesInRecordType(objectName: string, recordTypeName: string): string[] {
-    const warnings: string[] = [];
+  public checkAllPicklistValuesInRecordType(objectName: string, recordTypeName: string): MetadataProblem[] {
+    const warnings: MetadataProblem[] = [];
 
     const recordTypeFileName = this.recordTypeFileName(objectName, recordTypeName);
     const recordType = new RecordType(recordTypeFileName);
@@ -89,7 +86,7 @@ export class RecordTypePicklistValueChecker {
     recordTypeName: string,
     picklistName: string,
     valuesInRecordType: string[]
-  ): string[] {
+  ): MetadataProblem[] {
     // standard value sets not supported for now
     if (!this.hasValueSet(objectName, picklistName)) {
       return [];
@@ -105,7 +102,19 @@ export class RecordTypePicklistValueChecker {
       (v) => !lowerCasedValuesFromObject.includes(v.toLowerCase())
     );
 
-    return dodgyValues.map((v) => errorMessage(objectName, recordTypeName, picklistName, v));
+    return dodgyValues.map((v) => this.metadataError(objectName, recordTypeName, picklistName, v));
+  }
+
+  public metadataError(
+    objectName: string,
+    recordTypeName: string,
+    picklistName: string,
+    picklistValue: string
+  ): MetadataError {
+    const componentName = `${objectName}.${recordTypeName}`;
+    const fileName = this.recordTypeFileName(objectName, recordTypeName);
+    const message = `Invalid value '${picklistValue}' in picklist ${picklistName}`;
+    return new MetadataError(componentName, 'RecordType', fileName, message);
   }
 
   public picklistValuesFromObject(picklistName: string, objectName: string): string[] {
