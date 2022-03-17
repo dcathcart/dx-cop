@@ -1,13 +1,16 @@
 import {
+  AnyJson,
+  get,
+  getBoolean,
   getJsonArray,
   getJsonMap,
-  getString,
   hasJsonArray,
   hasJsonMap,
   hasString,
   JsonArray,
   JsonMap,
 } from '@salesforce/ts-types';
+import { decode } from 'html-entities';
 import { MetadataComponent } from './MetadataComponent';
 
 // Class that represents a CustomField of Picklsit type
@@ -48,7 +51,7 @@ export class PicklistField extends MetadataComponent {
   //         <fullName>suspended</fullName>  <-- and this
   //         ...
   // to an array of strings: [ 'active', 'suspended', ... ]
-  public values(): string[] {
+  public activeValues(): string[] {
     const customFieldElement: JsonMap = getJsonMap(this.metadata(), 'CustomField');
     const valueSet: JsonMap = getJsonMap(customFieldElement, 'valueSet');
     const valueSetDefinition: JsonMap = getJsonMap(valueSet, 'valueSetDefinition');
@@ -56,15 +59,40 @@ export class PicklistField extends MetadataComponent {
     if (hasJsonArray(valueSetDefinition, 'value')) {
       // multiple <value> elements
       const valueArray: JsonArray = getJsonArray(valueSetDefinition, 'value');
-      return valueArray.map((v) => getString(v, 'fullName'));
+      return valueArray.filter((v) => getBoolean(v, 'isActive') !== false).map((v) => this.extractValue(v));
     } else if (hasJsonMap(valueSetDefinition, 'value')) {
       // single <value> element
       const valueMap: JsonMap = getJsonMap(valueSetDefinition, 'value');
-      const value: string = getString(valueMap, 'fullName');
-      return [value];
+      if (getBoolean(valueMap, 'isActive') === false) {
+        return [];
+      } else {
+        const value: string = this.extractValue(valueMap);
+        return [value];
+      }
     } else {
       // no <value> elements
       return [];
     }
+  }
+
+  // Converts the actual picklist value from a picklist value element, i.e. this:
+  // ...
+  // <value>
+  //   <fullName>abc</fullName>
+  //   <default>false</default>
+  //   <label>ABC</label>
+  // </value>
+  // ...
+  // to this: 'abc'
+  // Also decodes special characters into the representation users would see in Salesforce.
+  private extractValue(valueMap: AnyJson): string {
+    // Use get() deliberately here instead of getString(), which returns undefined if the value is a number.
+    // We always want to treat picklist values as strings, hence the .toString()
+    // Related: XML parser has specific config to preserve leading zeros. See MetadataComponent.ts
+    const value = get(valueMap, 'fullName').toString();
+
+    // HTML decode <fullName> values because that's how Salesforce encodes them in picklist field definitions.
+    // e.g. '&' is stored as '&amp;'. Note this is different from how they are encoded in record types.
+    return decode(value);
   }
 }
