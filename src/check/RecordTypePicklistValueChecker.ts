@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { XMLParser } from 'fast-xml-parser/src/fxp';
 import { decode } from 'html-entities';
-import { RecordType } from '../metadata-browser/RecordType';
+import { RecordType } from '../metadata_browser/RecordType';
 import { MetadataError, MetadataProblem } from './MetadataProblem';
 
 function toArray(values: any): any[] {

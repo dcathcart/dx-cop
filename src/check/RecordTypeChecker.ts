@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { RecordType } from '../metadata-browser/RecordType';
+import { RecordType } from '../metadata_browser/RecordType';
 import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class RecordTypeChecker {
