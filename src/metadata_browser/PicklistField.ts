@@ -33,8 +33,14 @@ export class PicklistField extends MetadataComponent {
     }
   }
 
-  // Extract a list of picklist values from the field's XML. API Names only; we don't care about the labels.
-  // Convert this:
+  // List of *active* picklist values for this field
+  public activeValues(): string[] {
+    const isActiveFunction = (valueMap: AnyJson): boolean => getBoolean(valueMap, 'isActive') !== false;
+    return this.filterValues(isActiveFunction);
+  }
+
+  // Extracts picklist values from the field's XML. Filters results using the supplied filter function.
+  // Returns API Names only; we don't care about the labels. Converts this:
   // ...
   // <CustomField>
   //   <fullName>Account_Status__c</fullName>
@@ -43,32 +49,27 @@ export class PicklistField extends MetadataComponent {
   //     <valueSetDefinition>
   //       <sorted>false</sorted>
   //       <value>
-  //         <fullName>active</fullName>  <-- this
+  //         <fullName>active</fullName>  <-- pick me!
   //         <default>false</default>
   //         <label>Active</label>
   //       </value>
   //       <value>
-  //         <fullName>suspended</fullName>  <-- and this
+  //         <fullName>suspended</fullName>  <-- and me!
   //         ...
   // to an array of strings: [ 'active', 'suspended', ... ]
-  public activeValues(): string[] {
-    const customFieldElement: JsonMap = getJsonMap(this.metadata(), 'CustomField');
-    const valueSet: JsonMap = getJsonMap(customFieldElement, 'valueSet');
+  private filterValues(filterFunction: (valueMap: AnyJson) => boolean): string[] {
+    const customField: JsonMap = getJsonMap(this.metadata(), 'CustomField');
+    const valueSet: JsonMap = getJsonMap(customField, 'valueSet');
     const valueSetDefinition: JsonMap = getJsonMap(valueSet, 'valueSetDefinition');
 
     if (hasJsonArray(valueSetDefinition, 'value')) {
       // multiple <value> elements
       const valueArray: JsonArray = getJsonArray(valueSetDefinition, 'value');
-      return valueArray.filter((v) => getBoolean(v, 'isActive') !== false).map((v) => this.extractValue(v));
+      return valueArray.filter(filterFunction).map((v) => this.extractValue(v));
     } else if (hasJsonMap(valueSetDefinition, 'value')) {
       // single <value> element
       const valueMap: JsonMap = getJsonMap(valueSetDefinition, 'value');
-      if (getBoolean(valueMap, 'isActive') === false) {
-        return [];
-      } else {
-        const value: string = this.extractValue(valueMap);
-        return [value];
-      }
+      return filterFunction(valueMap) ? [this.extractValue(valueMap)] : [];
     } else {
       // no <value> elements
       return [];
