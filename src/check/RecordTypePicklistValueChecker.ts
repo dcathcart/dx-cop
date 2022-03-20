@@ -37,6 +37,7 @@ export class RecordTypePicklistValueChecker {
 
     const recordTypes = this.sfdxProjectBrowser.recordTypes(objectName);
     const picklistFieldMap = this.sfdxProjectBrowser.picklistFieldMap(objectName);
+
     for (const recordType of recordTypes) {
       warnings.push(...this.checkAllPicklistsInRecordType(recordType, picklistFieldMap));
     }
@@ -47,38 +48,34 @@ export class RecordTypePicklistValueChecker {
   // Loop through the picklists in a record type
   private checkAllPicklistsInRecordType(
     recordType: RecordType,
-    picklistFieldMap: Map<string, PicklistField>
+    picklistFieldMap: Map<string, PicklistField> // picklist field definitions from object
   ): MetadataProblem[] {
     const warnings: MetadataProblem[] = [];
+    const recordTypePicklistMap = recordType.picklistValueMap();
 
-    const recordTypePicklistMap = recordType.picklistValues();
     for (const picklistName of recordTypePicklistMap.keys()) {
-      if (this.IGNORE_PICKLISTS.includes(picklistName)) continue;
+      const picklist = picklistFieldMap.get(picklistName);
+      if (this.ignorePicklist(picklist)) continue;
 
-      warnings.push(
-        ...this.checkPicklistValues(
-          recordType,
-          picklistName,
-          picklistFieldMap.get(picklistName),
-          recordTypePicklistMap.get(picklistName)
-        )
-      );
+      const valuesInRecordType = recordTypePicklistMap.get(picklistName);
+      warnings.push(...this.checkPicklistValues(recordType, valuesInRecordType, picklist));
     }
 
     return warnings;
   }
 
+  private ignorePicklist(picklist: PicklistField): boolean {
+    if (this.IGNORE_PICKLISTS.includes(picklist.name)) return true;
+
+    return picklist.usesStandardValueSet() || picklist.usesGlobalValueSet();
+  }
+
+  // Check the picklist values in one picklist in a record type
   private checkPicklistValues(
     recordType: RecordType,
-    picklistName: string,
-    picklistField: PicklistField,
-    valuesInRecordType: string[]
+    valuesInRecordType: string[],
+    picklistField: PicklistField
   ): MetadataProblem[] {
-    // standard value sets / global value sets not supported for now
-    if (picklistField.usesStandardValueSet() || picklistField.usesGlobalValueSet()) {
-      return [];
-    }
-
     const lowerCasedValuesFromObject = picklistField.activeValues().map((v) => v.toLowerCase());
 
     // Every picklist value referenced in the record type needs to be a valid value from the object's picklist definition.
