@@ -9,9 +9,11 @@ import {
   JsonArray,
   JsonMap,
 } from '@salesforce/ts-types';
-import { MetadataComponent } from './MetadataComponent';
+import { SubComponentBase } from './ComponentBase';
 
-export class RecordType extends MetadataComponent {
+export class RecordType extends SubComponentBase {
+  protected readonly fileExtension = 'recordType';
+
   // Extract a list of picklist names from the RecordType XML, e.g.
   // <RecordType>
   //   ...
@@ -22,7 +24,7 @@ export class RecordType extends MetadataComponent {
   //     <picklist>Account_Status__c</picklist> <-- and this
   //     ...
   public picklistFieldNames(): string[] {
-    const recordTypeElement: JsonMap = getJsonMap(this.metadata(), 'RecordType');
+    const recordTypeElement: JsonMap = getJsonMap(this.metadata, 'RecordType');
 
     if (hasJsonArray(recordTypeElement, 'picklistValues')) {
       // multiple <picklistValues> elements
@@ -67,7 +69,7 @@ export class RecordType extends MetadataComponent {
   //   'Status__c' => [ 'Active', 'Inactive' ]
   // }
   public picklistValues(): Map<string, string[]> {
-    const recordTypeElement: JsonMap = getJsonMap(this.metadata(), 'RecordType');
+    const recordTypeElement: JsonMap = getJsonMap(this.metadata, 'RecordType');
 
     if (hasJsonArray(recordTypeElement, 'picklistValues')) {
       // multiple <picklistValues> elements

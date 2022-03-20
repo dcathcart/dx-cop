@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { SfdxProject } from '@salesforce/core';
+import { CustomField } from './CustomField';
+import { PicklistField } from './PicklistField';
 import { RecordType } from './RecordType';
 
 // Tools for browsing/navigating the metadata in an SFDX project
@@ -16,14 +18,32 @@ export class SfdxProjectBrowser {
     return fs.readdirSync(this.objectsBaseDir());
   }
 
-  // Return a list of record types for the given object
-  public recordTypes(objectName: string): RecordType[] {
-    const recordTypesDir = this.recordTypesBaseDir(objectName);
-    const recordTypeFileNames = fs.existsSync(recordTypesDir) ? fs.readdirSync(recordTypesDir) : [];
-    return recordTypeFileNames.map((r) => new RecordType(r));
+  // Return all picklist fields in a map (name -> PicklistField object)
+  public picklistFieldMap(objectName: string): Map<string, PicklistField> {
+    const picklists = this.customFields(objectName).filter((f) => f.isPicklist());
+    return new Map<string, PicklistField>(picklists.map((f) => [f.name, new PicklistField(f.fileName)]));
   }
 
-  // Directory containing all the record types for a given custom object
+  // Return a list of record types for the given object
+  public recordTypes(objectName: string): RecordType[] {
+    const dir = this.recordTypesBaseDir(objectName);
+    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    return fileNames.map((f) => new RecordType(path.join(dir, f)));
+  }
+
+  // Return a list of fields for the given object
+  private customFields(objectName: string): CustomField[] {
+    const dir = this.customFieldsBaseDir(objectName);
+    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    return fileNames.map((f) => new CustomField(path.join(dir, f)));
+  }
+
+  // Directory containing fields for a given object
+  private customFieldsBaseDir(objectName: string): string {
+    return path.join(this.objectDir(objectName), 'fields');
+  }
+
+  // Directory containing all the record types for a given object
   // Doesn't care whether the directory exists (likely it won't if the object has no record types)
   private recordTypesBaseDir(objectName: string): string {
     return path.join(this.objectDir(objectName), 'recordTypes');

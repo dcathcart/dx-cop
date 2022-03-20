@@ -11,19 +11,19 @@ import {
   JsonMap,
 } from '@salesforce/ts-types';
 import { decode } from 'html-entities';
-import { MetadataComponent } from './MetadataComponent';
+import { CustomField } from './CustomField';
 
 // Class that represents a CustomField of Picklsit type
-export class PicklistField extends MetadataComponent {
+export class PicklistField extends CustomField {
   public usesStandardValueSet(): boolean {
-    const customFieldElement: JsonMap = getJsonMap(this.metadata(), 'CustomField');
+    const customFieldElement: JsonMap = getJsonMap(this.metadata, 'CustomField');
     const hasValueSet: boolean = hasJsonMap(customFieldElement, 'valueSet');
     // if there is no <valueSet> element, assume the field uses a standard value set
     return !hasValueSet;
   }
 
   public usesGlobalValueSet(): boolean {
-    const customFieldElement: JsonMap = getJsonMap(this.metadata(), 'CustomField');
+    const customFieldElement: JsonMap = getJsonMap(this.metadata, 'CustomField');
     // global value sets have a <valueSet> that contains a <valueSetName>
     if (hasJsonMap(customFieldElement, 'valueSet')) {
       const valueSet: JsonMap = getJsonMap(customFieldElement, 'valueSet');
@@ -58,7 +58,7 @@ export class PicklistField extends MetadataComponent {
   //         ...
   // to an array of strings: [ 'active', 'suspended', ... ]
   private filterValues(filterFunction: (valueMap: AnyJson) => boolean): string[] {
-    const customField: JsonMap = getJsonMap(this.metadata(), 'CustomField');
+    const customField: JsonMap = getJsonMap(this.metadata, 'CustomField');
     const valueSet: JsonMap = getJsonMap(customField, 'valueSet');
     const valueSetDefinition: JsonMap = getJsonMap(valueSet, 'valueSetDefinition');
 

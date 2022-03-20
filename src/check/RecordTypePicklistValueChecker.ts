@@ -1,17 +1,16 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { RecordType } from '../metadata_browser/RecordType';
 import { PicklistField } from '../metadata_browser/PicklistField';
+import { RecordType } from '../metadata_browser/RecordType';
+import { SfdxProjectBrowser } from '../metadata_browser/SfdxProjectBrowser';
 import { MetadataError, MetadataProblem } from './MetadataProblem';
 
 export class RecordTypePicklistValueChecker {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
-  private IGNORE_PICKLISTS = ['ForecastCategoryName'];
+  private IGNORE_PICKLISTS = ['Name', 'ForecastCategoryName'];
 
-  private baseDir: string;
+  private sfdxProjectBrowser: SfdxProjectBrowser;
 
-  public constructor(baseDir: string) {
-    this.baseDir = baseDir;
+  public constructor(sfdxProjectBrowser: SfdxProjectBrowser) {
+    this.sfdxProjectBrowser = sfdxProjectBrowser;
   }
 
   // Run the record type picklist value checks. Returns an array of warning messages.
@@ -19,65 +18,62 @@ export class RecordTypePicklistValueChecker {
     return this.checkRecordTypesForAllObjects();
   }
 
-  public checkRecordTypesForAllObjects(): MetadataProblem[] {
+  // Loop through all custom objects, checking record types in each one
+  private checkRecordTypesForAllObjects(): MetadataProblem[] {
     const warnings: MetadataProblem[] = [];
-
-    const objectsToCheck = this.listObjects().filter((o) => !this.IGNORE_OBJECTS.includes(o));
-    for (const objectName of objectsToCheck) {
+    for (const objectName of this.objectsToCheck()) {
       warnings.push(...this.checkAllRecordTypesForObject(objectName));
     }
-
     return warnings;
   }
 
-  public listObjects(): string[] {
-    return fs.readdirSync(this.objectsDir());
+  private objectsToCheck(): string[] {
+    return this.sfdxProjectBrowser.objectNames().filter((o) => !this.IGNORE_OBJECTS.includes(o));
   }
 
-  public checkAllRecordTypesForObject(objectName: string): MetadataProblem[] {
+  // Loop through the record types in a single custom object
+  private checkAllRecordTypesForObject(objectName: string): MetadataProblem[] {
     const warnings: MetadataProblem[] = [];
 
-    const recordTypes: string[] = this.recordTypesForObject(objectName);
+    const recordTypes = this.sfdxProjectBrowser.recordTypes(objectName);
+    const picklistFieldMap = this.sfdxProjectBrowser.picklistFieldMap(objectName);
     for (const recordType of recordTypes) {
-      warnings.push(...this.checkAllPicklistValuesInRecordType(objectName, recordType));
+      warnings.push(...this.checkAllPicklistsInRecordType(recordType, picklistFieldMap));
     }
 
     return warnings;
   }
 
-  public recordTypesForObject(objectName: string): string[] {
-    const recordTypesDir = this.recordTypesDir(objectName);
-    const recordTypes = fs.existsSync(recordTypesDir) ? fs.readdirSync(recordTypesDir) : [];
-
-    return recordTypes.map((rt) => path.basename(rt, '.recordType-meta.xml'));
-  }
-
-  public checkAllPicklistValuesInRecordType(objectName: string, recordTypeName: string): MetadataProblem[] {
+  // Loop through the picklists in a record type
+  private checkAllPicklistsInRecordType(
+    recordType: RecordType,
+    picklistFieldMap: Map<string, PicklistField>
+  ): MetadataProblem[] {
     const warnings: MetadataProblem[] = [];
 
-    const recordTypeFileName = this.recordTypeFileName(objectName, recordTypeName);
-    const recordType = new RecordType(recordTypeFileName);
-    const picklistMap = recordType.picklistValues();
-
-    for (const picklistName of picklistMap.keys()) {
+    const recordTypePicklistMap = recordType.picklistValues();
+    for (const picklistName of recordTypePicklistMap.keys()) {
       if (this.IGNORE_PICKLISTS.includes(picklistName)) continue;
 
       warnings.push(
-        ...this.checkPicklistValuesInRecordType(objectName, recordTypeName, picklistName, picklistMap.get(picklistName))
+        ...this.checkPicklistValues(
+          recordType,
+          picklistName,
+          picklistFieldMap.get(picklistName),
+          recordTypePicklistMap.get(picklistName)
+        )
       );
     }
 
     return warnings;
   }
 
-  public checkPicklistValuesInRecordType(
-    objectName: string,
-    recordTypeName: string,
+  private checkPicklistValues(
+    recordType: RecordType,
     picklistName: string,
+    picklistField: PicklistField,
     valuesInRecordType: string[]
   ): MetadataProblem[] {
-    const picklistField = new PicklistField(this.fieldFileName(objectName, picklistName));
-
     // standard value sets / global value sets not supported for now
     if (picklistField.usesStandardValueSet() || picklistField.usesGlobalValueSet()) {
       return [];
@@ -92,42 +88,12 @@ export class RecordTypePicklistValueChecker {
       (v) => !lowerCasedValuesFromObject.includes(v.toLowerCase())
     );
 
-    return dodgyValues.map((v) => this.metadataError(objectName, recordTypeName, picklistName, v));
+    return dodgyValues.map((v) => this.metadataError(recordType, picklistField.name, v));
   }
 
-  public metadataError(
-    objectName: string,
-    recordTypeName: string,
-    picklistName: string,
-    picklistValue: string
-  ): MetadataError {
-    const componentName = `${objectName}.${recordTypeName}`;
-    const fileName = this.recordTypeFileName(objectName, recordTypeName);
+  private metadataError(recordType: RecordType, picklistName: string, picklistValue: string): MetadataError {
+    const componentName = `${recordType.objectName}.${recordType.name}`;
     const message = `Invalid value '${picklistValue}' in picklist ${picklistName}`;
-    return new MetadataError(componentName, 'RecordType', fileName, message);
-  }
-
-  public objectsDir(): string {
-    return path.join(this.baseDir, 'objects');
-  }
-
-  public objectDir(objectName: string): string {
-    return path.join(this.objectsDir(), objectName);
-  }
-
-  public fieldsDir(objectName: string): string {
-    return path.join(this.objectDir(objectName), 'fields');
-  }
-
-  public fieldFileName(objectName: string, fieldName: string): string {
-    return path.join(this.fieldsDir(objectName), fieldName + '.field-meta.xml');
-  }
-
-  public recordTypesDir(objectName: string): string {
-    return path.join(this.objectDir(objectName), 'recordTypes');
-  }
-
-  public recordTypeFileName(objectName: string, recordTypeName: string): string {
-    return path.join(this.recordTypesDir(objectName), recordTypeName + '.recordType-meta.xml');
+    return new MetadataError(componentName, 'RecordType', recordType.fileName, message);
   }
 }

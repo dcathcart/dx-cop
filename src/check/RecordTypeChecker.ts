@@ -120,8 +120,9 @@ export class RecordTypeChecker {
     const fieldFileName = this.fieldFileName(objectName, fieldName);
     const fileContents = fs.readFileSync(fieldFileName).toString();
 
-    const isPicklist = fileContents.includes('<type>Picklist</type>') || fileContents.includes('<type>MultiselectPicklist</type>');
-    return isPicklist;
+    const isPicklist = fileContents.includes('<type>Picklist</type>');
+    const isMultiselectPicklist = fileContents.includes('<type>MultiselectPicklist</type>');
+    return isPicklist || isMultiselectPicklist;
   }
 
   // expected: picklist value
