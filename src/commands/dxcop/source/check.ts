@@ -62,8 +62,7 @@ export default class Check extends SfdxCommand {
 
   public checkRecordTypeMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
     this.ux.log('Checking record type picklists...');
-    const baseDir = path.join(sfdxProject.getDefaultPackage().fullPath, 'main', 'default');
-    const recordTypePicklistChecker = new RecordTypePicklistChecker(baseDir);
+    const recordTypePicklistChecker = new RecordTypePicklistChecker(new SfdxProjectBrowser(sfdxProject));
     return recordTypePicklistChecker.run();
   }
 

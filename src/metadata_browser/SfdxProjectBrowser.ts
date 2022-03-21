@@ -19,9 +19,9 @@ export class SfdxProjectBrowser {
   }
 
   // Return all picklist fields in a map (picklist name -> PicklistField object)
-  public picklistFieldMap(objectName: string): Map<string, PicklistField> {
-    const picklists = this.customFields(objectName).filter((f) => f.isPicklist());
-    return new Map<string, PicklistField>(picklists.map((f) => [f.name, new PicklistField(f.fileName)]));
+  public picklistFields(objectName: string): PicklistField[] {
+    const picklists: CustomField[] = this.customFields(objectName).filter((f) => f.isPicklist());
+    return picklists.map((f) => new PicklistField(f.fileName));
   }
 
   // Return a list of record types for the given object

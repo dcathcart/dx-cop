@@ -23,7 +23,12 @@ export class RecordTypePicklistValueChecker {
     const warnings: MetadataProblem[] = [];
     for (const objectName of this.objectsToCheck()) {
       const recordTypes = this.sfdxProjectBrowser.recordTypes(objectName);
-      const picklistFieldMap = this.sfdxProjectBrowser.picklistFieldMap(objectName);
+      const picklistFields = this.sfdxProjectBrowser.picklistFields(objectName);
+
+      // convert the array of PicklistFields to a map; more useful in subsequent methods
+      const picklistFieldMap = new Map<string, PicklistField>(
+        picklistFields.map((f) => [f.name, new PicklistField(f.fileName)])
+      );
 
       for (const recordType of recordTypes) {
         warnings.push(...this.checkAllPicklistsInRecordType(recordType, picklistFieldMap));
