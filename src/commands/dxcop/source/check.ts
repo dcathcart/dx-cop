@@ -1,12 +1,12 @@
 import * as os from 'os';
 import * as path from 'path';
 import { SfdxCommand } from '@salesforce/command';
-import { Messages, NamedPackageDir, SfdxProject } from '@salesforce/core';
+import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 import { MetadataProblem } from '../../../check/MetadataProblem';
-import { RecordTypeChecker } from '../../../check/RecordTypeChecker';
+import { RecordTypePicklistChecker } from '../../../check/RecordTypePicklistChecker';
 import { RecordTypePicklistValueChecker } from '../../../check/RecordTypePicklistValueChecker';
 import { SfdxProjectBrowser } from '../../../metadata_browser/SfdxProjectBrowser';
 
@@ -63,13 +63,13 @@ export default class Check extends SfdxCommand {
   public checkRecordTypeMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
     this.ux.log('Checking record type picklists...');
     const baseDir = path.join(sfdxProject.getDefaultPackage().fullPath, 'main', 'default');
-    const recordTypeChecker = new RecordTypeChecker(baseDir);
-    return recordTypeChecker.run();
+    const recordTypePicklistChecker = new RecordTypePicklistChecker(baseDir);
+    return recordTypePicklistChecker.run();
   }
 
   public checkRecordTypePicklistMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
     this.ux.log('Checking record type picklist values...');
-    const recordTypePicklistChecker = new RecordTypePicklistValueChecker(new SfdxProjectBrowser(sfdxProject));
-    return recordTypePicklistChecker.run();
+    const recordTypePicklistValueChecker = new RecordTypePicklistValueChecker(new SfdxProjectBrowser(sfdxProject));
+    return recordTypePicklistValueChecker.run();
   }
 }

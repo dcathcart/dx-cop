@@ -3,7 +3,7 @@ import * as path from 'path';
 import { RecordType } from '../metadata_browser/RecordType';
 import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
 
-export class RecordTypeChecker {
+export class RecordTypePicklistChecker {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
   private BONUS_EXPECTED_PICKLISTS = ['Name', 'ForecastCategoryName'];
   private baseDir: string;
