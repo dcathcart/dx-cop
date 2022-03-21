@@ -18,7 +18,7 @@ export class SfdxProjectBrowser {
     return fs.readdirSync(this.objectsBaseDir());
   }
 
-  // Return all picklist fields in a map (name -> PicklistField object)
+  // Return all picklist fields in a map (picklist name -> PicklistField object)
   public picklistFieldMap(objectName: string): Map<string, PicklistField> {
     const picklists = this.customFields(objectName).filter((f) => f.isPicklist());
     return new Map<string, PicklistField>(picklists.map((f) => [f.name, new PicklistField(f.fileName)]));

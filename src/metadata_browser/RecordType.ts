@@ -68,7 +68,7 @@ export class RecordType extends SubComponentBase {
   //   'Country__c' => [ 'Australia' ],
   //   'Status__c' => [ 'Active', 'Inactive' ]
   // }
-  public picklistValues(): Map<string, string[]> {
+  public picklistValueMap(): Map<string, string[]> {
     const recordTypeElement: JsonMap = getJsonMap(this.metadata, 'RecordType');
 
     if (hasJsonArray(recordTypeElement, 'picklistValues')) {
