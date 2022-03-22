@@ -1,13 +1,14 @@
 import * as os from 'os';
 import * as path from 'path';
 import { SfdxCommand } from '@salesforce/command';
-import { Messages, NamedPackageDir, SfdxProject } from '@salesforce/core';
+import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 import { MetadataProblem } from '../../../check/MetadataProblem';
-import { RecordTypeChecker } from '../../../check/RecordTypeChecker';
+import { RecordTypePicklistChecker } from '../../../check/RecordTypePicklistChecker';
 import { RecordTypePicklistValueChecker } from '../../../check/RecordTypePicklistValueChecker';
+import { SfdxProjectBrowser } from '../../../metadata_browser/SfdxProjectBrowser';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -25,11 +26,10 @@ export default class Check extends SfdxCommand {
 
   public async run(): Promise<AnyJson> {
     const sfdxProject = await SfdxProject.resolve();
-    const defaultPackage = sfdxProject.getDefaultPackage();
 
-    const lwcWarnings = this.checkLwcMetadata(defaultPackage);
-    const rtWarnings = this.checkRecordTypeMetadata(defaultPackage);
-    const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(defaultPackage);
+    const lwcWarnings = this.checkLwcMetadata(sfdxProject);
+    const rtWarnings = this.checkRecordTypeMetadata(sfdxProject);
+    const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(sfdxProject);
 
     const metadataProblems = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings);
 
@@ -53,21 +53,22 @@ export default class Check extends SfdxCommand {
     return { problems: metadataProblems.map((p) => p.jsonOutput()) };
   }
 
-  public checkLwcMetadata(sfdxPackage: NamedPackageDir): MetadataProblem[] {
-    const lwcPath = path.join(sfdxPackage.fullPath, 'main', 'default', 'lwc');
+  public checkLwcMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
+    this.ux.log('Checking LWCs...');
+    const lwcPath = path.join(sfdxProject.getDefaultPackage().fullPath, 'main', 'default', 'lwc');
     const lwcMetadataChecker = new LwcMetadataChecker();
     return lwcMetadataChecker.checkLwcFolder(lwcPath);
   }
 
-  public checkRecordTypeMetadata(sfdxPackage: NamedPackageDir): MetadataProblem[] {
-    const baseDir = path.join(sfdxPackage.fullPath, 'main', 'default');
-    const recordTypeChecker = new RecordTypeChecker(baseDir);
-    return recordTypeChecker.run();
+  public checkRecordTypeMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
+    this.ux.log('Checking record type picklists...');
+    const recordTypePicklistChecker = new RecordTypePicklistChecker(new SfdxProjectBrowser(sfdxProject));
+    return recordTypePicklistChecker.run();
   }
 
-  public checkRecordTypePicklistMetadata(sfdxPackage: NamedPackageDir): MetadataProblem[] {
-    const baseDir = path.join(sfdxPackage.fullPath, 'main', 'default');
-    const recordTypePicklistChecker = new RecordTypePicklistValueChecker(baseDir);
-    return recordTypePicklistChecker.run();
+  public checkRecordTypePicklistMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
+    this.ux.log('Checking record type picklist values...');
+    const recordTypePicklistValueChecker = new RecordTypePicklistValueChecker(new SfdxProjectBrowser(sfdxProject));
+    return recordTypePicklistValueChecker.run();
   }
 }
