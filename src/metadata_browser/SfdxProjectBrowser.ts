@@ -7,7 +7,7 @@ import { RecordType } from './RecordType';
 
 // Tools for browsing/navigating the metadata in an SFDX project
 export class SfdxProjectBrowser {
-  private sfdxProject: SfdxProject;
+  public readonly sfdxProject: SfdxProject;
 
   public constructor(sfdxProject: SfdxProject) {
     this.sfdxProject = sfdxProject;

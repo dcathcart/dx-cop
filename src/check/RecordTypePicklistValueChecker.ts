@@ -1,17 +1,11 @@
 import { PicklistField } from '../metadata_browser/PicklistField';
 import { RecordType } from '../metadata_browser/RecordType';
-import { SfdxProjectBrowser } from '../metadata_browser/SfdxProjectBrowser';
+import { CheckerBase } from './CheckerBase';
 import { MetadataError, MetadataProblem } from './MetadataProblem';
 
-export class RecordTypePicklistValueChecker {
+export class RecordTypePicklistValueChecker extends CheckerBase {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
   private IGNORE_PICKLISTS = ['ForecastCategoryName'];
-
-  private sfdxProjectBrowser: SfdxProjectBrowser;
-
-  public constructor(sfdxProjectBrowser: SfdxProjectBrowser) {
-    this.sfdxProjectBrowser = sfdxProjectBrowser;
-  }
 
   // Run the record type picklist value checks. Returns an array of warning messages.
   public run(): MetadataProblem[] {
