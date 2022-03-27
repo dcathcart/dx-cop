@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SfdxProject } from '@salesforce/core';
 import { CustomField } from './CustomField';
+import { EntitlementProcessVersion } from './EntitlementProcessVersion';
 import { PicklistField } from './PicklistField';
 import { RecordType } from './RecordType';
 
@@ -11,6 +12,12 @@ export class SfdxProjectBrowser {
 
   public constructor(sfdxProject: SfdxProject) {
     this.sfdxProject = sfdxProject;
+  }
+
+  public entitlementProcessVersions(): EntitlementProcessVersion[] {
+    const dir = this.entitlementProcessesBaseDir();
+    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    return fileNames.map((f) => new EntitlementProcessVersion(path.join(dir, f)));
   }
 
   // Return a list of object names
@@ -41,6 +48,10 @@ export class SfdxProjectBrowser {
   // Directory containing fields for a given object
   private customFieldsBaseDir(objectName: string): string {
     return path.join(this.objectDir(objectName), 'fields');
+  }
+
+  private entitlementProcessesBaseDir(): string {
+    return path.join(this.defaultDir(), 'entitlementProcesses');
   }
 
   // Directory containing all the record types for a given object

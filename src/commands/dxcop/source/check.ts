@@ -3,6 +3,7 @@ import { SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
+import { EntitlementProcessChecker } from '../../../check/EntitlementProcessChecker';
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 import { MetadataProblem } from '../../../check/MetadataProblem';
 import { RecordTypePicklistChecker } from '../../../check/RecordTypePicklistChecker';
@@ -30,8 +31,9 @@ export default class Check extends SfdxCommand {
     const lwcWarnings = this.checkLwcMetadata(sfdxProjectBrowser);
     const rtWarnings = this.checkRecordTypeMetadata(sfdxProjectBrowser);
     const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(sfdxProjectBrowser);
+    const epvWarnings = new EntitlementProcessChecker(sfdxProjectBrowser).run();
 
-    const metadataProblems = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings);
+    const metadataProblems = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings).concat(epvWarnings);
 
     // Log output as a pretty table. Note it won't be shown if --json was passed
     const problemCount = metadataProblems.length;
