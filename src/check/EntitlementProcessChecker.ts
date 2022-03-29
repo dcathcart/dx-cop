@@ -38,7 +38,7 @@ export class EntitlementProcessChecker extends CheckerBase {
     const grouped = this.groupByVersionMaster(versions);
 
     for (const group of grouped.values()) {
-      const sorted = this.sortByVersionNumber(group);
+      const sorted = group.sort(this.compareVersionNumbers);
 
       // expect version numbers to start at 1
       const firstVersion = sorted[0];
@@ -54,7 +54,7 @@ export class EntitlementProcessChecker extends CheckerBase {
         const expectedVersionNumber = previousVersion.versionNumber + 1;
         const actualVersionNumber = thisVersion.versionNumber;
 
-        if (expectedVersionNumber !== actualVersionNumber) {
+        if (actualVersionNumber !== expectedVersionNumber) {
           const message = `Version numbers are not consecutive. Expected ${expectedVersionNumber} but saw ${actualVersionNumber}`;
           results.push(new MetadataWarning(thisVersion.name, 'EntitlementProcess', thisVersion.fileName, message));
         }
@@ -78,8 +78,12 @@ export class EntitlementProcessChecker extends CheckerBase {
     return grouped;
   }
 
-  // abstracting the code I don't like down here & will come back later
-  private sortByVersionNumber(versions: EntitlementProcessVersion[]): EntitlementProcessVersion[] {
-    return versions.sort((a, b) => a.versionNumber - b.versionNumber);
+  private compareVersionNumbers(this: void, a: EntitlementProcessVersion, b: EntitlementProcessVersion): number {
+    if (a.versionNumber === b.versionNumber) {
+      // when version numbers are the same, sort by name
+      return a.versionName < b.versionName ? -1 : 1;
+    } else {
+      return a.versionNumber - b.versionNumber;
+    }
   }
 }
