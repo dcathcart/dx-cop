@@ -1,5 +1,4 @@
 import * as os from 'os';
-import * as path from 'path';
 import { SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
@@ -26,10 +25,11 @@ export default class Check extends SfdxCommand {
 
   public async run(): Promise<AnyJson> {
     const sfdxProject = await SfdxProject.resolve();
+    const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
 
-    const lwcWarnings = this.checkLwcMetadata(sfdxProject);
-    const rtWarnings = this.checkRecordTypeMetadata(sfdxProject);
-    const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(sfdxProject);
+    const lwcWarnings = this.checkLwcMetadata(sfdxProjectBrowser);
+    const rtWarnings = this.checkRecordTypeMetadata(sfdxProjectBrowser);
+    const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(sfdxProjectBrowser);
 
     const metadataProblems = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings);
 
@@ -53,22 +53,18 @@ export default class Check extends SfdxCommand {
     return { problems: metadataProblems.map((p) => p.jsonOutput()) };
   }
 
-  public checkLwcMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
+  public checkLwcMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
     this.ux.log('Checking LWCs...');
-    const lwcPath = path.join(sfdxProject.getDefaultPackage().fullPath, 'main', 'default', 'lwc');
-    const lwcMetadataChecker = new LwcMetadataChecker();
-    return lwcMetadataChecker.checkLwcFolder(lwcPath);
+    return new LwcMetadataChecker(sfdxProjectBrowser).run();
   }
 
-  public checkRecordTypeMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
+  public checkRecordTypeMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
     this.ux.log('Checking record type picklists...');
-    const recordTypePicklistChecker = new RecordTypePicklistChecker(new SfdxProjectBrowser(sfdxProject));
-    return recordTypePicklistChecker.run();
+    return new RecordTypePicklistChecker(sfdxProjectBrowser).run();
   }
 
-  public checkRecordTypePicklistMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
+  public checkRecordTypePicklistMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
     this.ux.log('Checking record type picklist values...');
-    const recordTypePicklistValueChecker = new RecordTypePicklistValueChecker(new SfdxProjectBrowser(sfdxProject));
-    return recordTypePicklistValueChecker.run();
+    return new RecordTypePicklistValueChecker(sfdxProjectBrowser).run();
   }
 }
