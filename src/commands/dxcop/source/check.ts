@@ -8,6 +8,7 @@ import { MetadataProblem } from '../../../check/MetadataProblem';
 import { RecordTypePicklistChecker } from '../../../check/RecordTypePicklistChecker';
 import { RecordTypePicklistValueChecker } from '../../../check/RecordTypePicklistValueChecker';
 import { SfdxProjectBrowser } from '../../../metadata_browser/SfdxProjectBrowser';
+import { EmailToCaseSettingsChecker } from '../../../check/EmailToCaseSettingsChecker';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -27,11 +28,11 @@ export default class Check extends SfdxCommand {
     const sfdxProject = await SfdxProject.resolve();
     const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
 
-    const lwcWarnings = this.checkLwcMetadata(sfdxProjectBrowser);
-    const rtWarnings = this.checkRecordTypeMetadata(sfdxProjectBrowser);
-    const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(sfdxProjectBrowser);
-
-    const metadataProblems = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings);
+    const metadataProblems: MetadataProblem[] = [];
+    metadataProblems.push(...this.checkEmailToCaseSettings(sfdxProjectBrowser));
+    metadataProblems.push(...this.checkLwcMetadata(sfdxProjectBrowser));
+    metadataProblems.push(...this.checkRecordTypeMetadata(sfdxProjectBrowser));
+    metadataProblems.push(...this.checkRecordTypePicklistMetadata(sfdxProjectBrowser));
 
     // Log output as a pretty table. Note it won't be shown if --json was passed
     const problemCount = metadataProblems.length;
@@ -39,7 +40,7 @@ export default class Check extends SfdxCommand {
       this.ux.log('Successfully checked metadata. No problems found!');
     } else {
       const tableData = metadataProblems.map((p) => p.tableOutput());
-      this.ux.log(`=== Metadata Problems [${problemCount}]`);
+      this.ux.log(`\n=== Metadata Problems [${problemCount}]`);
       this.ux.table(tableData, MetadataProblem.tableOutputKeys);
     }
 
@@ -53,8 +54,13 @@ export default class Check extends SfdxCommand {
     return { problems: metadataProblems.map((p) => p.jsonOutput()) };
   }
 
+  public checkEmailToCaseSettings(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
+    this.ux.log('Checking email-to-case settings...');
+    return new EmailToCaseSettingsChecker(sfdxProjectBrowser).run();
+  }
+
   public checkLwcMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking LWCs...');
+    this.ux.log('Checking lwc metadata...');
     return new LwcMetadataChecker(sfdxProjectBrowser).run();
   }
 

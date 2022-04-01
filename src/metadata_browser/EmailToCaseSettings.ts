@@ -1,4 +1,13 @@
-import { AnyJson, JsonMap, getJsonArray, getJsonMap, getString, hasJsonArray, hasJsonMap } from '@salesforce/ts-types';
+import {
+  AnyJson,
+  JsonMap,
+  getBoolean,
+  getJsonArray,
+  getJsonMap,
+  getString,
+  hasJsonArray,
+  hasJsonMap,
+} from '@salesforce/ts-types';
 import { ComponentBase } from './ComponentBase';
 
 export class EmailToCaseSettings extends ComponentBase {
@@ -31,6 +40,14 @@ export class EmailToCaseRoutingAddress {
 
   public constructor(source: AnyJson) {
     this.source = source;
+  }
+
+  public get emailServicesAddress(): string {
+    return getString(this.source, 'emailServicesAddress');
+  }
+
+  public get isVerified(): boolean {
+    return getBoolean(this.source, 'isVerified');
   }
 
   public get routingName(): string {
