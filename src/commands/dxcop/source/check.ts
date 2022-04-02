@@ -1,9 +1,9 @@
 import * as os from 'os';
-import * as path from 'path';
 import { SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
+import { EmailToCaseSettingsChecker } from '../../../check/EmailToCaseSettingsChecker';
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 import { MetadataProblem } from '../../../check/MetadataProblem';
 import { RecordTypePicklistChecker } from '../../../check/RecordTypePicklistChecker';
@@ -26,14 +26,16 @@ export default class Check extends SfdxCommand {
 
   public async run(): Promise<AnyJson> {
     const sfdxProject = await SfdxProject.resolve();
+    const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
 
-    const lwcWarnings = this.checkLwcMetadata(sfdxProject);
-    const rtWarnings = this.checkRecordTypeMetadata(sfdxProject);
-    const rtPicklistWarnings = this.checkRecordTypePicklistMetadata(sfdxProject);
-
-    const metadataProblems = lwcWarnings.concat(rtWarnings).concat(rtPicklistWarnings);
+    const metadataProblems: MetadataProblem[] = [];
+    metadataProblems.push(...this.checkEmailToCaseSettings(sfdxProjectBrowser));
+    metadataProblems.push(...this.checkLwcMetadata(sfdxProjectBrowser));
+    metadataProblems.push(...this.checkRecordTypeMetadata(sfdxProjectBrowser));
+    metadataProblems.push(...this.checkRecordTypePicklistMetadata(sfdxProjectBrowser));
 
     // Log output as a pretty table. Note it won't be shown if --json was passed
+    this.ux.log(); // blank line first
     const problemCount = metadataProblems.length;
     if (problemCount === 0) {
       this.ux.log('Successfully checked metadata. No problems found!');
@@ -53,22 +55,23 @@ export default class Check extends SfdxCommand {
     return { problems: metadataProblems.map((p) => p.jsonOutput()) };
   }
 
-  public checkLwcMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
-    this.ux.log('Checking LWCs...');
-    const lwcPath = path.join(sfdxProject.getDefaultPackage().fullPath, 'main', 'default', 'lwc');
-    const lwcMetadataChecker = new LwcMetadataChecker();
-    return lwcMetadataChecker.checkLwcFolder(lwcPath);
+  public checkEmailToCaseSettings(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
+    this.ux.log('Checking email-to-case settings');
+    return new EmailToCaseSettingsChecker(sfdxProjectBrowser).run();
   }
 
-  public checkRecordTypeMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
-    this.ux.log('Checking record type picklists...');
-    const recordTypePicklistChecker = new RecordTypePicklistChecker(new SfdxProjectBrowser(sfdxProject));
-    return recordTypePicklistChecker.run();
+  public checkLwcMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
+    this.ux.log('Checking lwc metadata');
+    return new LwcMetadataChecker(sfdxProjectBrowser).run();
   }
 
-  public checkRecordTypePicklistMetadata(sfdxProject: SfdxProject): MetadataProblem[] {
-    this.ux.log('Checking record type picklist values...');
-    const recordTypePicklistValueChecker = new RecordTypePicklistValueChecker(new SfdxProjectBrowser(sfdxProject));
-    return recordTypePicklistValueChecker.run();
+  public checkRecordTypeMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
+    this.ux.log('Checking record type picklists');
+    return new RecordTypePicklistChecker(sfdxProjectBrowser).run();
+  }
+
+  public checkRecordTypePicklistMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
+    this.ux.log('Checking record type picklist values');
+    return new RecordTypePicklistValueChecker(sfdxProjectBrowser).run();
   }
 }

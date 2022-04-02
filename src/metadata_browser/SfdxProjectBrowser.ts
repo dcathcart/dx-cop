@@ -2,15 +2,21 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SfdxProject } from '@salesforce/core';
 import { CustomField } from './CustomField';
+import { EmailToCaseSettings } from './EmailToCaseSettings';
 import { PicklistField } from './PicklistField';
 import { RecordType } from './RecordType';
 
 // Tools for browsing/navigating the metadata in an SFDX project
 export class SfdxProjectBrowser {
-  private sfdxProject: SfdxProject;
+  public readonly sfdxProject: SfdxProject;
 
   public constructor(sfdxProject: SfdxProject) {
     this.sfdxProject = sfdxProject;
+  }
+
+  public emailToCaseSettings(): EmailToCaseSettings {
+    const fileName = path.join(this.settingsBaseDir(), 'Case.settings-meta.xml');
+    return new EmailToCaseSettings(fileName);
   }
 
   // Return a list of object names
@@ -57,6 +63,10 @@ export class SfdxProjectBrowser {
   // Directory containing custom objects
   private objectsBaseDir(): string {
     return path.join(this.defaultDir(), 'objects');
+  }
+
+  private settingsBaseDir(): string {
+    return path.join(this.defaultDir(), 'settings');
   }
 
   // Where to look for metadata XML files.

@@ -1,15 +1,10 @@
 import { RecordType } from '../metadata_browser/RecordType';
-import { SfdxProjectBrowser } from '../metadata_browser/SfdxProjectBrowser';
+import { CheckerBase } from './CheckerBase';
 import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
 
-export class RecordTypePicklistChecker {
+export class RecordTypePicklistChecker extends CheckerBase {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
   private BONUS_EXPECTED_PICKLISTS = ['Name', 'ForecastCategoryName'];
-  private sfdxProjectBrowser: SfdxProjectBrowser;
-
-  public constructor(sfdxProjectBrowser: SfdxProjectBrowser) {
-    this.sfdxProjectBrowser = sfdxProjectBrowser;
-  }
 
   public run(): MetadataProblem[] {
     const warnings: MetadataProblem[] = [];

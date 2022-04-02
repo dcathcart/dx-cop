@@ -40,6 +40,12 @@ When you add a new picklist field to an object, Salesforce automatically adds a 
 
 Checks `*.js-meta.xml` files for extra whitespace at the ends of lines. This can cause unexpected behaviour when you retrieve the same component after deployment; extra lines of whitespace can be inserted resulting in unexpected file differences.
 
+### Email-to-Case settings
+
+Ensures you don't have the `<emailServicesAddress>` and `<isVerified>` fields stored in version control. These are specific to each environment and usually cause validation failures if you try to change them in a deployment, so it's best not to store them at all.
+
+Also ensures that `<routingAddresses>` are ordered by `<routingName>`.
+
 ## Problem categories
 
 ### Errors
@@ -67,4 +73,8 @@ Picklists based on **standard value sets** or **global value sets** are currentl
 
 **PersonAccount**, **Event** and **Task** objects are currently ignored. These non-standard objects will require some special handling, which hasn't been built yet.
 
-**ForecastCategoryName** fields are also ignored.
+The **Opportunity.ForecastCategoryName** field is also ignored, for similar reasons.
+
+## Change log
+
+A full history of changes can be viewed in the [change log](https://github.com/dcathcart/dx-cop/blob/master/CHANGELOG.md).
