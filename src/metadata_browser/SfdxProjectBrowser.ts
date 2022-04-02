@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SfdxProject } from '@salesforce/core';
 import { CustomField } from './CustomField';
+import { CustomObject } from './CustomObject';
 import { EmailToCaseSettings } from './EmailToCaseSettings';
 import { PicklistField } from './PicklistField';
 import { Profile } from './Profile';
@@ -15,8 +16,21 @@ export class SfdxProjectBrowser {
     this.sfdxProject = sfdxProject;
   }
 
-  public customObjectNames(): string[] {
-    return this.objectNames().filter((n) => n.endsWith('__c'));
+  public customObjects(): CustomObject[] {
+    const results: CustomObject[] = [];
+    const baseDir = this.objectsBaseDir();
+    const objectDirs = fs.readdirSync(baseDir);
+
+    for (const objectDir of objectDirs) {
+      const fileName = path.join(baseDir, objectDir, objectDir + '.object-meta.xml');
+      // ignore objects that don't have a *.object-meta.xml file
+      // these are likely to be packaged objects that have been modified in some way (e.g. a custom first was added)
+      if (fs.existsSync(fileName)) {
+        results.push(new CustomObject(fileName));
+      }
+    }
+
+    return results.filter((obj) => obj.isCustomObject());
   }
 
   public emailToCaseSettings(): EmailToCaseSettings {
