@@ -73,4 +73,8 @@ Picklists based on **standard value sets** or **global value sets** are currentl
 
 **PersonAccount**, **Event** and **Task** objects are currently ignored. These non-standard objects will require some special handling, which hasn't been built yet.
 
-**ForecastCategoryName** fields are also ignored.
+The **Opportunity.ForecastCategoryName** field is also ignored, for similar reasons.
+
+## Change log
+
+A full history of changes can be viewed in the [change log](https://github.com/dcathcart/dx-cop/blob/master/CHANGELOG.md).
