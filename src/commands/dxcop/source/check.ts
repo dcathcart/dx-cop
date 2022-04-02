@@ -56,22 +56,22 @@ export default class Check extends SfdxCommand {
   }
 
   public checkEmailToCaseSettings(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking email-to-case settings...');
+    this.ux.log('Checking email-to-case settings');
     return new EmailToCaseSettingsChecker(sfdxProjectBrowser).run();
   }
 
   public checkLwcMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking lwc metadata...');
+    this.ux.log('Checking lwc metadata');
     return new LwcMetadataChecker(sfdxProjectBrowser).run();
   }
 
   public checkRecordTypeMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking record type picklists...');
+    this.ux.log('Checking record type picklists');
     return new RecordTypePicklistChecker(sfdxProjectBrowser).run();
   }
 
   public checkRecordTypePicklistMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking record type picklist values...');
+    this.ux.log('Checking record type picklist values');
     return new RecordTypePicklistValueChecker(sfdxProjectBrowser).run();
   }
 }

@@ -46,8 +46,9 @@ export class EmailToCaseSettingsChecker extends CheckerBase {
 
   // First(ish) go at checking the sort order of metadata.
   // Definitely some potential here for a generic check-the-sort-order-of-something function, which I'll visit in the future.
-  // Why is the sort order important? Because when you deploy, then retrieve the file again, the order will be different.
-  // This can lead to unexpected differences that you need to manage, which can lead to merge conflicts and other problems.
+  // Why is the sort order important? Because when you retrieve this metadata, Salesforce always sorts it by <routingName>.
+  // So if you deploy, then immediately retrieve the file again, the retrieved order will be different.
+  // This can lead to unexpected differences that you need to manage, which can in turn lead to merge conflicts and other problems.
   private checkSortOrder(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
     const results: MetadataProblem[] = [];
     const routingAddresses = emailToCaseSettings.routingAddresses();
