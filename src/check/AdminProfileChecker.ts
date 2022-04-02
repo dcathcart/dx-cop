@@ -5,7 +5,7 @@ import { MetadataProblem, MetadataWarning } from './MetadataProblem';
 export class AdminProfileChecker extends CheckerBase {
   public run(): MetadataProblem[] {
     const adminProfile = this.sfdxProjectBrowser.profileByName('Admin');
-    const objectNames = this.sfdxProjectBrowser.objectNames();
+    const objectNames = this.sfdxProjectBrowser.customObjectNames();
 
     return this.ensureObjectsExist(adminProfile, objectNames);
   }
@@ -17,7 +17,7 @@ export class AdminProfileChecker extends CheckerBase {
   }
 
   private missingObjectError(profile: Profile, objectName: string): MetadataWarning {
-    const message = `Object ${objectName} is missing from Admin profile <objectPermissions>`;
+    const message = `Object ${objectName} is missing from Admin profile's <objectPermissions>`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 }

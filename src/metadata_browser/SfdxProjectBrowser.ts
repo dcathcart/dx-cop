@@ -15,6 +15,10 @@ export class SfdxProjectBrowser {
     this.sfdxProject = sfdxProject;
   }
 
+  public customObjectNames(): string[] {
+    return this.objectNames().filter((n) => n.endsWith('__c'));
+  }
+
   public emailToCaseSettings(): EmailToCaseSettings {
     const fileName = path.join(this.settingsBaseDir(), 'Case.settings-meta.xml');
     return new EmailToCaseSettings(fileName);
