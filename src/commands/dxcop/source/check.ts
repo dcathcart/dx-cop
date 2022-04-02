@@ -3,12 +3,12 @@ import { SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
+import { EmailToCaseSettingsChecker } from '../../../check/EmailToCaseSettingsChecker';
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 import { MetadataProblem } from '../../../check/MetadataProblem';
 import { RecordTypePicklistChecker } from '../../../check/RecordTypePicklistChecker';
 import { RecordTypePicklistValueChecker } from '../../../check/RecordTypePicklistValueChecker';
 import { SfdxProjectBrowser } from '../../../metadata_browser/SfdxProjectBrowser';
-import { EmailToCaseSettingsChecker } from '../../../check/EmailToCaseSettingsChecker';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
