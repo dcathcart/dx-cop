@@ -4,6 +4,7 @@ import { SfdxProject } from '@salesforce/core';
 import { CustomField } from './CustomField';
 import { EmailToCaseSettings } from './EmailToCaseSettings';
 import { PicklistField } from './PicklistField';
+import { Profile } from './Profile';
 import { RecordType } from './RecordType';
 
 // Tools for browsing/navigating the metadata in an SFDX project
@@ -30,6 +31,11 @@ export class SfdxProjectBrowser {
     return picklists.map((f) => new PicklistField(f.fileName));
   }
 
+  public profileByName(profileName: string): Profile {
+    const fileName = path.join(this.profilesBaseDir(), profileName + '.profile-meta.xml');
+    return new Profile(fileName);
+  }
+
   // Return a list of record types for the given object
   public recordTypes(objectName: string): RecordType[] {
     const dir = this.recordTypesBaseDir(objectName);
@@ -47,6 +53,10 @@ export class SfdxProjectBrowser {
   // Directory containing fields for a given object
   private customFieldsBaseDir(objectName: string): string {
     return path.join(this.objectDir(objectName), 'fields');
+  }
+
+  private profilesBaseDir(): string {
+    return path.join(this.defaultDir(), 'profiles');
   }
 
   // Directory containing all the record types for a given object

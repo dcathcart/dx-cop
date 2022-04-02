@@ -3,6 +3,7 @@ import { SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
+import { AdminProfileChecker } from '../../../check/AdminProfileChecker';
 import { EmailToCaseSettingsChecker } from '../../../check/EmailToCaseSettingsChecker';
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 import { MetadataProblem } from '../../../check/MetadataProblem';
@@ -29,6 +30,7 @@ export default class Check extends SfdxCommand {
     const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
 
     const metadataProblems: MetadataProblem[] = [];
+    metadataProblems.push(...this.checkAdminProfile(sfdxProjectBrowser));
     metadataProblems.push(...this.checkEmailToCaseSettings(sfdxProjectBrowser));
     metadataProblems.push(...this.checkLwcMetadata(sfdxProjectBrowser));
     metadataProblems.push(...this.checkRecordTypeMetadata(sfdxProjectBrowser));
@@ -53,6 +55,11 @@ export default class Check extends SfdxCommand {
 
     // Return an object to be displayed with --json
     return { problems: metadataProblems.map((p) => p.jsonOutput()) };
+  }
+
+  public checkAdminProfile(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
+    this.ux.log('Checking admin profile');
+    return new AdminProfileChecker(sfdxProjectBrowser).run();
   }
 
   public checkEmailToCaseSettings(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
