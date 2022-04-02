@@ -35,12 +35,13 @@ export default class Check extends SfdxCommand {
     metadataProblems.push(...this.checkRecordTypePicklistMetadata(sfdxProjectBrowser));
 
     // Log output as a pretty table. Note it won't be shown if --json was passed
+    this.ux.log(); // blank line first
     const problemCount = metadataProblems.length;
     if (problemCount === 0) {
       this.ux.log('Successfully checked metadata. No problems found!');
     } else {
       const tableData = metadataProblems.map((p) => p.tableOutput());
-      this.ux.log(`\n=== Metadata Problems [${problemCount}]`);
+      this.ux.log(`=== Metadata Problems [${problemCount}]`);
       this.ux.table(tableData, MetadataProblem.tableOutputKeys);
     }
 
