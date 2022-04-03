@@ -6,22 +6,33 @@ import { MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class AdminProfileChecker extends CheckerBase {
   public run(): MetadataProblem[] {
-    const adminProfile = this.sfdxProjectBrowser.profileByName('Admin');
-    const customObjects = this.sfdxProjectBrowser.customObjects();
+    const adminProfile = this.sfdxProjectBrowser.profileByName('Admin'); // only checking the System Administrator profile
+    const customObjects = this.sfdxProjectBrowser.customObjects(); // and only *custom* objects for now
 
     const customFields: CustomField[] = [];
     for (const obj of customObjects) {
       customFields.push(...this.sfdxProjectBrowser.customFields(obj.name));
     }
 
-    return this.missingFields(adminProfile, customFields)
+    // Required fields do not appear in profiles.
+    // Makes sense if you think about it: they *have* to be readable and editable (regardless of profile, or anything else) if they are to be required.
+    //
+    // MasterDetail fields also do not appear in profiles.
+    // Also make sense; master-detail relationships appear to be like foreign key relationships, but "stronger",
+    // in that "detail" records can't exist on their own without a "master" record.
+    // So the field that links a detail record back to a master record is implicitly a required field.
+    const expectedFields = customFields.filter((f) => !f.required && !f.isMasterDetail());
+
+    return this.missingFields(adminProfile, expectedFields)
       .concat(this.missingObjects(adminProfile, customObjects))
       .concat(this.missingObjectPermissions(adminProfile));
   }
 
-  private missingFields(profile: Profile, customFields: CustomField[]): MetadataProblem[] {
-    const fieldNamesInProfile = profile.fieldPermissions().map((p) => p.objectFieldName);
-    const missingFields = customFields.filter((f) => !fieldNamesInProfile.includes(f.objectFieldName));
+  // Given a profile and a list of fields that are expected to be in that profile, return a collection of warnings for the fields that are not there.
+  // Note this method does not decide what fields are "expected"; it simply checks and reports the missing ones.
+  private missingFields(profile: Profile, expectedFields: CustomField[]): MetadataProblem[] {
+    const fieldNamesInProfile = profile.fieldPermissions().map((p) => p.objectFieldName); // objectFieldName denotes a composite name "Object.Field"
+    const missingFields = expectedFields.filter((f) => !fieldNamesInProfile.includes(f.objectFieldName));
     return missingFields.map((f) => this.missingFieldError(profile, f));
   }
 
