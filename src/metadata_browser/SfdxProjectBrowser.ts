@@ -16,35 +16,38 @@ export class SfdxProjectBrowser {
     this.sfdxProject = sfdxProject;
   }
 
-  public customFields(objectName: string): CustomField[] {
-    const fields = this.fields(objectName);
-    return fields.filter((f) => f.isCustom());
-  }
-
   // Provide a list of custom objects.
   // In this context, 'custom' means that standard Salesforce objects are excluded.
-  public customObjects(): CustomObject[] {
+  public objects(): CustomObject[] {
     const results: CustomObject[] = [];
+
     const baseDir = this.objectsBaseDir();
     const objectDirs = fs.readdirSync(baseDir);
 
     for (const objectDir of objectDirs) {
       const fileName = path.join(baseDir, objectDir, objectDir + '.object-meta.xml');
-      // ignore objects that don't have a *.object-meta.xml file
-      // these are likely to be packaged objects that have been modified in some way (e.g. a custom field was added)
+
+      // Ignore objects that don't have a *.object-meta.xml file.
+      // These are likely to be packaged objects that have been modified in some way (e.g. a custom field was added).
+      // TODO: Revisit this thinking. Is it valid for all scenarios?
       if (fs.existsSync(fileName)) {
         results.push(new CustomObject(fileName));
       }
     }
 
-    // Filter out anything that is not a custom object
-    // i.e. don't include standard objects, custom settings etc.
-    return results.filter((obj) => obj.isCustomObject());
+    return results;
   }
 
   public emailToCaseSettings(): EmailToCaseSettings {
     const fileName = path.join(this.settingsBaseDir(), 'Case.settings-meta.xml');
     return new EmailToCaseSettings(fileName);
+  }
+
+  // Return the list of fields for a given object
+  public fields(objectName: string): CustomField[] {
+    const dir = this.customFieldsBaseDir(objectName);
+    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    return fileNames.map((f) => new CustomField(path.join(dir, f)));
   }
 
   // Return a list of object names
@@ -68,13 +71,6 @@ export class SfdxProjectBrowser {
     const dir = this.recordTypesBaseDir(objectName);
     const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
     return fileNames.map((f) => new RecordType(path.join(dir, f)));
-  }
-
-  // Return a list of fields for the given object
-  private fields(objectName: string): CustomField[] {
-    const dir = this.customFieldsBaseDir(objectName);
-    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
-    return fileNames.map((f) => new CustomField(path.join(dir, f)));
   }
 
   // Directory containing fields for a given object

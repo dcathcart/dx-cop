@@ -6,14 +6,25 @@ import { MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class AdminProfileChecker extends CheckerBase {
   public run(): MetadataProblem[] {
-    const adminProfile = this.sfdxProjectBrowser.profileByName('Admin'); // only checking the System Administrator profile
-    const customObjects = this.sfdxProjectBrowser.customObjects(); // and only *custom* objects for now
+    const adminProfile = this.sfdxProjectBrowser.profileByName('Admin');
 
-    const customFields: CustomField[] = [];
-    for (const obj of customObjects) {
-      customFields.push(...this.sfdxProjectBrowser.customFields(obj.name));
-    }
+    const objects = this.sfdxProjectBrowser.objects();
+    const expectedObjects = this.filterObjects(objects);
 
+    const fields = expectedObjects.map((obj) => this.sfdxProjectBrowser.fields(obj.name)).reduce((a, b) => a.concat(b));
+    const expectedFields = this.filterFields(fields);
+
+    return this.checkProfile(adminProfile, expectedObjects, expectedFields);
+  }
+
+  private filterObjects(objects: CustomObject[]): CustomObject[] {
+    // Filter out anything that is not a custom object, i.e. don't include standard objects, custom settings etc.
+    return objects.filter((obj) => obj.isCustomObject());
+  }
+
+  private filterFields(fields: CustomField[]): CustomField[] {
+    // Filter out anything that is not a custom field
+    //
     // Required fields do not appear in profiles.
     // Makes sense if you think about it: they *have* to be readable and editable (regardless of profile, or anything else) if they are to be required.
     //
@@ -21,12 +32,18 @@ export class AdminProfileChecker extends CheckerBase {
     // Also make sense; master-detail relationships appear to be like foreign key relationships, but "stronger",
     // in that "detail" records can't exist on their own without a "master" record.
     // So the field that links a detail record back to a master record is implicitly a required field.
-    const expectedFields = customFields.filter((f) => !f.required && !f.isMasterDetail());
+    return fields.filter((f) => f.isCustom() && !f.required && !f.isMasterDetail());
+  }
 
-    return this.missingFields(adminProfile, expectedFields)
-      .concat(this.missingFieldPermissions(adminProfile))
-      .concat(this.missingObjects(adminProfile, customObjects))
-      .concat(this.missingObjectPermissions(adminProfile));
+  private checkProfile(
+    profile: Profile,
+    expectedObjects: CustomObject[],
+    expectedFields: CustomField[]
+  ): MetadataProblem[] {
+    return this.missingFields(profile, expectedFields)
+      .concat(this.missingFieldPermissions(profile))
+      .concat(this.missingObjects(profile, expectedObjects))
+      .concat(this.missingObjectPermissions(profile));
   }
 
   // Given a profile and a list of fields that are expected to be in that profile, return a collection of warnings for the fields that are not there.
@@ -62,7 +79,7 @@ export class AdminProfileChecker extends CheckerBase {
     fieldPermission: ProfileFieldPermission,
     permissionName: string
   ): MetadataWarning {
-    const message = `<${permissionName}> permissions not set for field ${fieldPermission.objectFieldName}`;
+    const message = `<${permissionName}> permission not set for field ${fieldPermission.objectFieldName}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
