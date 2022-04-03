@@ -1,6 +1,6 @@
 import { CustomField } from '../metadata_browser/CustomField';
 import { CustomObject } from '../metadata_browser/CustomObject';
-import { Profile, ProfileObjectPermission } from '../metadata_browser/Profile';
+import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../metadata_browser/Profile';
 import { CheckerBase } from './CheckerBase';
 import { MetadataProblem, MetadataWarning } from './MetadataProblem';
 
@@ -24,6 +24,7 @@ export class AdminProfileChecker extends CheckerBase {
     const expectedFields = customFields.filter((f) => !f.required && !f.isMasterDetail());
 
     return this.missingFields(adminProfile, expectedFields)
+      .concat(this.missingFieldPermissions(adminProfile))
       .concat(this.missingObjects(adminProfile, customObjects))
       .concat(this.missingObjectPermissions(adminProfile));
   }
@@ -38,6 +39,30 @@ export class AdminProfileChecker extends CheckerBase {
 
   private missingFieldError(profile: Profile, customField: CustomField): MetadataWarning {
     const message = `<fieldPermissions> not found for ${customField.objectFieldName}`;
+    return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
+  }
+
+  private missingFieldPermissions(profile: Profile): MetadataProblem[] {
+    const results: MetadataProblem[] = [];
+
+    for (const fieldPermission of profile.fieldPermissions()) {
+      if (!fieldPermission.editable) {
+        results.push(this.missingFieldPermissionError(profile, fieldPermission, 'editable'));
+      }
+      if (!fieldPermission.readable) {
+        results.push(this.missingFieldPermissionError(profile, fieldPermission, 'readable'));
+      }
+    }
+
+    return results;
+  }
+
+  private missingFieldPermissionError(
+    profile: Profile,
+    fieldPermission: ProfileFieldPermission,
+    permissionName: string
+  ): MetadataWarning {
+    const message = `<${permissionName}> permissions not set for field ${fieldPermission.objectFieldName}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
