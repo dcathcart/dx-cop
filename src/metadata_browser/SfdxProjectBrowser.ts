@@ -16,6 +16,8 @@ export class SfdxProjectBrowser {
     this.sfdxProject = sfdxProject;
   }
 
+  // Provide a list of custom objects.
+  // In this context, 'custom' means that standard Salesforce objects are excluded.
   public customObjects(): CustomObject[] {
     const results: CustomObject[] = [];
     const baseDir = this.objectsBaseDir();
@@ -24,12 +26,14 @@ export class SfdxProjectBrowser {
     for (const objectDir of objectDirs) {
       const fileName = path.join(baseDir, objectDir, objectDir + '.object-meta.xml');
       // ignore objects that don't have a *.object-meta.xml file
-      // these are likely to be packaged objects that have been modified in some way (e.g. a custom first was added)
+      // these are likely to be packaged objects that have been modified in some way (e.g. a custom field was added)
       if (fs.existsSync(fileName)) {
         results.push(new CustomObject(fileName));
       }
     }
 
+    // Filter out anything that is not a custom object
+    // i.e. don't include standard objects, custom settings etc.
     return results.filter((obj) => obj.isCustomObject());
   }
 
@@ -62,7 +66,7 @@ export class SfdxProjectBrowser {
   }
 
   // Return a list of fields for the given object
-  private customFields(objectName: string): CustomField[] {
+  public customFields(objectName: string): CustomField[] {
     const dir = this.customFieldsBaseDir(objectName);
     const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
     return fileNames.map((f) => new CustomField(path.join(dir, f)));

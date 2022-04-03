@@ -4,10 +4,50 @@ import { ComponentBase } from './ComponentBase';
 export class Profile extends ComponentBase {
   protected readonly fileExtension = 'profile';
 
+  public fieldPermissions(): ProfileFieldPermission[] {
+    const topLevelNode = getJsonMap(this.metadata, 'Profile');
+    const fieldPermissionArray = getJsonArray(topLevelNode, 'fieldPermissions');
+    return fieldPermissionArray.map((p) => new ProfileFieldPermission(p));
+  }
+
   public objectPermissions(): ProfileObjectPermission[] {
     const topLevelNode = getJsonMap(this.metadata, 'Profile');
     const objectPermissionArray = getJsonArray(topLevelNode, 'objectPermissions');
     return objectPermissionArray.map((p) => new ProfileObjectPermission(p));
+  }
+}
+
+// Snippet of the profile's XML-converted-to-JSON that represents a field permission:
+// <fieldPermissions>
+//   <editable>false</editable>
+//   <field>Account.AccountNumber</field>
+//   <readable>true</readable>
+// </fieldPermissions>
+export class ProfileFieldPermission {
+  private readonly source: AnyJson;
+
+  public constructor(source: AnyJson) {
+    this.source = source;
+  }
+
+  public get editable(): boolean {
+    return getBoolean(this.source, 'editable');
+  }
+
+  public get fieldName(): string {
+    return this.objectFieldName.split('.')[1];
+  }
+
+  public get objectFieldName(): string {
+    return getString(this.source, 'field');
+  }
+
+  public get objectName(): string {
+    return this.objectFieldName.split('.')[0];
+  }
+
+  public get readable(): boolean {
+    return getBoolean(this.source, 'readable');
   }
 }
 

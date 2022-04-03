@@ -1,3 +1,4 @@
+import { CustomField } from '../metadata_browser/CustomField';
 import { Profile, ProfileObjectPermission } from '../metadata_browser/Profile';
 import { CheckerBase } from './CheckerBase';
 import { MetadataProblem, MetadataWarning } from './MetadataProblem';
@@ -7,7 +8,25 @@ export class AdminProfileChecker extends CheckerBase {
     const adminProfile = this.sfdxProjectBrowser.profileByName('Admin');
     const objectNames = this.sfdxProjectBrowser.customObjects().map((obj) => obj.name);
 
-    return this.missingObjects(adminProfile, objectNames).concat(this.missingObjectPermissions(adminProfile));
+    const allFields: CustomField[] = [];
+    for (const objectName of this.sfdxProjectBrowser.objectNames()) {
+      allFields.push(...this.sfdxProjectBrowser.customFields(objectName));
+    }
+
+    return this.missingFields(adminProfile, allFields)
+      .concat(this.missingObjects(adminProfile, objectNames))
+      .concat(this.missingObjectPermissions(adminProfile));
+  }
+
+  private missingFields(profile: Profile, customFields: CustomField[]): MetadataProblem[] {
+    const fieldNamesInProfile = profile.fieldPermissions().map((p) => p.objectFieldName);
+    const missingFieldNames = customFields.filter((n) => !fieldNamesInProfile.includes(n.objectFieldName));
+    return missingFieldNames.map((n) => this.missingFieldError(profile, n.objectFieldName));
+  }
+
+  private missingFieldError(profile: Profile, objectDotfieldName: string): MetadataWarning {
+    const message = `<fieldPermissions> not found for ${objectDotfieldName}`;
+    return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
   private missingObjects(profile: Profile, objectNames: string[]): MetadataProblem[] {

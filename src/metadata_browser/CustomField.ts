@@ -5,6 +5,10 @@ import { SubComponentBase } from './ComponentBase';
 export class CustomField extends SubComponentBase {
   protected readonly fileExtension = 'field';
 
+  public get objectFieldName(): string {
+    return `${this.objectName}.${this.name}`;
+  }
+
   public get type(): string {
     const customField: JsonMap = getJsonMap(this.metadata, 'CustomField');
     const type: string = getString(customField, 'type');
