@@ -16,6 +16,11 @@ export class SfdxProjectBrowser {
     this.sfdxProject = sfdxProject;
   }
 
+  public customFields(objectName: string): CustomField[] {
+    const fields = this.fields(objectName);
+    return fields.filter((f) => f.isCustom());
+  }
+
   // Provide a list of custom objects.
   // In this context, 'custom' means that standard Salesforce objects are excluded.
   public customObjects(): CustomObject[] {
@@ -49,7 +54,7 @@ export class SfdxProjectBrowser {
 
   // Return all picklist fields in a map (picklist name -> PicklistField object)
   public picklistFields(objectName: string): PicklistField[] {
-    const picklists: CustomField[] = this.customFields(objectName).filter((f) => f.isPicklist());
+    const picklists: CustomField[] = this.fields(objectName).filter((f) => f.isPicklist());
     return picklists.map((f) => new PicklistField(f.fileName));
   }
 
@@ -66,7 +71,7 @@ export class SfdxProjectBrowser {
   }
 
   // Return a list of fields for the given object
-  public customFields(objectName: string): CustomField[] {
+  private fields(objectName: string): CustomField[] {
     const dir = this.customFieldsBaseDir(objectName);
     const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
     return fileNames.map((f) => new CustomField(path.join(dir, f)));

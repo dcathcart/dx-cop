@@ -15,6 +15,10 @@ export class CustomField extends SubComponentBase {
     return type;
   }
 
+  public isCustom(): boolean {
+    return this.name.endsWith('__c');
+  }
+
   public isPicklist(): boolean {
     return ['Picklist', 'MultiselectPicklist'].includes(this.type);
   }
