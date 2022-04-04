@@ -16,8 +16,7 @@ export class SfdxProjectBrowser {
     this.sfdxProject = sfdxProject;
   }
 
-  // Provide a list of custom objects.
-  // In this context, 'custom' means that standard Salesforce objects are excluded.
+  // Provide a list of objects. Includes both standard and custom objects.
   public objects(): CustomObject[] {
     const results: CustomObject[] = [];
 
