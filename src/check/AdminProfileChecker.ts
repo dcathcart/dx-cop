@@ -44,7 +44,8 @@ export class AdminProfileChecker extends CheckerBase {
       .concat(this.missingFieldPermissions(profile))
       .concat(this.fieldPermissionsSortOrder(profile))
       .concat(this.missingObjects(profile, expectedObjects))
-      .concat(this.missingObjectPermissions(profile));
+      .concat(this.missingObjectPermissions(profile))
+      .concat(this.objectPermissionsSortOrder(profile));
   }
 
   // Given a profile and a list of fields that are expected to be in that profile, return a collection of warnings for the fields that are not there.
@@ -92,7 +93,7 @@ export class AdminProfileChecker extends CheckerBase {
   }
 
   private fieldPermissionSortOrderError(profile: Profile, permission: ProfileFieldPermission): MetadataWarning {
-    const message = `<fieldPermissions> should be sorted by <field>: ${permission.objectFieldName}`;
+    const message = `<fieldPermissions> should be sorted by <field>: ${permission.objectFieldName} is out of order.`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
@@ -140,6 +141,18 @@ export class AdminProfileChecker extends CheckerBase {
     permissionName: string
   ): MetadataProblem {
     const message = `<${permissionName}> permission not set for object ${objectPermission.objectName}`;
+    return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
+  }
+
+  private objectPermissionsSortOrder(profile: Profile): MetadataProblem[] {
+    return profile
+      .objectPermissions()
+      .filter((_value, index, array) => array[index].objectName < array[index - 1]?.objectName)
+      .map((op) => this.objectPermissionSortOrderError(profile, op));
+  }
+
+  private objectPermissionSortOrderError(profile: Profile, permission: ProfileObjectPermission): MetadataWarning {
+    const message = `<objectPermissions> should be sorted by <object>: ${permission.objectName} is out of order.`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 }
