@@ -46,3 +46,27 @@ describe('EmailToCaseSettingsChecker.checkIsVerified()', () => {
     expect(result.length).to.equal(0);
   });
 });
+
+describe('EmailToCaseSettingsChecker.checkSortOrder()', () => {
+  it("should return a metadata error when <routingAddresses> aren't sorted by <routingName>", () => {
+    const fileName = 'test/fixtures/Case-errors.settings-meta.xml';
+    const emailToCaseSettings = new EmailToCaseSettings(fileName);
+    const checker = new EmailToCaseSettingsChecker(null);
+    const result = checker['checkSortOrder'](emailToCaseSettings);
+    expect(result.length).to.equal(1);
+    expect(result[0].componentType).to.equal('CaseSettings');
+    expect(result[0].componentName).to.equal('EmailToCase');
+    expect(result[0].fileName).to.equal(fileName);
+    expect(result[0].problem).to.equal(
+      "<routingAddresses> should be sorted by <routingName>. Expect 'Test email address 2' to be before 'Test email address 3'"
+    );
+    expect(result[0].problemType).to.equal('Warning');
+  });
+
+  it('should return an empty array when there are no errors', () => {
+    const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/Case.settings-meta.xml');
+    const checker = new EmailToCaseSettingsChecker(null);
+    const result = checker['checkSortOrder'](emailToCaseSettings);
+    expect(result.length).to.equal(0);
+  });
+});

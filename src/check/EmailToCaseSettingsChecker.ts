@@ -70,7 +70,7 @@ export class EmailToCaseSettingsChecker extends CheckerBase {
     routingAddressA: EmailToCaseRoutingAddress,
     routingAddressB: EmailToCaseRoutingAddress
   ): MetadataWarning {
-    const message = `<routingAddresses> should be sorted by <routingName>. Expect '${routingAddressB.routingName}' < '${routingAddressA.routingName}'`;
+    const message = `<routingAddresses> should be sorted by <routingName>. Expect '${routingAddressB.routingName}' to be before '${routingAddressA.routingName}'`;
     return new MetadataWarning('EmailToCase', 'CaseSettings', settings.fileName, message);
   }
 }
