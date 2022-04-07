@@ -1,9 +1,36 @@
 import 'mocha';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
 import { EmailToCaseSettings } from '../../src/metadata_browser/EmailToCaseSettings';
 import { EmailToCaseSettingsChecker } from '../../src/check/EmailToCaseSettingsChecker';
+import { SfdxProjectBrowser } from '../../src/metadata_browser/SfdxProjectBrowser';
 
 describe('EmailToCaseSettingsChecker', () => {
+  describe('.run() method', () => {
+    it('should return an array of metadata problems', () => {
+      const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/settings/Case-errors.settings-meta.xml');
+      const sfdxProjectBrowser = new SfdxProjectBrowser(null);
+      const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
+      mockProjectBrowser.expects('emailToCaseSettings').once().returns(emailToCaseSettings);
+
+      const checker = new EmailToCaseSettingsChecker(sfdxProjectBrowser);
+      const result = checker.run();
+      expect(result.length).to.equal(3);
+      mockProjectBrowser.verify();
+    });
+    it('should an empty array when there are no problems', () => {
+      const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/settings/Case.settings-meta.xml');
+      const sfdxProjectBrowser = new SfdxProjectBrowser(null);
+      const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
+      mockProjectBrowser.expects('emailToCaseSettings').once().returns(emailToCaseSettings);
+
+      const checker = new EmailToCaseSettingsChecker(sfdxProjectBrowser);
+      const result = checker.run();
+      expect(result.length).to.equal(0);
+      mockProjectBrowser.verify();
+    });
+  });
+
   describe('.checkEmailServicesAddress() method', () => {
     it('should return a metadata error when an <emailServicesAddress> field exists', () => {
       const fileName = 'test/fixtures/settings/Case-errors.settings-meta.xml';
