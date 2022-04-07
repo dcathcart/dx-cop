@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- sample CaseSettings with multiple <emailToCase>/<routingAddresses> and no metadata problems -->
 <CaseSettings xmlns="http://soap.sforce.com/2006/04/metadata">
     <emailToCase>
         <routingAddresses>
@@ -21,6 +22,17 @@
             <createTask>false</createTask>
             <emailAddress>test2@test.com</emailAddress>
             <routingName>Test email address 2</routingName>
+            <saveEmailHeaders>false</saveEmailHeaders>
+        </routingAddresses>
+        <routingAddresses>
+            <addressType>EmailToCase</addressType>
+            <caseOrigin>Email</caseOrigin>
+            <caseOwner>TestQueue</caseOwner>
+            <caseOwnerType>Queue</caseOwnerType>
+            <casePriority>Medium</casePriority>
+            <createTask>false</createTask>
+            <emailAddress>test3@test.com</emailAddress>
+            <routingName>Test email address 3</routingName>
             <saveEmailHeaders>false</saveEmailHeaders>
         </routingAddresses>
     </emailToCase>

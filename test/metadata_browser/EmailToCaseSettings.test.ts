@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { EmailToCaseSettings } from '../../src/metadata_browser/EmailToCaseSettings';
 import 'mocha';
 
-describe('routingAddresses() function', () => {
+describe('EmailToCaseSettings.routingAddresses()', () => {
   it('should return an empty array when there are no routing addresses', () => {
     const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/Case0.settings-meta.xml');
     const result = emailToCaseSettings.routingAddresses();
@@ -17,8 +17,8 @@ describe('routingAddresses() function', () => {
   });
 
   it('should return multiple routing address objects', () => {
-    const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/Case2.settings-meta.xml');
+    const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/Case.settings-meta.xml');
     const result = emailToCaseSettings.routingAddresses();
-    expect(result.length).to.equal(2);
+    expect(result.length).to.greaterThan(1);
   });
 });
