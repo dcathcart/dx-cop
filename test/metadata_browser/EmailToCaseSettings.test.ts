@@ -1,6 +1,6 @@
+import 'mocha';
 import { expect } from 'chai';
 import { EmailToCaseSettings } from '../../src/metadata_browser/EmailToCaseSettings';
-import 'mocha';
 
 describe('EmailToCaseSettings.routingAddresses()', () => {
   it('should return an empty array when there are no routing addresses', () => {
