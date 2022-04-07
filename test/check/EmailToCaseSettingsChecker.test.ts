@@ -6,7 +6,7 @@ import { EmailToCaseSettingsChecker } from '../../src/check/EmailToCaseSettingsC
 describe('EmailToCaseSettingsChecker', () => {
   describe('.checkEmailServicesAddress() method', () => {
     it('should return a metadata error when an <emailServicesAddress> field exists', () => {
-      const fileName = 'test/fixtures/Case-errors.settings-meta.xml';
+      const fileName = 'test/fixtures/settings/Case-errors.settings-meta.xml';
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
       const checker = new EmailToCaseSettingsChecker(null);
       const result = checker['checkEmailServicesAddress'](emailToCaseSettings);
@@ -19,7 +19,7 @@ describe('EmailToCaseSettingsChecker', () => {
     });
 
     it('should return an empty array when there are no errors', () => {
-      const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/Case.settings-meta.xml');
+      const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/settings/Case.settings-meta.xml');
       const checker = new EmailToCaseSettingsChecker(null);
       const result = checker['checkEmailServicesAddress'](emailToCaseSettings);
       expect(result.length).to.equal(0);
@@ -28,7 +28,7 @@ describe('EmailToCaseSettingsChecker', () => {
 
   describe('.checkIsVerified() method', () => {
     it('should return a metadata error when an <isVerified> field exists', () => {
-      const fileName = 'test/fixtures/Case-errors.settings-meta.xml';
+      const fileName = 'test/fixtures/settings/Case-errors.settings-meta.xml';
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
       const checker = new EmailToCaseSettingsChecker(null);
       const result = checker['checkIsVerified'](emailToCaseSettings);
@@ -41,7 +41,7 @@ describe('EmailToCaseSettingsChecker', () => {
     });
 
     it('should return an empty array when there are no errors', () => {
-      const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/Case.settings-meta.xml');
+      const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/settings/Case.settings-meta.xml');
       const checker = new EmailToCaseSettingsChecker(null);
       const result = checker['checkIsVerified'](emailToCaseSettings);
       expect(result.length).to.equal(0);
@@ -50,7 +50,7 @@ describe('EmailToCaseSettingsChecker', () => {
 
   describe('.checkSortOrder() method', () => {
     it("should return a metadata error when <routingAddresses> aren't sorted by <routingName>", () => {
-      const fileName = 'test/fixtures/Case-errors.settings-meta.xml';
+      const fileName = 'test/fixtures/settings/Case-errors.settings-meta.xml';
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
       const checker = new EmailToCaseSettingsChecker(null);
       const result = checker['checkSortOrder'](emailToCaseSettings);
@@ -65,7 +65,7 @@ describe('EmailToCaseSettingsChecker', () => {
     });
 
     it('should return an empty array when there are no errors', () => {
-      const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/Case.settings-meta.xml');
+      const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/settings/Case.settings-meta.xml');
       const checker = new EmailToCaseSettingsChecker(null);
       const result = checker['checkSortOrder'](emailToCaseSettings);
       expect(result.length).to.equal(0);
