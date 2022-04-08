@@ -4,13 +4,17 @@ import { XMLParser } from 'fast-xml-parser/src/fxp';
 import { JsonMap, ensureJsonMap } from '@salesforce/ts-types';
 
 // Abstract base class for all metadata components
-export abstract class ComponentBase {
+export abstract class MetadataComponent {
   public readonly fileName: string;
   private parsedMetadata: JsonMap;
 
   // The part of the file extension that is specific to each metadata type, e.g. the 'field' in '.field-meta.xml'.
   // Must be set in every subclass so the component name can be properly derived from the file name.
   protected abstract readonly fileExtension: string;
+
+  // The Salesforce metadata type, according to https://developer.salesforce.com/docs/atlas.en-us.234.0.api_meta.meta/api_meta/meta_types_list.htm
+  // This is the name of the 'top level' node in the metadata XML.
+  protected abstract readonly metadataType: string;
 
   public constructor(fileName: string) {
     this.fileName = fileName;
@@ -36,12 +40,13 @@ export abstract class ComponentBase {
     });
 
     const file: Buffer = fs.readFileSync(this.fileName);
-    return ensureJsonMap(xmlParser.parse(file));
+    const parsed: JsonMap = ensureJsonMap(xmlParser.parse(file));
+    return ensureJsonMap(parsed[this.metadataType]);
   }
 }
 
 // Abstract base class for sub-components of objects, e.g. fields, record types
-export abstract class SubComponentBase extends ComponentBase {
+export abstract class ObjectSubComponent extends MetadataComponent {
   public get objectName(): string {
     const dir = path.dirname(this.fileName);
     const split = dir.split(path.sep); // assumes fileName is using the appropriate path separator for the platform

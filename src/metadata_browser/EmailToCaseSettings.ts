@@ -8,10 +8,11 @@ import {
   hasJsonArray,
   hasJsonMap,
 } from '@salesforce/ts-types';
-import { ComponentBase } from './ComponentBase';
+import { MetadataComponent } from './MetadataComponent';
 
-export class EmailToCaseSettings extends ComponentBase {
+export class EmailToCaseSettings extends MetadataComponent {
   protected fileExtension = 'settings';
+  protected metadataType = 'CaseSettings';
 
   public routingAddresses(): EmailToCaseRoutingAddress[] {
     if (hasJsonArray(this.emailToCaseSettings, 'routingAddresses')) {
@@ -27,30 +28,26 @@ export class EmailToCaseSettings extends ComponentBase {
   }
 
   private get emailToCaseSettings(): JsonMap {
-    return getJsonMap(this.rootElement, 'emailToCase');
-  }
-
-  private get rootElement(): JsonMap {
-    return getJsonMap(this.metadata, 'CaseSettings');
+    return getJsonMap(this.metadata, 'emailToCase');
   }
 }
 
 export class EmailToCaseRoutingAddress {
-  private readonly source: AnyJson;
+  private readonly json: AnyJson;
 
-  public constructor(source: AnyJson) {
-    this.source = source;
+  public constructor(json: AnyJson) {
+    this.json = json;
   }
 
   public get emailServicesAddress(): string {
-    return getString(this.source, 'emailServicesAddress');
+    return getString(this.json, 'emailServicesAddress');
   }
 
   public get isVerified(): boolean {
-    return getBoolean(this.source, 'isVerified');
+    return getBoolean(this.json, 'isVerified');
   }
 
   public get routingName(): string {
-    return getString(this.source, 'routingName');
+    return getString(this.json, 'routingName');
   }
 }
