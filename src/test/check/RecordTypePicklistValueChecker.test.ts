@@ -7,8 +7,7 @@ import { RecordTypePicklistValueChecker } from '../../check/RecordTypePicklistVa
 import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
 
 describe('RecordTypePicklistValueChecker', () => {
-  // this one is less unit test, more functional test
-  // uses carefully crafted sample XML files to test the object at a high level
+  // Regression test. Uses carefully crafted sample XML files to test the object at a high level.
   describe('.run() method', () => {
     it('should return an array of metadata problems', () => {
       const objectNames = ['TestObject2'];

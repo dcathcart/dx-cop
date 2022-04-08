@@ -5,8 +5,7 @@ import { LwcMetadataChecker } from '../../check/LwcMetadataChecker';
 import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
 
 describe('LwcMetadataChecker', () => {
-  // this one is less unit test, more functional test
-  // uses carefully crafted sample XML files to test the object at a high level
+  // Regression test. Uses carefully crafted sample XML files to test the object at a high level.
   describe('.run() method', () => {
     it('should return an array of metadata problems', () => {
       const lwcFolders = new Map<string, string>();
