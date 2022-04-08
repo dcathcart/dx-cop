@@ -1,4 +1,5 @@
 import 'mocha';
+import * as path from 'path';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { EmailToCaseSettings } from '../../src/metadata_browser/EmailToCaseSettings';
@@ -35,7 +36,7 @@ describe('EmailToCaseSettingsChecker', () => {
 
   describe('.emailServicesAddressErrors()', () => {
     it('should return a metadata error when an <emailServicesAddress> field exists', () => {
-      const fileName = 'test/fixtures/settings/Case-errors.settings-meta.xml';
+      const fileName = path.normalize('test/fixtures/settings/Case-errors.settings-meta.xml');
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
       const checker = new EmailToCaseSettingsChecker(null);
       const result = checker['emailServicesAddressErrors'](emailToCaseSettings);
@@ -57,7 +58,7 @@ describe('EmailToCaseSettingsChecker', () => {
 
   describe('.isVerifiedErrors()', () => {
     it('should return a metadata error when an <isVerified> field exists', () => {
-      const fileName = 'test/fixtures/settings/Case-errors.settings-meta.xml';
+      const fileName = path.normalize('test/fixtures/settings/Case-errors.settings-meta.xml');
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
       const checker = new EmailToCaseSettingsChecker(null);
       const result = checker['isVerifiedErrors'](emailToCaseSettings);
@@ -79,7 +80,7 @@ describe('EmailToCaseSettingsChecker', () => {
 
   describe('.sortOrderWarnings()', () => {
     it("should return a metadata error when <routingAddresses> aren't sorted by <routingName>", () => {
-      const fileName = 'test/fixtures/settings/Case-errors.settings-meta.xml';
+      const fileName = path.normalize('test/fixtures/settings/Case-errors.settings-meta.xml');
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
       const checker = new EmailToCaseSettingsChecker(null);
       const result = checker['sortOrderWarnings'](emailToCaseSettings);
