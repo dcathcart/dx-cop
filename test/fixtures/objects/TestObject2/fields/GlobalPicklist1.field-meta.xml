@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GlobalPicklist1</fullName>
+    <externalId>false</externalId>
+    <label>Global Picklist 1</label>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>GlobalValueSet1</valueSetName>
+    </valueSet>
+</CustomField>
