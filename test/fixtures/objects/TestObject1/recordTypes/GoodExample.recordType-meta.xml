@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Example record type with no problems.
+    Note there is deliberately no reference to picklist field 'StandardPicklist2'; this is not considered to be a problem.
+-->
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GoodExample</fullName>
+    <active>true</active>
+    <label>Good example</label>
+    <picklistValues>
+        <picklist>CustomPicklist1__c</picklist>
+        <values>
+            <fullName>Value 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Value 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CustomPicklist2__c</picklist>
+        <values>
+            <fullName>Value 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Value 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>StandardPicklist1</picklist>
+        <values>
+            <fullName>Value 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Value 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>
