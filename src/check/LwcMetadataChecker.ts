@@ -5,23 +5,20 @@ import { MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class LwcMetadataChecker extends CheckerBase {
   public run(): MetadataProblem[] {
-    // TODO: Move this folder/file logic back to the SfdxProjectBrowser
-    const defaultPackage = this.sfdxProjectBrowser.sfdxProject.getDefaultPackage();
-    const lwcPath = path.join(defaultPackage.fullPath, 'main', 'default', 'lwc');
-    return this.checkLwcFolder(lwcPath);
+    const lwcFolders = this.sfdxProjectBrowser.lwcFolders();
+    return this.checkLwcFolders(lwcFolders);
   }
 
-  // Checks over all of the lightning web components in a given lwc folder (full path expected).
+  // Checks over all of the given lightning web components.
   // Right now the only check performed is for trailing whitespace. Any trailing whitespace in a .js-meta.xml file
   // can, for reasons unknown, cause even more whitespace to be added _between_ lines during a Salesforce deployment
   // (which can result in noisy diffs later when the lwc is retrieved). Best to avoid in the first place.
-  private checkLwcFolder(lwcFolder: string): MetadataProblem[] {
-    const lwcs = fs.readdirSync(lwcFolder).filter((entry) => entry !== 'jsconfig.json');
+  private checkLwcFolders(lwcFolders: Map<string, string>): MetadataProblem[] {
     const warnings: MetadataProblem[] = [];
 
-    lwcs.forEach((entry) => {
-      const jsMetaFileName = path.join(lwcFolder, entry, entry + '.js-meta.xml');
-      warnings.push(...this.checkJsMetaFile(entry, jsMetaFileName));
+    lwcFolders.forEach((lwcFolder, lwcName) => {
+      const jsMetaFileName = path.join(lwcFolder, lwcName + '.js-meta.xml');
+      warnings.push(...this.checkJsMetaFile(lwcName, jsMetaFileName));
     });
 
     return warnings;

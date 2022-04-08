@@ -18,7 +18,7 @@ describe('EmailToCaseSettingsChecker', () => {
       expect(result.length).to.equal(3);
       mockProjectBrowser.verify();
     });
-    it('should an empty array when there are no problems', () => {
+    it('should return an empty array when there are no problems', () => {
       const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/settings/Case.settings-meta.xml');
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
