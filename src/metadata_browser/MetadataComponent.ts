@@ -17,7 +17,7 @@ export abstract class MetadataComponent {
   protected abstract readonly metadataType: string;
 
   public constructor(fileName: string) {
-    this.fileName = fileName;
+    this.fileName = path.normalize(fileName); // smooth away any rough edges, forward/backslash issues etc
   }
 
   // The name (aka Developer Name) of this metadata component
