@@ -3,6 +3,7 @@ import * as path from 'path';
 import { SfdxProject } from '@salesforce/core';
 import { CustomField } from './CustomField';
 import { EmailToCaseSettings } from './EmailToCaseSettings';
+import { LightningComponentBundle } from './LightningComponentBundle';
 import { PicklistField } from './PicklistField';
 import { RecordType } from './RecordType';
 
@@ -20,11 +21,11 @@ export class SfdxProjectBrowser {
   }
 
   // Return a map of all LWCs. key = LWC name, value = full path to the folder that contains all the components for that LWC
-  public lwcFolders(): Map<string, string> {
+  public lwcBundles(): LightningComponentBundle[] {
     const lwcBaseDir = this.lwcBaseDir();
-    const lwcs = fs.readdirSync(lwcBaseDir).filter((entry) => entry !== 'jsconfig.json');
+    const lwcDirs = fs.readdirSync(lwcBaseDir).filter((entry) => entry !== 'jsconfig.json');
 
-    return new Map<string, string>(lwcs.map((lwc) => [lwc, path.join(lwcBaseDir, lwc)]));
+    return lwcDirs.map((lwc) => new LightningComponentBundle(lwc));
   }
 
   // Return a list of object names
