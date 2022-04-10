@@ -1,14 +1,15 @@
 import { JsonMap } from '@salesforce/ts-types';
 
 export abstract class MetadataProblem {
+  // for use in calls to SfdxCommand.ux.table()
   public static tableOutputKeys: string[] = ['type', 'metadataType', 'name', 'problem'];
 
-  protected problemType: string;
+  public readonly componentName: string;
+  public readonly componentType: string;
+  public readonly fileName: string;
+  public readonly problem: string;
 
-  private componentName: string;
-  private componentType: string;
-  private fileName: string;
-  private problem: string;
+  public abstract readonly problemType: string;
 
   public constructor(componentName: string, componentType: string, fileName: string, problem: string) {
     this.componentName = componentName;
@@ -40,7 +41,7 @@ export abstract class MetadataProblem {
 // A Metadata Error is a condition that would in all likelihood prevent a component from being deployed,
 // due to a Salesforce validation error. e.g. when a record type references a picklist value that no longer exists.
 export class MetadataError extends MetadataProblem {
-  protected problemType = 'Error';
+  public readonly problemType = 'Error';
 }
 
 // A Metadata Warning is a condition that usually *doesn't* result in a validation/deployment error, but could still
@@ -50,5 +51,5 @@ export class MetadataError extends MetadataProblem {
 // - config intended by the developer is missed
 // - unexpected differences when retrieving component from org
 export class MetadataWarning extends MetadataProblem {
-  protected problemType = 'Warning';
+  public readonly problemType = 'Warning';
 }

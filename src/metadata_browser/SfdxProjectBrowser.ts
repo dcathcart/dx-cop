@@ -8,7 +8,7 @@ import { RecordType } from './RecordType';
 
 // Tools for browsing/navigating the metadata in an SFDX project
 export class SfdxProjectBrowser {
-  public readonly sfdxProject: SfdxProject;
+  private readonly sfdxProject: SfdxProject;
 
   public constructor(sfdxProject: SfdxProject) {
     this.sfdxProject = sfdxProject;
@@ -17,6 +17,14 @@ export class SfdxProjectBrowser {
   public emailToCaseSettings(): EmailToCaseSettings {
     const fileName = path.join(this.settingsBaseDir(), 'Case.settings-meta.xml');
     return new EmailToCaseSettings(fileName);
+  }
+
+  // Return a map of all LWCs. key = LWC name, value = full path to the folder that contains all the components for that LWC
+  public lwcFolders(): Map<string, string> {
+    const lwcBaseDir = this.lwcBaseDir();
+    const lwcs = fs.readdirSync(lwcBaseDir).filter((entry) => entry !== 'jsconfig.json');
+
+    return new Map<string, string>(lwcs.map((lwc) => [lwc, path.join(lwcBaseDir, lwc)]));
   }
 
   // Return a list of object names
@@ -47,6 +55,10 @@ export class SfdxProjectBrowser {
   // Directory containing fields for a given object
   private customFieldsBaseDir(objectName: string): string {
     return path.join(this.objectDir(objectName), 'fields');
+  }
+
+  private lwcBaseDir(): string {
+    return path.join(this.defaultDir(), 'lwc');
   }
 
   // Directory containing all the record types for a given object

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Example record type with no problems.
+    - all picklist values match valid values in the field definitions
+    - fields that use standard value sets or global value sets are ignored
+-->
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GoodExample</fullName>
+    <active>true</active>
+    <label>Good example</label>
+    <picklistValues>
+        <picklist>CustomPicklist1__c</picklist>
+        <values>
+            <fullName>Value 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Value 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CustomPicklist2__c</picklist>
+        <values>
+            <fullName>Value 1A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Value 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GlobalPicklist1</picklist>
+        <values>
+            <fullName>Doesn't matter</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>what values</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>are here</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>StandardPicklist1</picklist>
+        <values>
+            <fullName>or here</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>because they won't be checked</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

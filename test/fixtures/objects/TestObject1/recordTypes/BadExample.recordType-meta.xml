@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Example record type with a number of problems:
+    1. missing reference to CustomPicklist2__c
+    2. reference to CustomPicklist3__c which doesn't exist
+-->
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>BadExample</fullName>
+    <active>true</active>
+    <label>Good example</label>
+    <picklistValues>
+        <picklist>CustomPicklist1__c</picklist>
+        <values>
+            <fullName>Value 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Value 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CustomPicklist3__c</picklist>
+        <values>
+            <fullName>Value 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Value 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>StandardPicklist1</picklist>
+        <values>
+            <fullName>Value 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Value 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

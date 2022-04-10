@@ -27,10 +27,10 @@ export class EmailToCaseSettings extends ComponentBase {
   }
 
   private get emailToCaseSettings(): JsonMap {
-    return getJsonMap(this.roolElement, 'emailToCase');
+    return getJsonMap(this.rootElement, 'emailToCase');
   }
 
-  private get roolElement(): JsonMap {
+  private get rootElement(): JsonMap {
     return getJsonMap(this.metadata, 'CaseSettings');
   }
 }
