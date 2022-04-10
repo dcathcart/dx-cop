@@ -1,8 +1,8 @@
 import { RecordType } from '../metadata_browser/RecordType';
-import { CheckerBase } from './CheckerBase';
 import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
+import { MetadataScanner } from './MetadataScanner';
 
-export class RecordTypePicklistChecker extends CheckerBase {
+export class RecordTypePicklistScanner extends MetadataScanner {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
   private BONUS_EXPECTED_PICKLISTS = ['Name', 'ForecastCategoryName'];
 
@@ -11,13 +11,13 @@ export class RecordTypePicklistChecker extends CheckerBase {
 
     const objects = this.sfdxProjectBrowser.objectNames().filter((o) => !this.IGNORE_OBJECTS.includes(o));
     for (const obj of objects) {
-      warnings.push(...this.checkRecordTypes(obj));
+      warnings.push(...this.scanRecordTypes(obj));
     }
 
     return warnings;
   }
 
-  public checkRecordTypes(objectName: string): MetadataProblem[] {
+  public scanRecordTypes(objectName: string): MetadataProblem[] {
     const objectPicklists = this.sfdxProjectBrowser.picklistFields(objectName);
 
     // For reasons I can't quite explain, Salesforce makes an effort to furnish record types with all picklist fields that don't use standard value sets.
@@ -31,13 +31,13 @@ export class RecordTypePicklistChecker extends CheckerBase {
     const warnings: MetadataProblem[] = [];
     const recordTypes = this.sfdxProjectBrowser.recordTypes(objectName);
     for (const recordType of recordTypes) {
-      const result = this.checkRecordTypePicklists(recordType, requiredPicklists, optionalPicklists);
+      const result = this.scanRecordTypePicklists(recordType, requiredPicklists, optionalPicklists);
       warnings.push(...result);
     }
     return warnings;
   }
 
-  public checkRecordTypePicklists(
+  public scanRecordTypePicklists(
     recordType: RecordType,
     requiredPicklists: string[],
     optionalPicklists: string[]

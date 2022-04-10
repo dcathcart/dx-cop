@@ -1,14 +1,14 @@
 import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../metadata_browser/EmailToCaseSettings';
-import { CheckerBase } from './CheckerBase';
 import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
+import { MetadataScanner } from './MetadataScanner';
 
-export class EmailToCaseSettingsChecker extends CheckerBase {
+export class EmailToCaseSettingsScanner extends MetadataScanner {
   public run(): MetadataProblem[] {
     const emailToCaseSettings = this.sfdxProjectBrowser.emailToCaseSettings();
-    return this.checkRoutingAddresses(emailToCaseSettings);
+    return this.routingAddressProblems(emailToCaseSettings);
   }
 
-  private checkRoutingAddresses(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
+  private routingAddressProblems(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
     return this.emailServicesAddressErrors(emailToCaseSettings)
       .concat(this.isVerifiedErrors(emailToCaseSettings))
       .concat(this.sortOrderWarnings(emailToCaseSettings));

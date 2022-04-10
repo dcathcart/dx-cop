@@ -1,6 +1,6 @@
 import { SfdxProjectBrowser } from '../metadata_browser/SfdxProjectBrowser';
 
-export class CheckerBase {
+export class MetadataScanner {
   protected sfdxProjectBrowser: SfdxProjectBrowser;
 
   public constructor(sfdxProjectBrowser: SfdxProjectBrowser) {

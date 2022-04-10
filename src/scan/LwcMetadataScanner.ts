@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import { LightningComponentBundle } from '../metadata_browser/LightningComponentBundle';
-import { CheckerBase } from './CheckerBase';
 import { MetadataProblem, MetadataWarning } from './MetadataProblem';
+import { MetadataScanner } from './MetadataScanner';
 
-export class LwcMetadataChecker extends CheckerBase {
+export class LwcMetadataScanner extends MetadataScanner {
   // Checks over all lightning web components in the project.
   // Right now the only check performed is for trailing whitespace.
   // Any trailing whitespace in a .js-meta.xml file can, for reasons unknown, cause even more whitespace to be added

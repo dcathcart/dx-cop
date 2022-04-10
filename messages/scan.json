@@ -1,0 +1,7 @@
+{
+  "commandDescription": "Scans a project for metadata problems",
+  "examples": [
+    "sfdx dxcop:source:scan",
+    "sfdx dxcop:source:scan --json"
+  ]
+}

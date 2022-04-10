@@ -1,21 +1,21 @@
 import { PicklistField } from '../metadata_browser/PicklistField';
 import { RecordType } from '../metadata_browser/RecordType';
-import { CheckerBase } from './CheckerBase';
 import { MetadataError, MetadataProblem } from './MetadataProblem';
+import { MetadataScanner } from './MetadataScanner';
 
-export class RecordTypePicklistValueChecker extends CheckerBase {
+export class RecordTypePicklistValueScanner extends MetadataScanner {
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
   private IGNORE_PICKLISTS = ['ForecastCategoryName'];
 
   // Run the record type picklist value checks. Returns an array of warning messages.
   public run(): MetadataProblem[] {
-    return this.checkRecordTypesForAllObjects();
+    return this.scanRecordTypesForAllObjects();
   }
 
   // Loop through all custom objects, then through all record types in each object
-  private checkRecordTypesForAllObjects(): MetadataProblem[] {
+  private scanRecordTypesForAllObjects(): MetadataProblem[] {
     const warnings: MetadataProblem[] = [];
-    for (const objectName of this.objectsToCheck()) {
+    for (const objectName of this.objectsToScan()) {
       const recordTypes = this.sfdxProjectBrowser.recordTypes(objectName);
       const picklistFields = this.sfdxProjectBrowser.picklistFields(objectName);
 
@@ -25,18 +25,18 @@ export class RecordTypePicklistValueChecker extends CheckerBase {
       );
 
       for (const recordType of recordTypes) {
-        warnings.push(...this.checkAllPicklistsInRecordType(recordType, picklistFieldMap));
+        warnings.push(...this.scanAllPicklistsInRecordType(recordType, picklistFieldMap));
       }
     }
     return warnings;
   }
 
-  private objectsToCheck(): string[] {
+  private objectsToScan(): string[] {
     return this.sfdxProjectBrowser.objectNames().filter((o) => !this.IGNORE_OBJECTS.includes(o));
   }
 
   // Loop through the picklists in a record type
-  private checkAllPicklistsInRecordType(
+  private scanAllPicklistsInRecordType(
     recordType: RecordType,
     picklistFieldMap: Map<string, PicklistField> // picklist field definitions from object
   ): MetadataProblem[] {
@@ -47,7 +47,7 @@ export class RecordTypePicklistValueChecker extends CheckerBase {
       if (this.IGNORE_PICKLISTS.includes(picklistName)) continue;
 
       // If the record type references a picklist that doesn't exist, or a field that is not a picklist, then ignore it here.
-      // It will be picked up as a problem by the RecordTypeChecker.
+      // It will be picked up as a problem by the RecordTypePicklistScanner.
       if (!picklistFieldMap.has(picklistName)) continue;
 
       const picklist = picklistFieldMap.get(picklistName);
@@ -56,14 +56,14 @@ export class RecordTypePicklistValueChecker extends CheckerBase {
       if (picklist.usesStandardValueSet() || picklist.usesGlobalValueSet()) continue;
 
       const valuesInRecordType = recordTypePicklistMap.get(picklistName);
-      warnings.push(...this.checkPicklistValues(recordType, valuesInRecordType, picklist));
+      warnings.push(...this.scanPicklistValues(recordType, valuesInRecordType, picklist));
     }
 
     return warnings;
   }
 
   // Check the picklist values in one picklist in a record type
-  private checkPicklistValues(
+  private scanPicklistValues(
     recordType: RecordType,
     valuesInRecordType: string[],
     picklistField: PicklistField

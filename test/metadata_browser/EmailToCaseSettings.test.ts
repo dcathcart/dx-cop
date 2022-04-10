@@ -2,8 +2,8 @@ import 'mocha';
 import { expect } from 'chai';
 import { EmailToCaseSettings } from '../../src/metadata_browser/EmailToCaseSettings';
 
-describe('EmailToCaseSettings class', () => {
-  describe('.routingAddresses() method', () => {
+describe('EmailToCaseSettings', () => {
+  describe('.routingAddresses()', () => {
     it('should return an empty array when there are no routing addresses', () => {
       const emailToCaseSettings = new EmailToCaseSettings('test/fixtures/settings/Case0.settings-meta.xml');
       const result = emailToCaseSettings.routingAddresses();
