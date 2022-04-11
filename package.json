@@ -18,7 +18,7 @@
     "@oclif/dev-cli": "^1",
     "@oclif/plugin-help": "^5",
     "@oclif/test": "^1",
-    "@salesforce/dev-config": "^2",
+    "@salesforce/dev-config": "^3",
     "@salesforce/dev-scripts": "^0",
     "@salesforce/prettier-config": "^0",
     "@salesforce/ts-sinon": "^1",
