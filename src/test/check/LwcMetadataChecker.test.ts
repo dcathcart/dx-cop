@@ -1,8 +1,8 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { LwcMetadataChecker } from '../../src/check/LwcMetadataChecker';
-import { SfdxProjectBrowser } from '../../src/metadata_browser/SfdxProjectBrowser';
+import { LwcMetadataChecker } from '../../check/LwcMetadataChecker';
+import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
 
 describe('LwcMetadataChecker', () => {
   // this one is less unit test, more functional test
@@ -10,7 +10,7 @@ describe('LwcMetadataChecker', () => {
   describe('.run() method', () => {
     it('should return an array of metadata problems', () => {
       const lwcFolders = new Map<string, string>();
-      lwcFolders.set('BadExample', 'test/fixtures/lwc/BadExample');
+      lwcFolders.set('BadExample', 'src/test/fixtures/lwc/BadExample');
 
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
@@ -24,7 +24,7 @@ describe('LwcMetadataChecker', () => {
 
     it('should return an empty array when there are no problems', () => {
       const lwcFolders = new Map<string, string>();
-      lwcFolders.set('GoodExample', 'test/fixtures/lwc/GoodExample');
+      lwcFolders.set('GoodExample', 'src/test/fixtures/lwc/GoodExample');
 
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
