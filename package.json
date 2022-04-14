@@ -82,7 +82,7 @@
     "postpack": "rimraf oclif.manifest.json",
     "posttest": "eslint src/**/*.ts",
     "prepack": "rimraf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "nyc --extension .ts --require ts-node/register mocha --forbid-only \"src/test/**/*.test.ts\"",
+    "test": "nyc --check-coverage --lines 80 --extension .ts --require ts-node/register mocha --forbid-only \"src/test/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
   }
 }
