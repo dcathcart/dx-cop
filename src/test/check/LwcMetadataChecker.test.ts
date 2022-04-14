@@ -41,8 +41,8 @@ describe('LwcMetadataChecker', () => {
   describe('.trailingWhitespaceWarnings()', () => {
     it('should return a metadata warning when there is trailing whitespace', () => {
       const lwcBundles = [
-        new LightningComponentBundle('test/fixtures/lwc/GoodExample'),
-        new LightningComponentBundle('test/fixtures/lwc/BadExample'),
+        new LightningComponentBundle('src/test/fixtures/lwc/GoodExample'),
+        new LightningComponentBundle('src/test/fixtures/lwc/BadExample'),
       ];
       const checker = new LwcMetadataChecker(null);
       // mock out the calls to .fileHasTrailingWhitespace(); make it look like one no, one yes
@@ -56,7 +56,7 @@ describe('LwcMetadataChecker', () => {
       expect(results.length).to.equal(1);
       expect(results[0].componentName).to.equal('BadExample');
       expect(results[0].componentType).to.equal('LightningComponentBundle');
-      expect(results[0].fileName).to.equal(path.normalize('test/fixtures/lwc/BadExample/BadExample.js-meta.xml'));
+      expect(results[0].fileName).to.equal(path.normalize('src/test/fixtures/lwc/BadExample/BadExample.js-meta.xml'));
       expect(results[0].problem).to.equal(
         'Whitespace characters detected at the end of one or more lines in .js-meta.xml'
       );
@@ -68,13 +68,13 @@ describe('LwcMetadataChecker', () => {
   describe('.fileHasTrailingWhitespace()', () => {
     it('should return true when there is whitespace at the end of one or more lines', () => {
       const checker = new LwcMetadataChecker(null);
-      const result = checker['fileHasTrailingWhitespace']('test/fixtures/lwc/BadExample/BadExample.js-meta.xml');
+      const result = checker['fileHasTrailingWhitespace']('src/test/fixtures/lwc/BadExample/BadExample.js-meta.xml');
       expect(result).to.equal(true);
     });
 
     it('should return false when there is no trailing whitespace', () => {
       const checker = new LwcMetadataChecker(null);
-      const result = checker['fileHasTrailingWhitespace']('test/fixtures/lwc/GoodExample/GoodExample.js-meta.xml');
+      const result = checker['fileHasTrailingWhitespace']('src/test/fixtures/lwc/GoodExample/GoodExample.js-meta.xml');
       expect(result).to.equal(false);
     });
   });
