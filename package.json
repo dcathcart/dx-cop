@@ -19,7 +19,7 @@
     "@oclif/plugin-help": "^3",
     "@oclif/test": "^1",
     "@salesforce/dev-config": "^2",
-    "@salesforce/dev-scripts": "^0",
+    "@salesforce/dev-scripts": "^2",
     "@salesforce/prettier-config": "^0",
     "@salesforce/ts-sinon": "^1",
     "@types/chai": "^4",
