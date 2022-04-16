@@ -11,11 +11,11 @@ describe('LightningComponentBundle', () => {
     });
   });
 
-  describe('.jsMetaFileName()', () => {
+  describe('.jsMetaFileName preperty', () => {
     it('should return the file name for the *.js-meta.xml file in this bundle', () => {
       const lwc = new LightningComponentBundle('src/test/fixtures/lwc/GoodExample');
-      const expected = path.normalize('src/test/fixtures/lwc/GoodExample/GoodExample.js-meta.xml');
-      expect(lwc.jsMetaFileName()).to.equal(expected);
+      const expected = path.normalize('src/test/fixtures/lwc/GoodExample/GoodExample.js-meta.xml'); // full path expected
+      expect(lwc.jsMetaFileName).to.equal(expected);
     });
   });
 });

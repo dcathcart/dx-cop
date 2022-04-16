@@ -24,8 +24,7 @@ export class SfdxProjectBrowser {
   public lwcBundles(): LightningComponentBundle[] {
     const lwcBaseDir = this.lwcBaseDir();
     const lwcDirs = fs.readdirSync(lwcBaseDir).filter((entry) => entry !== 'jsconfig.json');
-
-    return lwcDirs.map((lwc) => new LightningComponentBundle(lwc));
+    return lwcDirs.map((lwc) => new LightningComponentBundle(path.join(lwcBaseDir, lwc)));
   }
 
   // Return a list of object names

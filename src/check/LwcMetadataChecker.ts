@@ -16,7 +16,7 @@ export class LwcMetadataChecker extends CheckerBase {
 
   private trailingWhitespaceWarnings(lwcBundles: LightningComponentBundle[]): MetadataProblem[] {
     return lwcBundles
-      .filter((lwc) => this.fileHasTrailingWhitespace(lwc.jsMetaFileName()))
+      .filter((lwc) => this.fileHasTrailingWhitespace(lwc.jsMetaFileName))
       .map((lwc) => this.trailingWhitespaceWarning(lwc));
   }
 
@@ -34,7 +34,7 @@ export class LwcMetadataChecker extends CheckerBase {
     return new MetadataWarning(
       lwc.name,
       lwc.metadataType,
-      lwc.jsMetaFileName(),
+      lwc.jsMetaFileName,
       'Whitespace characters detected at the end of one or more lines in .js-meta.xml'
     );
   }
