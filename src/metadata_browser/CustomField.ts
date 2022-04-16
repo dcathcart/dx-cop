@@ -1,17 +1,16 @@
-import { getString, getJsonMap, JsonMap } from '@salesforce/ts-types';
-import { SubComponentBase } from './ComponentBase';
+import { getString } from '@salesforce/ts-types';
+import { ObjectSubComponent } from './MetadataComponent';
 
 // Basic CustomField class
-export class CustomField extends SubComponentBase {
+export class CustomField extends ObjectSubComponent {
   protected readonly fileExtension = 'field';
+  protected readonly metadataType = 'CustomField';
 
-  public get type(): string {
-    const customField: JsonMap = getJsonMap(this.metadata, 'CustomField');
-    const type: string = getString(customField, 'type');
-    return type;
+  public get dataType(): string {
+    return getString(this.metadata, 'type');
   }
 
   public isPicklist(): boolean {
-    return ['Picklist', 'MultiselectPicklist'].includes(this.type);
+    return ['Picklist', 'MultiselectPicklist'].includes(this.dataType);
   }
 }
