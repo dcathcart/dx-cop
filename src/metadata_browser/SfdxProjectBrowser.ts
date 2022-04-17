@@ -4,13 +4,14 @@ import { SfdxProject } from '@salesforce/core';
 import { CustomField } from './CustomField';
 import { CustomObject } from './CustomObject';
 import { EmailToCaseSettings } from './EmailToCaseSettings';
+import { LightningComponentBundle } from './LightningComponentBundle';
 import { PicklistField } from './PicklistField';
 import { Profile } from './Profile';
 import { RecordType } from './RecordType';
 
 // Tools for browsing/navigating the metadata in an SFDX project
 export class SfdxProjectBrowser {
-  public readonly sfdxProject: SfdxProject;
+  private readonly sfdxProject: SfdxProject;
 
   public constructor(sfdxProject: SfdxProject) {
     this.sfdxProject = sfdxProject;
@@ -49,6 +50,13 @@ export class SfdxProjectBrowser {
     return fileNames.map((f) => new CustomField(path.join(dir, f)));
   }
 
+  // Return a map of all LWCs. key = LWC name, value = full path to the folder that contains all the components for that LWC
+  public lwcBundles(): LightningComponentBundle[] {
+    const lwcBaseDir = this.lwcBaseDir();
+    const lwcDirs = fs.readdirSync(lwcBaseDir).filter((entry) => entry !== 'jsconfig.json');
+    return lwcDirs.map((lwc) => new LightningComponentBundle(path.join(lwcBaseDir, lwc)));
+  }
+
   // Return a list of object names
   public objectNames(): string[] {
     return fs.readdirSync(this.objectsBaseDir());
@@ -75,6 +83,10 @@ export class SfdxProjectBrowser {
   // Directory containing fields for a given object
   private customFieldsBaseDir(objectName: string): string {
     return path.join(this.objectDir(objectName), 'fields');
+  }
+
+  private lwcBaseDir(): string {
+    return path.join(this.defaultDir(), 'lwc');
   }
 
   private profilesBaseDir(): string {

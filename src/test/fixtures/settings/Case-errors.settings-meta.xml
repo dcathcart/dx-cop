@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- sample CaseSettings with multiple <emailToCase>/<routingAddresses> and multiple metadata problems -->
+<CaseSettings xmlns="http://soap.sforce.com/2006/04/metadata">
+    <emailToCase>
+        <routingAddresses>
+            <addressType>EmailToCase</addressType>
+            <caseOrigin>Email</caseOrigin>
+            <caseOwner>TestQueue</caseOwner>
+            <caseOwnerType>Queue</caseOwnerType>
+            <casePriority>Medium</casePriority>
+            <createTask>false</createTask>
+            <emailAddress>test@test.com</emailAddress>
+            <emailServicesAddress>test@agca745nobmpze4x0vqym6auo0vm03wowt5c5ild9umsfa8j9.2m-b7f5uac.cs115.case.sandbox.salesforce.com</emailServicesAddress>
+            <isVerified>false</isVerified>
+            <routingName>Test email address</routingName>
+            <saveEmailHeaders>false</saveEmailHeaders>
+        </routingAddresses>
+        <routingAddresses>
+            <addressType>EmailToCase</addressType>
+            <caseOrigin>Email</caseOrigin>
+            <caseOwner>TestQueue</caseOwner>
+            <caseOwnerType>Queue</caseOwnerType>
+            <casePriority>Medium</casePriority>
+            <createTask>false</createTask>
+            <emailAddress>test3@test.com</emailAddress>
+            <routingName>Test email address 3</routingName>
+            <saveEmailHeaders>false</saveEmailHeaders>
+        </routingAddresses>
+        <routingAddresses>
+            <addressType>EmailToCase</addressType>
+            <caseOrigin>Email</caseOrigin>
+            <caseOwner>TestQueue</caseOwner>
+            <caseOwnerType>Queue</caseOwnerType>
+            <casePriority>Medium</casePriority>
+            <createTask>false</createTask>
+            <emailAddress>test2@test.com</emailAddress>
+            <routingName>Test email address 2</routingName>
+            <saveEmailHeaders>false</saveEmailHeaders>
+        </routingAddresses>
+    </emailToCase>
+</CaseSettings>

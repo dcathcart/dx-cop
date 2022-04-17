@@ -9,10 +9,11 @@ import {
   JsonArray,
   JsonMap,
 } from '@salesforce/ts-types';
-import { SubComponentBase } from './ComponentBase';
+import { ObjectSubComponent } from './MetadataComponent';
 
-export class RecordType extends SubComponentBase {
+export class RecordType extends ObjectSubComponent {
   protected readonly fileExtension = 'recordType';
+  protected readonly metadataType = 'RecordType';
 
   // Extract a list of picklist names from the RecordType XML, e.g.
   // <RecordType>
@@ -24,15 +25,13 @@ export class RecordType extends SubComponentBase {
   //     <picklist>Account_Status__c</picklist> <-- and this
   //     ...
   public picklistFieldNames(): string[] {
-    const recordTypeElement: JsonMap = getJsonMap(this.metadata, 'RecordType');
-
-    if (hasJsonArray(recordTypeElement, 'picklistValues')) {
+    if (hasJsonArray(this.metadata, 'picklistValues')) {
       // multiple <picklistValues> elements
-      const picklistValuesArray: JsonArray = getJsonArray(recordTypeElement, 'picklistValues');
+      const picklistValuesArray: JsonArray = getJsonArray(this.metadata, 'picklistValues');
       return picklistValuesArray.map((p) => getString(p, 'picklist'));
-    } else if (hasJsonMap(recordTypeElement, 'picklistValues')) {
+    } else if (hasJsonMap(this.metadata, 'picklistValues')) {
       // single <picklistValues> element
-      const picklistValuesMap: JsonMap = getJsonMap(recordTypeElement, 'picklistValues');
+      const picklistValuesMap: JsonMap = getJsonMap(this.metadata, 'picklistValues');
       const picklist: string = getString(picklistValuesMap, 'picklist');
       return [picklist];
     } else {
@@ -69,17 +68,15 @@ export class RecordType extends SubComponentBase {
   //   'Status__c' => [ 'Active', 'Inactive' ]
   // }
   public picklistValueMap(): Map<string, string[]> {
-    const recordTypeElement: JsonMap = getJsonMap(this.metadata, 'RecordType');
-
-    if (hasJsonArray(recordTypeElement, 'picklistValues')) {
+    if (hasJsonArray(this.metadata, 'picklistValues')) {
       // multiple <picklistValues> elements
-      const picklistValuesArray: JsonArray = getJsonArray(recordTypeElement, 'picklistValues');
+      const picklistValuesArray: JsonArray = getJsonArray(this.metadata, 'picklistValues');
       return new Map<string, string[]>(
         picklistValuesArray.map((pv) => [getString(pv, 'picklist'), this.extractPicklistValues(pv)])
       );
-    } else if (hasJsonMap(recordTypeElement, 'picklistValues')) {
+    } else if (hasJsonMap(this.metadata, 'picklistValues')) {
       // single <picklistValues> element
-      const picklistValueMap: JsonMap = getJsonMap(recordTypeElement, 'picklistValues');
+      const picklistValueMap: JsonMap = getJsonMap(this.metadata, 'picklistValues');
       const picklist: string = getString(picklistValueMap, 'picklist');
       const values: string[] = this.extractPicklistValues(picklistValueMap);
       return new Map<string, string[]>([[picklist, values]]);

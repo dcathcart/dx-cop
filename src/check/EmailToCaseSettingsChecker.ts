@@ -9,15 +9,15 @@ export class EmailToCaseSettingsChecker extends CheckerBase {
   }
 
   private checkRoutingAddresses(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
-    return this.checkEmailServicesAddress(emailToCaseSettings)
-      .concat(this.checkIsVerified(emailToCaseSettings))
-      .concat(this.checkSortOrder(emailToCaseSettings));
+    return this.emailServicesAddressErrors(emailToCaseSettings)
+      .concat(this.isVerifiedErrors(emailToCaseSettings))
+      .concat(this.sortOrderWarnings(emailToCaseSettings));
   }
 
   // <emailServicesAddress> should not be stored in version control.
   // This field is set by Salesforce and it unique for each environment, so you can't deploy it.
   // In fact trying to change it during a deployment results in a Salesforce validation error.
-  private checkEmailServicesAddress(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
+  private emailServicesAddressErrors(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
     return emailToCaseSettings
       .routingAddresses()
       .filter((r) => r.emailServicesAddress !== undefined)
@@ -27,7 +27,7 @@ export class EmailToCaseSettingsChecker extends CheckerBase {
   // <isVerified> should not be stored in version control.
   // It specifies whether an email address as been verified and is specific to each environment.
   // As such it can't be modified in a deployment; doing so will result in a Salesforce validation error.
-  private checkIsVerified(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
+  private isVerifiedErrors(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
     return emailToCaseSettings
       .routingAddresses()
       .filter((r) => r.isVerified !== undefined)
@@ -49,7 +49,7 @@ export class EmailToCaseSettingsChecker extends CheckerBase {
   // Why is the sort order important? Because when you retrieve this metadata, Salesforce always sorts it by <routingName>.
   // So if you deploy, then immediately retrieve the file again, the retrieved order will be different.
   // This can lead to unexpected differences that you need to manage, which can in turn lead to merge conflicts and other problems.
-  private checkSortOrder(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
+  private sortOrderWarnings(emailToCaseSettings: EmailToCaseSettings): MetadataProblem[] {
     const results: MetadataProblem[] = [];
     const routingAddresses = emailToCaseSettings.routingAddresses();
 
@@ -58,19 +58,19 @@ export class EmailToCaseSettingsChecker extends CheckerBase {
       const b = routingAddresses[i];
 
       if (a.routingName >= b.routingName) {
-        results.push(this.sortOrderError(emailToCaseSettings, a, b));
+        results.push(this.sortOrderWarning(emailToCaseSettings, a, b));
       }
     }
 
     return results;
   }
 
-  private sortOrderError(
+  private sortOrderWarning(
     settings: EmailToCaseSettings,
     routingAddressA: EmailToCaseRoutingAddress,
     routingAddressB: EmailToCaseRoutingAddress
   ): MetadataWarning {
-    const message = `<routingAddresses> should be sorted by <routingName>. Expect '${routingAddressB.routingName}' < '${routingAddressA.routingName}'`;
+    const message = `<routingAddresses> should be sorted by <routingName>. Expect '${routingAddressB.routingName}' to be before '${routingAddressA.routingName}'`;
     return new MetadataWarning('EmailToCase', 'CaseSettings', settings.fileName, message);
   }
 }

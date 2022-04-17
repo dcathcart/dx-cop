@@ -1,7 +1,7 @@
 {
   "name": "dx-cop",
-  "description": "Static analysis for your Salesforce git repo",
-  "version": "0.0.3",
+  "description": "Static analysis for your Salesforce git repository",
+  "version": "0.0.4",
   "author": "David Cathcart",
   "bugs": "https://github.com/dcathcart/dx-cop/issues",
   "dependencies": {
@@ -19,7 +19,7 @@
     "@oclif/plugin-help": "^3",
     "@oclif/test": "^1",
     "@salesforce/dev-config": "^2",
-    "@salesforce/dev-scripts": "^0",
+    "@salesforce/dev-scripts": "^2",
     "@salesforce/prettier-config": "^0",
     "@salesforce/ts-sinon": "^1",
     "@types/chai": "^4",
@@ -27,7 +27,7 @@
     "@types/mocha": "^8",
     "@typescript-eslint/eslint-plugin": "^4",
     "@typescript-eslint/parser": "^4",
-    "chai": "^4",
+    "chai": "^4.3.6",
     "eslint": "^7",
     "eslint-config-oclif": "^3.1",
     "eslint-config-prettier": "^8",
@@ -40,13 +40,13 @@
     "eslint-plugin-typescript": "^0",
     "globby": "^11",
     "husky": "^4",
-    "mocha": "^8",
+    "mocha": "^9",
     "nyc": "^15",
     "prettier": "^2",
     "pretty-quick": "^3",
     "rimraf": "^3.0.2",
-    "sinon": "10.0.0",
-    "ts-node": "^10",
+    "sinon": "^10.0.0",
+    "ts-node": "^10.7.0",
     "typescript": "4"
   },
   "engines": {
@@ -78,11 +78,11 @@
   "repository": "dcathcart/dx-cop",
   "scripts": {
     "build": "tsc -p .",
-    "lint": "eslint src/**/*.ts test/**/*.ts",
+    "lint": "eslint src/**/*.ts",
     "postpack": "rimraf oclif.manifest.json",
-    "posttest": "eslint src/**/*.ts test/**/*.ts",
+    "posttest": "eslint src/**/*.ts",
     "prepack": "rimraf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "nyc --extension .ts --require ts-node/register mocha --forbid-only \"test/**/*.test.ts\"",
+    "test": "nyc --check-coverage --lines 80 --extension .ts --require ts-node/register mocha --forbid-only \"src/test/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
   }
 }

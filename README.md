@@ -8,11 +8,17 @@ Features are drawn largely from experience in working with Salesforce projects. 
 
 Integrate into your Salesforce CI jobs to keep your repo clean and find deployment problems before they happen!
 
-## Usage
+## Prerequisites
 
-To install:
+Requires the Salesforce command line tool.
+
+`npm install --global sfdx-cli`
+
+## Installation
 
 `sfdx plugins:install dx-cop`
+
+## Usage
 
 To run, clone and cd into your Salesforce git repo, then
 
