@@ -22,31 +22,32 @@ export class Profile extends MetadataComponent {
 //   <field>Account.AccountNumber</field>
 //   <readable>true</readable>
 // </fieldPermissions>
+// --> converted to JSON this would look like { editable: false, field: 'Account.AccountNumber', readable: true }
 export class ProfileFieldPermission {
-  private readonly source: AnyJson;
+  private readonly json: AnyJson;
 
-  public constructor(source: AnyJson) {
-    this.source = source;
+  public constructor(json: AnyJson) {
+    this.json = json;
   }
 
   public get editable(): boolean {
-    return getBoolean(this.source, 'editable');
-  }
-
-  public get fieldName(): string {
-    return this.objectFieldName.split('.')[1];
+    return getBoolean(this.json, 'editable');
   }
 
   public get objectFieldName(): string {
-    return getString(this.source, 'field');
-  }
-
-  public get objectName(): string {
-    return this.objectFieldName.split('.')[0];
+    return getString(this.json, 'field');
   }
 
   public get readable(): boolean {
-    return getBoolean(this.source, 'readable');
+    return getBoolean(this.json, 'readable');
+  }
+
+  public fieldName(): string {
+    return this.objectFieldName.split('.')[1];
+  }
+
+  public objectName(): string {
+    return this.objectFieldName.split('.')[0];
   }
 }
 
@@ -60,38 +61,39 @@ export class ProfileFieldPermission {
 //   <object>Account</object>
 //   <viewAllRecords>true</viewAllRecords>
 // </objectPermissions>
+// --> converted to JSON this would look like { allowCreate: true, allowDelete: true, ... }
 export class ProfileObjectPermission {
-  private readonly source: AnyJson;
+  private readonly json: AnyJson;
 
-  public constructor(source: AnyJson) {
-    this.source = source;
+  public constructor(json: AnyJson) {
+    this.json = json;
   }
 
   public get allowCreate(): boolean {
-    return getBoolean(this.source, 'allowCreate');
+    return getBoolean(this.json, 'allowCreate');
   }
 
   public get allowDelete(): boolean {
-    return getBoolean(this.source, 'allowDelete');
+    return getBoolean(this.json, 'allowDelete');
   }
 
   public get allowEdit(): boolean {
-    return getBoolean(this.source, 'allowDelete');
+    return getBoolean(this.json, 'allowEdit');
   }
 
   public get allowRead(): boolean {
-    return getBoolean(this.source, 'allowRead');
+    return getBoolean(this.json, 'allowRead');
   }
 
   public get modifyAllRecords(): boolean {
-    return getBoolean(this.source, 'modifyAllRecords');
+    return getBoolean(this.json, 'modifyAllRecords');
   }
 
   public get objectName(): string {
-    return getString(this.source, 'object');
+    return getString(this.json, 'object');
   }
 
   public get viewAllRecords(): boolean {
-    return getBoolean(this.source, 'viewAllRecords');
+    return getBoolean(this.json, 'viewAllRecords');
   }
 }
