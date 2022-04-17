@@ -1,19 +1,18 @@
-import { AnyJson, getBoolean, getJsonArray, getJsonMap, getString } from '@salesforce/ts-types';
-import { ComponentBase } from './ComponentBase';
+import { AnyJson, getBoolean, getJsonArray, getString } from '@salesforce/ts-types';
+import { MetadataComponent } from './MetadataComponent';
 
-export class Profile extends ComponentBase {
+export class Profile extends MetadataComponent {
   protected readonly fileExtension = 'profile';
+  protected readonly metadataType = 'Profile';
 
   public fieldPermissions(): ProfileFieldPermission[] {
-    const topLevelNode = getJsonMap(this.metadata, 'Profile');
-    const fieldPermissionArray = getJsonArray(topLevelNode, 'fieldPermissions');
-    return fieldPermissionArray.map((p) => new ProfileFieldPermission(p));
+    const permissions = getJsonArray(this.metadata, 'fieldPermissions');
+    return permissions.map((p) => new ProfileFieldPermission(p));
   }
 
   public objectPermissions(): ProfileObjectPermission[] {
-    const topLevelNode = getJsonMap(this.metadata, 'Profile');
-    const objectPermissionArray = getJsonArray(topLevelNode, 'objectPermissions');
-    return objectPermissionArray.map((p) => new ProfileObjectPermission(p));
+    const permissions = getJsonArray(this.metadata, 'objectPermissions');
+    return permissions.map((p) => new ProfileObjectPermission(p));
   }
 }
 
