@@ -57,7 +57,7 @@ export class EmailToCaseSettingsChecker extends CheckerBase {
       const a = routingAddresses[i - 1];
       const b = routingAddresses[i];
 
-      if (a.routingName >= b.routingName) {
+      if (a.routingName > b.routingName) {
         results.push(this.sortOrderWarning(emailToCaseSettings, a, b));
       }
     }

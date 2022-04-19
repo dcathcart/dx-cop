@@ -10,7 +10,7 @@ Integrate into your Salesforce CI jobs to keep your repo clean and find deployme
 
 ## Prerequisites
 
-Requires the Salesforce command line tool.
+Requires the Salesforce command line tool:
 
 `npm install --global sfdx-cli`
 
