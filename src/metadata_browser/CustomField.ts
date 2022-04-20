@@ -1,4 +1,4 @@
-import { getBoolean, getString, getJsonMap, JsonMap } from '@salesforce/ts-types';
+import { getBoolean, getString } from '@salesforce/ts-types';
 import { ObjectSubComponent } from './MetadataComponent';
 
 // Basic CustomField class
@@ -6,16 +6,14 @@ export class CustomField extends ObjectSubComponent {
   protected readonly fileExtension = 'field';
   protected readonly metadataType = 'CustomField';
 
-  public get objectFieldName(): string {
-    return `${this.objectName}.${this.name}`;
+  // Deliberately don't call this 'type'
+  // Want to keep a clear distinction between the data type of the field and the metadata type of the object
+  public get dataType(): string {
+    return getString(this.metadata, 'type');
   }
 
   public get required(): boolean {
-    return getBoolean(this.customField, 'required');
-  }
-
-  public get type(): string {
-    return getString(this.customField, 'type');
+    return getBoolean(this.metadata, 'required');
   }
 
   public isCustom(): boolean {
@@ -23,18 +21,14 @@ export class CustomField extends ObjectSubComponent {
   }
 
   public isMasterDetail(): boolean {
-    return this.type === 'MasterDetail';
-  }
-
-  public get dataType(): string {
-    return getString(this.metadata, 'type');
+    return this.dataType === 'MasterDetail';
   }
 
   public isPicklist(): boolean {
     return ['Picklist', 'MultiselectPicklist'].includes(this.dataType);
   }
 
-  private get customField(): JsonMap {
-    return getJsonMap(this.metadata, 'CustomField');
+  public objectFieldName(): string {
+    return `${this.objectName}.${this.name}`;
   }
 }

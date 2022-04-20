@@ -52,12 +52,12 @@ export class AdminProfileChecker extends CheckerBase {
   // Note this method does not decide what fields are "expected"; it simply checks and reports the missing ones.
   private missingFields(profile: Profile, expectedFields: CustomField[]): MetadataProblem[] {
     const fieldNamesInProfile = profile.fieldPermissions().map((p) => p.objectFieldName); // objectFieldName denotes a composite name "Object.Field"
-    const missingFields = expectedFields.filter((f) => !fieldNamesInProfile.includes(f.objectFieldName));
+    const missingFields = expectedFields.filter((f) => !fieldNamesInProfile.includes(f.objectFieldName()));
     return missingFields.map((f) => this.missingFieldError(profile, f));
   }
 
   private missingFieldError(profile: Profile, customField: CustomField): MetadataWarning {
-    const message = `<fieldPermissions> not found for ${customField.objectFieldName}`;
+    const message = `<fieldPermissions> not found for ${customField.objectFieldName()}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
