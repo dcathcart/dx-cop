@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
-import * as Sinon from 'sinon';
+import * as sinon from 'sinon';
 import { JsonMap } from '@salesforce/ts-types';
 import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../../metadata_browser/Profile';
 
@@ -14,7 +14,7 @@ describe('Profile', () => {
         ],
       };
       const profile = new Profile('');
-      Sinon.stub(profile, 'metadata').get(() => json);
+      sinon.stub(profile, 'metadata').get(() => json);
 
       const results = profile.fieldPermissions();
       expect(results.length).to.equal(2);
@@ -32,7 +32,7 @@ describe('Profile', () => {
         ],
       };
       const profile = new Profile('');
-      Sinon.stub(profile, 'metadata').get(() => json);
+      sinon.stub(profile, 'metadata').get(() => json);
 
       const results = profile.objectPermissions();
       expect(results.length).to.equal(2);
