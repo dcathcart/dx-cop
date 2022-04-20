@@ -42,10 +42,10 @@ export class AdminProfileChecker extends CheckerBase {
   ): MetadataProblem[] {
     return this.missingFields(profile, expectedFields)
       .concat(this.missingFieldPermissions(profile))
-      .concat(this.fieldPermissionsSortOrder(profile))
+      .concat(this.fieldSortOrderWarnings(profile))
       .concat(this.missingObjects(profile, expectedObjects))
       .concat(this.missingObjectPermissions(profile))
-      .concat(this.objectPermissionsSortOrder(profile));
+      .concat(this.objectSortOrderWarnings(profile));
   }
 
   // Given a profile and a list of fields that are expected to be in that profile, return a collection of warnings for the fields that are not there.
@@ -53,10 +53,10 @@ export class AdminProfileChecker extends CheckerBase {
   private missingFields(profile: Profile, expectedFields: CustomField[]): MetadataProblem[] {
     const fieldNamesInProfile = profile.fieldPermissions().map((p) => p.objectFieldName); // objectFieldName denotes a composite name "Object.Field"
     const missingFields = expectedFields.filter((f) => !fieldNamesInProfile.includes(f.objectFieldName()));
-    return missingFields.map((f) => this.missingFieldError(profile, f));
+    return missingFields.map((f) => this.missingFieldWarning(profile, f));
   }
 
-  private missingFieldError(profile: Profile, customField: CustomField): MetadataWarning {
+  private missingFieldWarning(profile: Profile, customField: CustomField): MetadataWarning {
     const message = `<fieldPermissions> not found for ${customField.objectFieldName()}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
@@ -66,17 +66,17 @@ export class AdminProfileChecker extends CheckerBase {
 
     for (const fieldPermission of profile.fieldPermissions()) {
       if (!fieldPermission.editable) {
-        results.push(this.missingFieldPermissionError(profile, fieldPermission, 'editable'));
+        results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'editable'));
       }
       if (!fieldPermission.readable) {
-        results.push(this.missingFieldPermissionError(profile, fieldPermission, 'readable'));
+        results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'readable'));
       }
     }
 
     return results;
   }
 
-  private missingFieldPermissionError(
+  private missingFieldPermissionWarning(
     profile: Profile,
     fieldPermission: ProfileFieldPermission,
     permissionName: string
@@ -85,25 +85,38 @@ export class AdminProfileChecker extends CheckerBase {
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
-  private fieldPermissionsSortOrder(profile: Profile): MetadataProblem[] {
-    return profile
-      .fieldPermissions()
-      .filter((_value, index, array) => array[index].objectFieldName < array[index - 1]?.objectFieldName)
-      .map((fp) => this.fieldPermissionSortOrderError(profile, fp));
+  private fieldSortOrderWarnings(profile: Profile): MetadataProblem[] {
+    const results: MetadataWarning[] = [];
+    const fieldPermissions = profile.fieldPermissions();
+
+    for (let i = 1; i < fieldPermissions.length; i++) {
+      const a = fieldPermissions[i - 1];
+      const b = fieldPermissions[i];
+
+      if (a.objectFieldName > b.objectFieldName) {
+        results.push(this.fieldSortOrderWarning(profile, a, b));
+      }
+    }
+
+    return results;
   }
 
-  private fieldPermissionSortOrderError(profile: Profile, permission: ProfileFieldPermission): MetadataWarning {
-    const message = `<fieldPermissions> should be sorted by <field>: ${permission.objectFieldName} is out of order.`;
+  private fieldSortOrderWarning(
+    profile: Profile,
+    a: ProfileFieldPermission,
+    b: ProfileFieldPermission
+  ): MetadataWarning {
+    const message = `<fieldPermissions> should be sorted by <field>. Expect '${b.objectFieldName}' to be before '${a.objectFieldName}'`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
   private missingObjects(profile: Profile, customObjects: CustomObject[]): MetadataProblem[] {
     const objectNamesInProfile = profile.objectPermissions().map((p) => p.objectName);
     const missingObjects = customObjects.filter((obj) => !objectNamesInProfile.includes(obj.name));
-    return missingObjects.map((obj) => this.missingObjectError(profile, obj));
+    return missingObjects.map((obj) => this.missingObjectWarning(profile, obj));
   }
 
-  private missingObjectError(profile: Profile, customObject: CustomObject): MetadataWarning {
+  private missingObjectWarning(profile: Profile, customObject: CustomObject): MetadataWarning {
     const message = `<objectPermissions> not found for ${customObject.name}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
@@ -113,46 +126,59 @@ export class AdminProfileChecker extends CheckerBase {
 
     for (const objectPermission of profile.objectPermissions()) {
       if (!objectPermission.allowCreate) {
-        results.push(this.missingObjectPermissionError(profile, objectPermission, 'allowCreate'));
+        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'allowCreate'));
       }
       if (!objectPermission.allowDelete) {
-        results.push(this.missingObjectPermissionError(profile, objectPermission, 'allowDelete'));
+        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'allowDelete'));
       }
       if (!objectPermission.allowEdit) {
-        results.push(this.missingObjectPermissionError(profile, objectPermission, 'allowEdit'));
+        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'allowEdit'));
       }
       if (!objectPermission.allowRead) {
-        results.push(this.missingObjectPermissionError(profile, objectPermission, 'allowRead'));
+        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'allowRead'));
       }
       if (!objectPermission.modifyAllRecords) {
-        results.push(this.missingObjectPermissionError(profile, objectPermission, 'modifyAllRecords'));
+        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'modifyAllRecords'));
       }
       if (!objectPermission.viewAllRecords) {
-        results.push(this.missingObjectPermissionError(profile, objectPermission, 'viewAllRecords'));
+        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'viewAllRecords'));
       }
     }
 
     return results;
   }
 
-  private missingObjectPermissionError(
+  private missingObjectPermissionWarning(
     profile: Profile,
     objectPermission: ProfileObjectPermission,
     permissionName: string
-  ): MetadataProblem {
+  ): MetadataWarning {
     const message = `<${permissionName}> permission not set for object ${objectPermission.objectName}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
-  private objectPermissionsSortOrder(profile: Profile): MetadataProblem[] {
-    return profile
-      .objectPermissions()
-      .filter((_value, index, array) => array[index].objectName < array[index - 1]?.objectName)
-      .map((op) => this.objectPermissionSortOrderError(profile, op));
+  private objectSortOrderWarnings(profile: Profile): MetadataProblem[] {
+    const results: MetadataWarning[] = [];
+    const objectPermissions = profile.objectPermissions();
+
+    for (let i = 1; i < objectPermissions.length; i++) {
+      const a = objectPermissions[i - 1];
+      const b = objectPermissions[i];
+
+      if (a.objectName > b.objectName) {
+        results.push(this.objectSortOrderWarning(profile, a, b));
+      }
+    }
+
+    return results;
   }
 
-  private objectPermissionSortOrderError(profile: Profile, permission: ProfileObjectPermission): MetadataWarning {
-    const message = `<objectPermissions> should be sorted by <object>: ${permission.objectName} is out of order.`;
+  private objectSortOrderWarning(
+    profile: Profile,
+    a: ProfileObjectPermission,
+    b: ProfileObjectPermission
+  ): MetadataWarning {
+    const message = `<objectPermissions> should be sorted by <object>. Expect '${b.objectName}' to be before '${a.objectName}'`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 }
