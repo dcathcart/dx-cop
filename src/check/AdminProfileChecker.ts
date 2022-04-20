@@ -106,13 +106,13 @@ export class AdminProfileChecker extends CheckerBase {
     a: ProfileFieldPermission,
     b: ProfileFieldPermission
   ): MetadataWarning {
-    const message = `<fieldPermissions> should be sorted by <field>. Expect '${b.objectFieldName}' to be before '${a.objectFieldName}'`;
+    const message = `<fieldPermissions> should be sorted by <field>. Expect ${b.objectFieldName} to be before ${a.objectFieldName}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
-  private missingObjects(profile: Profile, customObjects: CustomObject[]): MetadataProblem[] {
+  private missingObjects(profile: Profile, expectedObjects: CustomObject[]): MetadataProblem[] {
     const objectNamesInProfile = profile.objectPermissions().map((p) => p.objectName);
-    const missingObjects = customObjects.filter((obj) => !objectNamesInProfile.includes(obj.name));
+    const missingObjects = expectedObjects.filter((obj) => !objectNamesInProfile.includes(obj.name));
     return missingObjects.map((obj) => this.missingObjectWarning(profile, obj));
   }
 
@@ -178,7 +178,7 @@ export class AdminProfileChecker extends CheckerBase {
     a: ProfileObjectPermission,
     b: ProfileObjectPermission
   ): MetadataWarning {
-    const message = `<objectPermissions> should be sorted by <object>. Expect '${b.objectName}' to be before '${a.objectName}'`;
+    const message = `<objectPermissions> should be sorted by <object>. Expect ${b.objectName} to be before ${a.objectName}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 }
