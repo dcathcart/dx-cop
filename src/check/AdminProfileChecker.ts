@@ -7,23 +7,22 @@ import { MetadataProblem, MetadataWarning } from './MetadataProblem';
 export class AdminProfileChecker extends CheckerBase {
   public run(): MetadataProblem[] {
     const adminProfile = this.sfdxProjectBrowser.profileByName('Admin');
-
-    const objects = this.sfdxProjectBrowser.objects();
-    const expectedObjects = this.filterObjects(objects);
-
-    const fields = expectedObjects.map((obj) => this.sfdxProjectBrowser.fields(obj.name)).flat();
-    const expectedFields = this.filterFields(fields);
+    const expectedObjects = this.expectedObjects();
+    const expectedFields = this.expectedFields(expectedObjects);
 
     return this.checkProfile(adminProfile, expectedObjects, expectedFields);
   }
 
-  private filterObjects(objects: CustomObject[]): CustomObject[] {
+  private expectedObjects(): CustomObject[] {
+    // Get a list of objects we should 'expect' to see in a profile.
     // Filter out anything that is not a custom object, i.e. don't include standard objects, custom settings etc.
+    const objects = this.sfdxProjectBrowser.objects();
     return objects.filter((obj) => obj.isCustomObject());
   }
 
-  private filterFields(fields: CustomField[]): CustomField[] {
-    // Filter out anything that is not a custom field
+  private expectedFields(objects: CustomObject[]): CustomField[] {
+    // For the given list of objects, get a list of fields we should 'expect' to see in a profile.
+    // Filter out anything that is not a custom field.
     //
     // Required fields do not appear in profiles.
     // Makes sense if you think about it: they *have* to be readable and editable (regardless of profile, or anything else) if they are to be required.
@@ -32,6 +31,7 @@ export class AdminProfileChecker extends CheckerBase {
     // Also make sense; master-detail relationships appear to be like foreign key relationships, but "stronger",
     // in that "detail" records can't exist on their own without a "master" record.
     // So the field that links a detail record back to a master record is implicitly a required field.
+    const fields = objects.map((obj) => this.sfdxProjectBrowser.fields(obj.name)).flat();
     return fields.filter((f) => f.isCustom() && !f.required && !f.isMasterDetail());
   }
 
