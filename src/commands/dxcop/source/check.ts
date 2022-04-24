@@ -56,7 +56,7 @@ export default class Check extends SfdxCommand {
   }
 
   private ruleSets(sfdxProject: SfdxProject): CheckerBase[] {
-    const config = rc('dxcop', defaultConfig());
+    const config = this.loadConfig();
 
     const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
     const ruleSets: CheckerBase[] = [];
@@ -75,5 +75,10 @@ export default class Check extends SfdxCommand {
     }
 
     return ruleSets;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  private loadConfig() {
+    return rc('dxcop', defaultConfig());
   }
 }

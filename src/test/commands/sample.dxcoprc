@@ -1,0 +1,8 @@
+{
+    "ruleSets": {
+        "emailToCaseSettings": { "enabled": false },
+        "lightningWebComponents": { "enabled": false },
+        "recordTypePicklists": { "enabled": true },
+        "recordTypePicklistValues": { "enabled": true }
+    }
+}
