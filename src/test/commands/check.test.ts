@@ -7,11 +7,11 @@ describe('dxcop:source:check command', () => {
   describe('.loadConfig()', () => {
     context('when a .dxcoprc config file exists', () => {
       before(() => {
-        fs.copyFileSync('src/test/commands/sample.dxcoprc', '.dxcoprc');
+        fs.copyFileSync('src/test/commands/test.dxcoprc', '.dxcoprc');
       });
 
       it('should load config from the file', () => {
-        fs.copyFileSync('src/test/commands/sample.dxcoprc', '.dxcoprc');
+        fs.copyFileSync('src/test/commands/test.dxcoprc', '.dxcoprc');
         const checkCommand = new Check([], null);
         const config = checkCommand['loadConfig']();
         expect(config.ruleSets.emailToCaseSettings.enabled).to.equal(false);
@@ -19,7 +19,7 @@ describe('dxcop:source:check command', () => {
       });
 
       after(() => {
-        fs.rmSync('.dxcoprc');
+        fs.unlinkSync('.dxcoprc'); // fs.rmSync() not available in node 12
       });
     });
     context('when there is no .dxcoprc config file', () => {
