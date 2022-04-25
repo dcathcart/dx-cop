@@ -66,6 +66,9 @@ export default class Check extends SfdxCommand {
     const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
     const rulesets: CheckerBase[] = [];
 
+    if (config.ruleSets.adminProfile.enabled) {
+      rulesets.push(new AdminProfileChecker(sfdxProjectBrowser));
+    }
     if (config.ruleSets.emailToCaseSettings.enabled) {
       rulesets.push(new EmailToCaseSettingsChecker(sfdxProjectBrowser));
     }

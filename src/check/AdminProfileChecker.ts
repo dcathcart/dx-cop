@@ -5,6 +5,8 @@ import { CheckerBase } from './CheckerBase';
 import { MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class AdminProfileChecker extends CheckerBase {
+  public displayName = 'Admin profile';
+
   public run(): MetadataProblem[] {
     const adminProfile = this.sfdxProjectBrowser.profileByName('Admin');
     const expectedObjects = this.expectedObjects();
