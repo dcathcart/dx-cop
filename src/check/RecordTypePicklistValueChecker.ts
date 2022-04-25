@@ -4,6 +4,8 @@ import { CheckerBase } from './CheckerBase';
 import { MetadataError, MetadataProblem } from './MetadataProblem';
 
 export class RecordTypePicklistValueChecker extends CheckerBase {
+  public displayName = 'Record type picklist values';
+
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
   private IGNORE_PICKLISTS = ['ForecastCategoryName'];
 

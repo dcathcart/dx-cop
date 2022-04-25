@@ -1,14 +1,18 @@
 import * as os from 'os';
+import rc = require('rc');
+
 import { SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
 import { AdminProfileChecker } from '../../../check/AdminProfileChecker';
+import { CheckerBase } from '../../../check/CheckerBase';
 import { EmailToCaseSettingsChecker } from '../../../check/EmailToCaseSettingsChecker';
 import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
 import { MetadataProblem } from '../../../check/MetadataProblem';
 import { RecordTypePicklistChecker } from '../../../check/RecordTypePicklistChecker';
 import { RecordTypePicklistValueChecker } from '../../../check/RecordTypePicklistValueChecker';
+import defaultConfig from '../../../config/DefaultConfig';
 import { SfdxProjectBrowser } from '../../../metadata_browser/SfdxProjectBrowser';
 
 // Initialize Messages with the current plugin directory
@@ -27,14 +31,13 @@ export default class Check extends SfdxCommand {
 
   public async run(): Promise<AnyJson> {
     const sfdxProject = await SfdxProject.resolve();
-    const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
 
-    const metadataProblems: MetadataProblem[] = [];
-    metadataProblems.push(...this.checkAdminProfile(sfdxProjectBrowser));
-    metadataProblems.push(...this.checkEmailToCaseSettings(sfdxProjectBrowser));
-    metadataProblems.push(...this.checkLwcMetadata(sfdxProjectBrowser));
-    metadataProblems.push(...this.checkRecordTypeMetadata(sfdxProjectBrowser));
-    metadataProblems.push(...this.checkRecordTypePicklistMetadata(sfdxProjectBrowser));
+    const metadataProblems = this.rulesetsToRun(sfdxProject)
+      .map((ruleset) => {
+        this.ux.log(ruleset.displayName);
+        return ruleset.run(); // returns an array of metadata problems for each ruleset
+      })
+      .flat(); // which are then flattened into one big array
 
     // Log output as a pretty table. Note it won't be shown if --json was passed
     this.ux.log(); // blank line first
@@ -57,28 +60,30 @@ export default class Check extends SfdxCommand {
     return { problems: metadataProblems.map((p) => p.jsonOutput()) };
   }
 
-  public checkAdminProfile(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking admin profile');
-    return new AdminProfileChecker(sfdxProjectBrowser).run();
+  private rulesetsToRun(sfdxProject: SfdxProject): CheckerBase[] {
+    const config = this.loadConfig();
+
+    const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
+    const rulesets: CheckerBase[] = [];
+
+    if (config.ruleSets.emailToCaseSettings.enabled) {
+      rulesets.push(new EmailToCaseSettingsChecker(sfdxProjectBrowser));
+    }
+    if (config.ruleSets.lightningWebComponents.enabled) {
+      rulesets.push(new LwcMetadataChecker(sfdxProjectBrowser));
+    }
+    if (config.ruleSets.recordTypePicklists.enabled) {
+      rulesets.push(new RecordTypePicklistChecker(sfdxProjectBrowser));
+    }
+    if (config.ruleSets.recordTypePicklistValues.enabled) {
+      rulesets.push(new RecordTypePicklistValueChecker(sfdxProjectBrowser));
+    }
+
+    return rulesets;
   }
 
-  public checkEmailToCaseSettings(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking email-to-case settings');
-    return new EmailToCaseSettingsChecker(sfdxProjectBrowser).run();
-  }
-
-  public checkLwcMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking lwc metadata');
-    return new LwcMetadataChecker(sfdxProjectBrowser).run();
-  }
-
-  public checkRecordTypeMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking record type picklists');
-    return new RecordTypePicklistChecker(sfdxProjectBrowser).run();
-  }
-
-  public checkRecordTypePicklistMetadata(sfdxProjectBrowser: SfdxProjectBrowser): MetadataProblem[] {
-    this.ux.log('Checking record type picklist values');
-    return new RecordTypePicklistValueChecker(sfdxProjectBrowser).run();
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  private loadConfig() {
+    return rc('dxcop', defaultConfig());
   }
 }
