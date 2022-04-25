@@ -3,6 +3,8 @@ import { CheckerBase } from './CheckerBase';
 import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class EmailToCaseSettingsChecker extends CheckerBase {
+  public displayName = 'Email-to-Case settings';
+
   public run(): MetadataProblem[] {
     const emailToCaseSettings = this.sfdxProjectBrowser.emailToCaseSettings();
     return this.checkRoutingAddresses(emailToCaseSettings);
