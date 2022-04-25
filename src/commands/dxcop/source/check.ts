@@ -31,8 +31,13 @@ export default class Check extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     const sfdxProject = await SfdxProject.resolve();
 
-    const ruleSets = this.ruleSets(sfdxProject);
-    const metadataProblems = ruleSets.map((rs) => rs.run()).flat();
+    const rulesetsToRun = this.rulesetsToRun(sfdxProject);
+    const metadataProblems = rulesetsToRun
+      .map((ruleset) => {
+        this.ux.log(ruleset.displayName);
+        return ruleset.run();
+      })
+      .flat();
 
     // Log output as a pretty table. Note it won't be shown if --json was passed
     this.ux.log(); // blank line first
@@ -55,26 +60,26 @@ export default class Check extends SfdxCommand {
     return { problems: metadataProblems.map((p) => p.jsonOutput()) };
   }
 
-  private ruleSets(sfdxProject: SfdxProject): CheckerBase[] {
+  private rulesetsToRun(sfdxProject: SfdxProject): CheckerBase[] {
     const config = this.loadConfig();
 
     const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
-    const ruleSets: CheckerBase[] = [];
+    const rulesets: CheckerBase[] = [];
 
     if (config.ruleSets.emailToCaseSettings.enabled) {
-      ruleSets.push(new EmailToCaseSettingsChecker(sfdxProjectBrowser));
+      rulesets.push(new EmailToCaseSettingsChecker(sfdxProjectBrowser));
     }
     if (config.ruleSets.lightningWebComponents.enabled) {
-      ruleSets.push(new LwcMetadataChecker(sfdxProjectBrowser));
+      rulesets.push(new LwcMetadataChecker(sfdxProjectBrowser));
     }
     if (config.ruleSets.recordTypePicklists.enabled) {
-      ruleSets.push(new RecordTypePicklistChecker(sfdxProjectBrowser));
+      rulesets.push(new RecordTypePicklistChecker(sfdxProjectBrowser));
     }
     if (config.ruleSets.recordTypePicklistValues.enabled) {
-      ruleSets.push(new RecordTypePicklistValueChecker(sfdxProjectBrowser));
+      rulesets.push(new RecordTypePicklistValueChecker(sfdxProjectBrowser));
     }
 
-    return ruleSets;
+    return rulesets;
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
