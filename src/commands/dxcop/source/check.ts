@@ -31,13 +31,12 @@ export default class Check extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     const sfdxProject = await SfdxProject.resolve();
 
-    const rulesetsToRun = this.rulesetsToRun(sfdxProject);
-    const metadataProblems = rulesetsToRun
+    const metadataProblems = this.rulesetsToRun(sfdxProject)
       .map((ruleset) => {
         this.ux.log(ruleset.displayName);
-        return ruleset.run();
+        return ruleset.run(); // returns an array of metadata problems for each ruleset
       })
-      .flat();
+      .flat(); // which are then flattened into one big array
 
     // Log output as a pretty table. Note it won't be shown if --json was passed
     this.ux.log(); // blank line first

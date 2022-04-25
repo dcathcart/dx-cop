@@ -28,7 +28,9 @@ or to format output as JSON:
 
 `sfdx dxcop:source:check --json`
 
-There are no other parameters; running the above command performs all known checks. Returns exit code 1 if any metadata problems are found, for easy integration into CI jobs.
+There are no other parameters, other than the standard sfdx-cli ones (run with `--help` to view these).
+
+Returns exit code 1 if any metadata problems are found, for easy integration into CI jobs.
 
 ## Configuration
 
