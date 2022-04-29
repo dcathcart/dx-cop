@@ -5,13 +5,13 @@ import { JsonMap } from '@salesforce/ts-types';
 import { CustomField } from '../../metadata_browser/CustomField';
 
 describe('CustomField', () => {
-  it('should return the correct values for all properties', () => {
-    const json: JsonMap = { required: true, type: 'Text' };
-    const customField = new CustomField('');
-    sinon.stub(customField, 'metadata').get(() => json);
-
-    expect(customField.dataType).to.equal('Text');
-    expect(customField.required).to.equal(true);
+  describe('.dataType property', () => {
+    it('should return the value of the <type> element', () => {
+      const customField = new CustomField('');
+      const json: JsonMap = { type: 'Text' };
+      sinon.stub(customField, 'metadata').get(() => json);
+      expect(customField.dataType).to.equal('Text');
+    });
   });
 
   describe('.isCustom()', () => {
@@ -22,21 +22,6 @@ describe('CustomField', () => {
     it('should return false for standard objects', () => {
       const customField = new CustomField('Account');
       expect(customField.isCustom()).to.equal(false);
-    });
-  });
-
-  describe('.isMasterDetail()', () => {
-    it('should return true for Master-Detail fields', () => {
-      const customField = new CustomField('');
-      sinon.stub(customField, 'dataType').get(() => 'MasterDetail');
-      expect(customField.isMasterDetail()).to.equal(true);
-    });
-    it('should return false for other types of fields', () => {
-      const customField = new CustomField('');
-      // eslint-disable-next-line prettier/prettier
-      sinon.stub(customField, 'dataType').onFirstCall().get(() => 'Number').onSecondCall().get(() => 'Picklist');
-      expect(customField.isMasterDetail()).to.equal(false);
-      expect(customField.isMasterDetail()).to.equal(false);
     });
   });
 
@@ -54,9 +39,38 @@ describe('CustomField', () => {
     it('should return false for other types of fields', () => {
       const customField = new CustomField('');
       // eslint-disable-next-line prettier/prettier
-      sinon.stub(customField, 'dataType').onFirstCall().get(() => 'Number').onSecondCall().get(() => 'Text');
-      expect(customField.isMasterDetail()).to.equal(false);
-      expect(customField.isMasterDetail()).to.equal(false);
+      sinon.stub(customField, 'dataType').onFirstCall().get(() => 'Number');
+      // eslint-disable-next-line prettier/prettier
+      sinon.stub(customField, 'dataType').onSecondCall().get(() => 'Text');
+      expect(customField.isPicklist()).to.equal(false);
+      expect(customField.isPicklist()).to.equal(false);
+    });
+  });
+
+  describe('.isRequired()', () => {
+    it('should return true if the field is required', () => {
+      const field = new CustomField('');
+      const json: JsonMap = { required: true };
+      sinon.stub(field, 'metadata').get(() => json);
+      expect(field.isRequired()).to.equal(true);
+    });
+    it('should return true if the field is a master-detail field', () => {
+      const field = new CustomField('');
+      const json: JsonMap = { type: 'MasterDetail' };
+      sinon.stub(field, 'metadata').get(() => json);
+      expect(field.isRequired()).to.equal(true);
+    });
+    it('should return false if the field is neither required nor master-detail', () => {
+      const field = new CustomField('');
+      const json: JsonMap = { required: false, type: 'Text' };
+      sinon.stub(field, 'metadata').get(() => json);
+      expect(field.isRequired()).to.equal(false);
+    });
+    it('should return false if there is no <required> element (e.g. for a standard field)', () => {
+      const field = new CustomField('');
+      const json: JsonMap = { nothing: 'here' };
+      sinon.stub(field, 'metadata').get(() => json);
+      expect(field.isRequired()).to.equal(false);
     });
   });
 

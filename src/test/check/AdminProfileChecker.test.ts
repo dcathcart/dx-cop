@@ -15,58 +15,56 @@ describe('AdminProfileChecker', () => {
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
 
-      const customObject = new CustomObject('Object1__c.object-meta.xml');
-      sinon.stub(customObject, 'isCustomObject').returns(true);
-      const standardObject = new CustomObject('Object2.object-meta.xml');
+      const standardObject = new CustomObject('Object1.object-meta.xml');
       sinon.stub(standardObject, 'isCustomObject').returns(false);
+      const customObject = new CustomObject('Object2__c.object-meta.xml');
+      sinon.stub(customObject, 'isCustomObject').returns(true);
 
-      const objects = [customObject, standardObject];
+      const objects = [standardObject, customObject];
       mockProjectBrowser.expects('objects').once().returns(objects);
 
       const checker = new AdminProfileChecker(sfdxProjectBrowser);
       const results = checker['expectedObjects']();
       expect(results.length).to.equal(1);
-      expect(results[0].name).to.equal('Object1__c');
+      expect(results[0].name).to.equal('Object2__c');
 
       mockProjectBrowser.verify();
     });
   });
 
   describe('.expectedFields()', () => {
-    it('should only check custom fields that are not required and not Master-Detail fields', () => {
-      // blergh. Need to break this down into several different tests
+    it('retrieves fields for each of the given objects', () => {
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
 
-      const object1 = new CustomObject('Object1__c.object-meta.xml');
-      const object2 = new CustomObject('Object2__c.object-meta.xml');
-      const objects = [object1, object2];
+      const standardObject = new CustomObject('Object1.object-meta.xml');
+      const customObject = new CustomObject('Object2__c.object-meta.xml');
+      const objects = [standardObject, customObject];
 
-      const standardField = new CustomField('path/to/objects/Object1__c/fields/Field1.field-meta.xml');
-      sinon.stub(standardField, 'isCustom').returns(false);
-      const customField = new CustomField('path/to/objects/Object1__c/fields/Field2__c.fields-meta.xml');
-      sinon.stub(customField, 'isCustom').returns(true);
-      sinon.stub(customField, 'required').get(() => false);
-      sinon.stub(customField, 'isMasterDetail').returns(false);
-      const object1Fields = [standardField, customField];
+      mockProjectBrowser.expects('fields').once().withArgs('Object1').returns([]);
+      mockProjectBrowser.expects('fields').once().withArgs('Object2__c').returns([]);
+      const checker = new AdminProfileChecker(sfdxProjectBrowser);
+      checker['expectedFields'](objects);
+      mockProjectBrowser.verify();
+    });
+    it('only checks custom fields that are not required', () => {
+      const sfdxProjectBrowser = new SfdxProjectBrowser(null);
+      const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
+      const objects = [new CustomObject('Object1.object-meta.xml')];
 
-      const requiredField = new CustomField('path/to/objects/Object2__c/fields/Field3__c.fields-meta.xml');
-      sinon.stub(requiredField, 'isCustom').returns(true);
-      sinon.stub(requiredField, 'required').get(() => true);
-      const masterDetailField = new CustomField('path/to/objects/Object2__c/fields/Field4__c.fields-meta.xml');
-      sinon.stub(masterDetailField, 'isCustom').returns(true);
-      sinon.stub(masterDetailField, 'required').get(() => false);
-      sinon.stub(masterDetailField, 'isMasterDetail').returns(true);
-      const object2Fields = [requiredField, masterDetailField];
+      // required field - not expected in results
+      const field1 = new CustomField('path/to/objects/Object1/fields/Field1__c.field-meta.xml');
+      sinon.stub(field1, 'isRequired').returns(true);
 
-      mockProjectBrowser.expects('fields').once().withArgs('Object1__c').returns(object1Fields);
-      mockProjectBrowser.expects('fields').once().withArgs('Object2__c').returns(object2Fields);
+      // NON-required field, IS expected in results
+      const field2 = new CustomField('path/to/objects/Object1/fields/Field2__c.field-meta.xml');
+      sinon.stub(field2, 'isRequired').returns(false);
 
+      mockProjectBrowser.expects('fields').once().withArgs('Object1').returns([field1, field2]);
       const checker = new AdminProfileChecker(sfdxProjectBrowser);
       const results = checker['expectedFields'](objects);
-      // after all that, only expect to see the custom field that is not required & not master-detail
       expect(results.length).to.equal(1);
-      expect(results[0]).to.equal(customField);
+      expect(results[0]).to.equal(field2);
       mockProjectBrowser.verify();
     });
   });
