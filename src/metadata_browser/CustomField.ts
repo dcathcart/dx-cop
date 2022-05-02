@@ -12,23 +12,26 @@ export class CustomField extends ObjectSubComponent {
     return getString(this.metadata, 'type');
   }
 
-  public get required(): boolean {
-    return getBoolean(this.metadata, 'required');
-  }
-
   public isCustom(): boolean {
     return this.name.endsWith('__c');
-  }
-
-  public isMasterDetail(): boolean {
-    return this.dataType === 'MasterDetail';
   }
 
   public isPicklist(): boolean {
     return ['Picklist', 'MultiselectPicklist'].includes(this.dataType);
   }
 
+  public isRequired(): boolean {
+    // Master-Detail fields are required fields.
+    // Master-Detail relationships are like foreign key relationships, but "stronger", in that detail records can't exist on their own without a master record.
+    // So the field that links a detail record back to a master record is implicitly a required field.
+    return this.required || this.dataType === 'MasterDetail';
+  }
+
   public objectFieldName(): string {
     return `${this.objectName}.${this.name}`;
+  }
+
+  private get required(): boolean {
+    return getBoolean(this.metadata, 'required');
   }
 }

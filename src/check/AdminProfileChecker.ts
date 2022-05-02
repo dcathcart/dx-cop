@@ -17,24 +17,17 @@ export class AdminProfileChecker extends CheckerBase {
 
   private expectedObjects(): CustomObject[] {
     // Get a list of objects we should 'expect' to see in a profile.
-    // Filter out anything that is not a custom object, i.e. don't include standard objects, custom settings etc.
+    // Limit scope to custom objects for now. Don't include standard objects, custom settings etc.
     const objects = this.sfdxProjectBrowser.objects();
     return objects.filter((obj) => obj.isCustomObject());
   }
 
   private expectedFields(objects: CustomObject[]): CustomField[] {
     // For the given list of objects, get a list of fields we should 'expect' to see in a profile.
-    // Filter out anything that is not a custom field.
-    //
-    // Required fields do not appear in profiles.
+    // Required fields do not appear in profiles, so filter them out.
     // Makes sense if you think about it: they *have* to be readable and editable (regardless of profile, or anything else) if they are to be required.
-    //
-    // MasterDetail fields also do not appear in profiles.
-    // Also make sense; master-detail relationships appear to be like foreign key relationships, but "stronger",
-    // in that "detail" records can't exist on their own without a "master" record.
-    // So the field that links a detail record back to a master record is implicitly a required field.
     const fields = objects.map((obj) => this.sfdxProjectBrowser.fields(obj.name)).flat();
-    return fields.filter((f) => f.isCustom() && !f.required && !f.isMasterDetail());
+    return fields.filter((f) => !f.isRequired());
   }
 
   private checkProfile(
