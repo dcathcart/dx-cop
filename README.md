@@ -28,11 +28,28 @@ or to format output as JSON:
 
 `sfdx dxcop:source:check --json`
 
-There are no other parameters; running the above command performs all known checks. Returns exit code 1 if any metadata problems are found, for easy integration into CI jobs.
+There are no other parameters, other than the standard sfdx-cli ones (run with `--help` to view these).
 
-## Checks performed
+Returns exit code 1 if any metadata problems are found, for easy integration into CI jobs.
 
-This plugin is new - please be kind! There are currently only a small number of checks, but the list is growing.
+## Configuration
+
+An optional `.dxcoprc` configuration file, in JSON format, can be used to enable/disable individual rulesets. Create in the base folder of your Salesforce project, with the following format:
+
+```
+{
+    "ruleSets": {
+        "emailToCaseSettings": { "enabled": true },
+        "lightningWebComponents": { "enabled": true },
+        "recordTypePicklists": { "enabled": true },
+        "recordTypePicklistValues": { "enabled": true }
+    }
+}
+```
+
+## Rulesets
+
+A ruleset is a collection of closely-related rules that are run together. There are currently a small number of rulesets, but the list is growing.
 
 ### Record types: picklist values
 

@@ -4,6 +4,8 @@ import { CheckerBase } from './CheckerBase';
 import { MetadataProblem, MetadataWarning } from './MetadataProblem';
 
 export class LwcMetadataChecker extends CheckerBase {
+  public displayName = 'Lightning web components';
+
   // Checks over all lightning web components in the project.
   // Right now the only check performed is for trailing whitespace.
   // Any trailing whitespace in a .js-meta.xml file can, for reasons unknown, cause even more whitespace to be added
