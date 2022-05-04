@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import { LightningComponentBundle } from '../metadata_browser/LightningComponentBundle';
-import { CheckerBase } from './CheckerBase';
 import { MetadataProblem, MetadataWarning } from './MetadataProblem';
+import { MetadataRuleset } from './MetadataRuleset';
 
-export class LwcMetadataChecker extends CheckerBase {
+export class LwcMetadataRuleset extends MetadataRuleset {
   public displayName = 'Lightning web components';
 
   // Checks over all lightning web components in the project.

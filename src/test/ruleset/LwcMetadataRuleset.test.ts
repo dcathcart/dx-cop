@@ -2,11 +2,11 @@ import 'mocha';
 import * as path from 'path';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { LwcMetadataChecker } from '../../check/LwcMetadataChecker';
 import { LightningComponentBundle } from '../../metadata_browser/LightningComponentBundle';
 import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
+import { LwcMetadataRuleset } from '../../ruleset/LwcMetadataRuleset';
 
-describe('LwcMetadataChecker', () => {
+describe('LwcMetadataRuleset', () => {
   // Regression test. Uses carefully crafted sample XML files to test the object at a high level.
   // Tests every method in the class, but only lightly.
   describe('.run() method', () => {
@@ -19,8 +19,8 @@ describe('LwcMetadataChecker', () => {
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
       mockProjectBrowser.expects('lwcBundles').once().returns(lwcBundles);
 
-      const checker = new LwcMetadataChecker(sfdxProjectBrowser);
-      const result = checker.run();
+      const ruleset = new LwcMetadataRuleset(sfdxProjectBrowser);
+      const result = ruleset.run();
       expect(result.length).to.equal(1);
       mockProjectBrowser.verify();
     });
@@ -31,8 +31,8 @@ describe('LwcMetadataChecker', () => {
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
       mockProjectBrowser.expects('lwcBundles').once().returns(lwcBundles);
 
-      const checker = new LwcMetadataChecker(sfdxProjectBrowser);
-      const result = checker.run();
+      const ruleset = new LwcMetadataRuleset(sfdxProjectBrowser);
+      const result = ruleset.run();
       expect(result.length).to.equal(0);
       mockProjectBrowser.verify();
     });
@@ -44,13 +44,13 @@ describe('LwcMetadataChecker', () => {
         new LightningComponentBundle('src/test/fixtures/lwc/GoodExample'),
         new LightningComponentBundle('src/test/fixtures/lwc/BadExample'),
       ];
-      const checker = new LwcMetadataChecker(null);
+      const ruleset = new LwcMetadataRuleset(null);
       // mock out the calls to .fileHasTrailingWhitespace(); make it look like one no, one yes
-      const mock = sinon.mock(checker);
+      const mock = sinon.mock(ruleset);
       mock.expects('fileHasTrailingWhitespace').once().returns(false);
       mock.expects('fileHasTrailingWhitespace').once().returns(true);
 
-      const results = checker['trailingWhitespaceWarnings'](lwcBundles);
+      const results = ruleset['trailingWhitespaceWarnings'](lwcBundles);
 
       // Expect one metadata warning. Check all the properties of the warning object; covers .trailingWhitespaceWarning() as well
       expect(results.length).to.equal(1);
@@ -67,45 +67,45 @@ describe('LwcMetadataChecker', () => {
 
   describe('.fileHasTrailingWhitespace()', () => {
     it('should return true when there is whitespace at the end of one or more lines', () => {
-      const checker = new LwcMetadataChecker(null);
-      const result = checker['fileHasTrailingWhitespace']('src/test/fixtures/lwc/BadExample/BadExample.js-meta.xml');
+      const ruleset = new LwcMetadataRuleset(null);
+      const result = ruleset['fileHasTrailingWhitespace']('src/test/fixtures/lwc/BadExample/BadExample.js-meta.xml');
       expect(result).to.equal(true);
     });
 
     it('should return false when there is no trailing whitespace', () => {
-      const checker = new LwcMetadataChecker(null);
-      const result = checker['fileHasTrailingWhitespace']('src/test/fixtures/lwc/GoodExample/GoodExample.js-meta.xml');
+      const ruleset = new LwcMetadataRuleset(null);
+      const result = ruleset['fileHasTrailingWhitespace']('src/test/fixtures/lwc/GoodExample/GoodExample.js-meta.xml');
       expect(result).to.equal(false);
     });
   });
 
   describe('.lineHasTrailingWhitespace()', () => {
     it('should return true when there are one or more spaces at the end of a line', () => {
-      const checker = new LwcMetadataChecker(null);
+      const ruleset = new LwcMetadataRuleset(null);
       const lineWithOneSpace = '<someField>someValue</someField> ';
       const lineWithManySpaces = '<someField>someValue</someField>    ';
-      expect(checker['lineHasTrailingWhitespace'](lineWithOneSpace)).to.equal(true);
-      expect(checker['lineHasTrailingWhitespace'](lineWithManySpaces)).to.equal(true);
+      expect(ruleset['lineHasTrailingWhitespace'](lineWithOneSpace)).to.equal(true);
+      expect(ruleset['lineHasTrailingWhitespace'](lineWithManySpaces)).to.equal(true);
     });
 
     it('should return true when there are tabs at the end of a line', () => {
-      const checker = new LwcMetadataChecker(null);
+      const ruleset = new LwcMetadataRuleset(null);
       const lineWithTabs = '<someField>someValue</someField>		';
-      expect(checker['lineHasTrailingWhitespace'](lineWithTabs)).to.equal(true);
+      expect(ruleset['lineHasTrailingWhitespace'](lineWithTabs)).to.equal(true);
     });
 
     it('should return true when there are non-breaking spaces at the end of a line', () => {
-      const checker = new LwcMetadataChecker(null);
+      const ruleset = new LwcMetadataRuleset(null);
       const lineWithNbsp = '<someField>someValue</someField>' + decodeURIComponent('%C2%A0');
-      expect(checker['lineHasTrailingWhitespace'](lineWithNbsp)).to.equal(true);
+      expect(ruleset['lineHasTrailingWhitespace'](lineWithNbsp)).to.equal(true);
     });
 
     it('should return false when there is no whitespace at the end of a line', () => {
-      const checker = new LwcMetadataChecker(null);
+      const ruleset = new LwcMetadataRuleset(null);
       const lineWithNoWhitespace = '<someField>someValue</someField>';
       const lineWithLeadingWhitespace = '    <someField>someValue</someField>';
-      expect(checker['lineHasTrailingWhitespace'](lineWithNoWhitespace)).to.equal(false);
-      expect(checker['lineHasTrailingWhitespace'](lineWithLeadingWhitespace)).to.equal(false);
+      expect(ruleset['lineHasTrailingWhitespace'](lineWithNoWhitespace)).to.equal(false);
+      expect(ruleset['lineHasTrailingWhitespace'](lineWithLeadingWhitespace)).to.equal(false);
     });
   });
 });

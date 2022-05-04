@@ -3,10 +3,10 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { PicklistField } from '../../metadata_browser/PicklistField';
 import { RecordType } from '../../metadata_browser/RecordType';
-import { RecordTypePicklistValueChecker } from '../../check/RecordTypePicklistValueChecker';
 import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
+import { RecordTypePicklistValueRuleset } from '../../ruleset/RecordTypePicklistValueRuleset';
 
-describe('RecordTypePicklistValueChecker', () => {
+describe('RecordTypePicklistValueRuleset', () => {
   // Regression test. Uses carefully crafted sample XML files to test the object at a high level.
   describe('.run() method', () => {
     it('should return an array of metadata problems', () => {
@@ -26,8 +26,8 @@ describe('RecordTypePicklistValueChecker', () => {
       mockProjectBrowser.expects('picklistFields').once().returns(picklistFields);
       mockProjectBrowser.expects('recordTypes').once().returns(recordTypes);
 
-      const checker = new RecordTypePicklistValueChecker(sfdxProjectBrowser);
-      const result = checker.run();
+      const ruleset = new RecordTypePicklistValueRuleset(sfdxProjectBrowser);
+      const result = ruleset.run();
       expect(result.length).to.equal(2);
       mockProjectBrowser.verify();
     });
@@ -49,8 +49,8 @@ describe('RecordTypePicklistValueChecker', () => {
       mockProjectBrowser.expects('picklistFields').once().returns(picklistFields);
       mockProjectBrowser.expects('recordTypes').once().returns(recordTypes);
 
-      const checker = new RecordTypePicklistValueChecker(sfdxProjectBrowser);
-      const result = checker.run();
+      const ruleset = new RecordTypePicklistValueRuleset(sfdxProjectBrowser);
+      const result = ruleset.run();
       expect(result.length).to.equal(0);
       mockProjectBrowser.verify();
     });

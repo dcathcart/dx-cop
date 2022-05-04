@@ -3,10 +3,10 @@ import * as path from 'path';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../../metadata_browser/EmailToCaseSettings';
-import { EmailToCaseSettingsChecker } from '../../check/EmailToCaseSettingsChecker';
 import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
+import { EmailToCaseSettingsRuleset } from '../../ruleset/EmailToCaseSettingsRuleset';
 
-describe('EmailToCaseSettingsChecker', () => {
+describe('EmailToCaseSettingsRuleset', () => {
   // Regression test. Uses carefully crafted sample XML files to test the object at a high level.
   describe('.run()', () => {
     it('should return an array of metadata problems', () => {
@@ -15,8 +15,8 @@ describe('EmailToCaseSettingsChecker', () => {
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
       mockProjectBrowser.expects('emailToCaseSettings').once().returns(emailToCaseSettings);
 
-      const checker = new EmailToCaseSettingsChecker(sfdxProjectBrowser);
-      const result = checker.run();
+      const ruleset = new EmailToCaseSettingsRuleset(sfdxProjectBrowser);
+      const result = ruleset.run();
       expect(result.length).to.equal(3);
       mockProjectBrowser.verify();
     });
@@ -27,8 +27,8 @@ describe('EmailToCaseSettingsChecker', () => {
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
       mockProjectBrowser.expects('emailToCaseSettings').once().returns(emailToCaseSettings);
 
-      const checker = new EmailToCaseSettingsChecker(sfdxProjectBrowser);
-      const result = checker.run();
+      const ruleset = new EmailToCaseSettingsRuleset(sfdxProjectBrowser);
+      const result = ruleset.run();
       expect(result.length).to.equal(0);
       mockProjectBrowser.verify();
     });
@@ -38,8 +38,8 @@ describe('EmailToCaseSettingsChecker', () => {
     it('should return a metadata error when an <emailServicesAddress> field exists', () => {
       const fileName = path.normalize('src/test/fixtures/settings/Case-errors.settings-meta.xml');
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
-      const checker = new EmailToCaseSettingsChecker(null);
-      const result = checker['emailServicesAddressErrors'](emailToCaseSettings);
+      const ruleset = new EmailToCaseSettingsRuleset(null);
+      const result = ruleset['emailServicesAddressErrors'](emailToCaseSettings);
       expect(result.length).to.equal(1);
       expect(result[0].componentType).to.equal('CaseSettings');
       expect(result[0].componentName).to.equal('EmailToCase:Test email address');
@@ -50,8 +50,8 @@ describe('EmailToCaseSettingsChecker', () => {
 
     it('should return an empty array when there are no errors', () => {
       const emailToCaseSettings = new EmailToCaseSettings('src/test/fixtures/settings/Case.settings-meta.xml');
-      const checker = new EmailToCaseSettingsChecker(null);
-      const result = checker['emailServicesAddressErrors'](emailToCaseSettings);
+      const ruleset = new EmailToCaseSettingsRuleset(null);
+      const result = ruleset['emailServicesAddressErrors'](emailToCaseSettings);
       expect(result.length).to.equal(0);
     });
   });
@@ -60,8 +60,8 @@ describe('EmailToCaseSettingsChecker', () => {
     it('should return a metadata error when an <isVerified> field exists', () => {
       const fileName = path.normalize('src/test/fixtures/settings/Case-errors.settings-meta.xml');
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
-      const checker = new EmailToCaseSettingsChecker(null);
-      const result = checker['isVerifiedErrors'](emailToCaseSettings);
+      const ruleset = new EmailToCaseSettingsRuleset(null);
+      const result = ruleset['isVerifiedErrors'](emailToCaseSettings);
       expect(result.length).to.equal(1);
       expect(result[0].componentType).to.equal('CaseSettings');
       expect(result[0].componentName).to.equal('EmailToCase:Test email address');
@@ -72,8 +72,8 @@ describe('EmailToCaseSettingsChecker', () => {
 
     it('should return an empty array when there are no errors', () => {
       const emailToCaseSettings = new EmailToCaseSettings('src/test/fixtures/settings/Case.settings-meta.xml');
-      const checker = new EmailToCaseSettingsChecker(null);
-      const result = checker['isVerifiedErrors'](emailToCaseSettings);
+      const ruleset = new EmailToCaseSettingsRuleset(null);
+      const result = ruleset['isVerifiedErrors'](emailToCaseSettings);
       expect(result.length).to.equal(0);
     });
   });
@@ -89,8 +89,8 @@ describe('EmailToCaseSettingsChecker', () => {
       sinon.stub(emailToCaseSettings, 'routingAddresses').returns(routingAddresses);
       sinon.stub(emailToCaseSettings, 'fileName').get(() => 'Case.settings-meta.xml');
 
-      const checker = new EmailToCaseSettingsChecker(null);
-      const result = checker['sortOrderWarnings'](emailToCaseSettings);
+      const ruleset = new EmailToCaseSettingsRuleset(null);
+      const result = ruleset['sortOrderWarnings'](emailToCaseSettings);
       expect(result.length).to.equal(1);
       expect(result[0].componentType).to.equal('CaseSettings');
       expect(result[0].componentName).to.equal('EmailToCase');
@@ -110,15 +110,15 @@ describe('EmailToCaseSettingsChecker', () => {
       const emailToCaseSettings = new EmailToCaseSettings('');
       sinon.stub(emailToCaseSettings, 'routingAddresses').returns(routingAddresses);
 
-      const checker = new EmailToCaseSettingsChecker(null);
-      const results = checker['sortOrderWarnings'](emailToCaseSettings);
+      const ruleset = new EmailToCaseSettingsRuleset(null);
+      const results = ruleset['sortOrderWarnings'](emailToCaseSettings);
       expect(results.length).to.equal(0);
     });
 
     it('should return an empty array when there are no errors', () => {
       const emailToCaseSettings = new EmailToCaseSettings('src/test/fixtures/settings/Case.settings-meta.xml');
-      const checker = new EmailToCaseSettingsChecker(null);
-      const result = checker['sortOrderWarnings'](emailToCaseSettings);
+      const ruleset = new EmailToCaseSettingsRuleset(null);
+      const result = ruleset['sortOrderWarnings'](emailToCaseSettings);
       expect(result.length).to.equal(0);
     });
   });
