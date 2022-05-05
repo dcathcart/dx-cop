@@ -1,7 +1,7 @@
 import * as fs from 'fs';
-import { LightningComponentBundle } from '../metadata_browser/LightningComponentBundle';
-import { MetadataProblem, MetadataWarning } from './MetadataProblem';
-import { MetadataRuleset } from './MetadataRuleset';
+import { LightningComponentBundle } from '../metadata_browser/lightningComponentBundle';
+import { MetadataProblem, MetadataWarning } from './metadataProblem';
+import { MetadataRuleset } from './metadataRuleset';
 
 export class LwcMetadataRuleset extends MetadataRuleset {
   public displayName = 'Lightning web components';

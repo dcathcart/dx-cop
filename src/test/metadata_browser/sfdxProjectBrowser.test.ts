@@ -2,7 +2,7 @@ import 'mocha';
 import * as path from 'path';
 import { expect } from 'chai';
 import Sinon = require('sinon');
-import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
+import { SfdxProjectBrowser } from '../../metadata_browser/sfdxProjectBrowser';
 
 describe('SfdxProjectBrowser', () => {
   describe('.lwcBundles()', () => {

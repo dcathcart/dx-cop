@@ -1,5 +1,5 @@
-import { SfdxProjectBrowser } from '../metadata_browser/SfdxProjectBrowser';
-import { MetadataProblem } from './MetadataProblem';
+import { SfdxProjectBrowser } from '../metadata_browser/sfdxProjectBrowser';
+import { MetadataProblem } from './metadataProblem';
 
 export abstract class MetadataRuleset {
   protected sfdxProjectBrowser: SfdxProjectBrowser;

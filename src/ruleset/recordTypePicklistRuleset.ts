@@ -1,6 +1,6 @@
-import { RecordType } from '../metadata_browser/RecordType';
-import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
-import { MetadataRuleset } from './MetadataRuleset';
+import { RecordType } from '../metadata_browser/recordType';
+import { MetadataError, MetadataProblem, MetadataWarning } from './metadataProblem';
+import { MetadataRuleset } from './metadataRuleset';
 
 export class RecordTypePicklistRuleset extends MetadataRuleset {
   public displayName = 'Record type picklists';

@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
-import { CustomField } from '../../metadata_browser/CustomField';
+import { CustomField } from '../../metadata_browser/customField';
 
 describe('ObjectSubComponent', () => {
   describe('.objectName()', () => {

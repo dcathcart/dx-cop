@@ -1,7 +1,7 @@
 import 'mocha';
 import * as path from 'path';
 import { expect } from 'chai';
-import { LightningComponentBundle } from '../../metadata_browser/LightningComponentBundle';
+import { LightningComponentBundle } from '../../metadata_browser/lightningComponentBundle';
 
 describe('LightningComponentBundle', () => {
   describe('.baseFolder property', () => {

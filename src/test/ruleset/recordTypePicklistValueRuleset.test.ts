@@ -1,10 +1,10 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { PicklistField } from '../../metadata_browser/PicklistField';
-import { RecordType } from '../../metadata_browser/RecordType';
-import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
-import { RecordTypePicklistValueRuleset } from '../../ruleset/RecordTypePicklistValueRuleset';
+import { PicklistField } from '../../metadata_browser/picklistField';
+import { RecordType } from '../../metadata_browser/recordType';
+import { SfdxProjectBrowser } from '../../metadata_browser/sfdxProjectBrowser';
+import { RecordTypePicklistValueRuleset } from '../../ruleset/recordTypePicklistValueRuleset';
 
 describe('RecordTypePicklistValueRuleset', () => {
   // Regression test. Uses carefully crafted sample XML files to test the object at a high level.

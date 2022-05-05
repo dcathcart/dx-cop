@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
-import { EmailToCaseSettings } from '../../metadata_browser/EmailToCaseSettings';
+import { EmailToCaseSettings } from '../../metadata_browser/emailToCaseSettings';
 
 describe('EmailToCaseSettings class', () => {
   describe('.routingAddresses() method', () => {

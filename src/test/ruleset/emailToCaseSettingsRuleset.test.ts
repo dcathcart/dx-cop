@@ -2,9 +2,9 @@ import 'mocha';
 import * as path from 'path';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../../metadata_browser/EmailToCaseSettings';
-import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
-import { EmailToCaseSettingsRuleset } from '../../ruleset/EmailToCaseSettingsRuleset';
+import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../../metadata_browser/emailToCaseSettings';
+import { SfdxProjectBrowser } from '../../metadata_browser/sfdxProjectBrowser';
+import { EmailToCaseSettingsRuleset } from '../../ruleset/emailToCaseSettingsRuleset';
 
 describe('EmailToCaseSettingsRuleset', () => {
   // Regression test. Uses carefully crafted sample XML files to test the object at a high level.

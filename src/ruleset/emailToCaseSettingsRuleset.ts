@@ -1,6 +1,6 @@
-import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../metadata_browser/EmailToCaseSettings';
-import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
-import { MetadataRuleset } from './MetadataRuleset';
+import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../metadata_browser/emailToCaseSettings';
+import { MetadataError, MetadataProblem, MetadataWarning } from './metadataProblem';
+import { MetadataRuleset } from './metadataRuleset';
 
 export class EmailToCaseSettingsRuleset extends MetadataRuleset {
   public displayName = 'Email-to-Case settings';

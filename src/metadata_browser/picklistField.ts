@@ -11,7 +11,7 @@ import {
   JsonMap,
 } from '@salesforce/ts-types';
 import { decode } from 'html-entities';
-import { CustomField } from './CustomField';
+import { CustomField } from './customField';
 
 // Class that represents a CustomField of Picklist type
 export class PicklistField extends CustomField {

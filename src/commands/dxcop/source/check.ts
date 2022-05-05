@@ -5,14 +5,14 @@ import { SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
-import defaultConfig from '../../../config/DefaultConfig';
-import { SfdxProjectBrowser } from '../../../metadata_browser/SfdxProjectBrowser';
-import { EmailToCaseSettingsRuleset } from '../../../ruleset/EmailToCaseSettingsRuleset';
-import { LwcMetadataRuleset } from '../../../ruleset/LwcMetadataRuleset';
-import { MetadataProblem } from '../../../ruleset/MetadataProblem';
-import { MetadataRuleset } from '../../../ruleset/MetadataRuleset';
-import { RecordTypePicklistRuleset } from '../../../ruleset/RecordTypePicklistRuleset';
-import { RecordTypePicklistValueRuleset } from '../../../ruleset/RecordTypePicklistValueRuleset';
+import defaultConfig from '../../../config/defaultConfig';
+import { SfdxProjectBrowser } from '../../../metadata_browser/sfdxProjectBrowser';
+import { EmailToCaseSettingsRuleset } from '../../../ruleset/emailToCaseSettingsRuleset';
+import { LwcMetadataRuleset } from '../../../ruleset/lwcMetadataRuleset';
+import { MetadataProblem } from '../../../ruleset/metadataProblem';
+import { MetadataRuleset } from '../../../ruleset/metadataRuleset';
+import { RecordTypePicklistRuleset } from '../../../ruleset/recordTypePicklistRuleset';
+import { RecordTypePicklistValueRuleset } from '../../../ruleset/recordTypePicklistValueRuleset';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);

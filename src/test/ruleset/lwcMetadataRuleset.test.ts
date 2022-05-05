@@ -2,9 +2,9 @@ import 'mocha';
 import * as path from 'path';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { LightningComponentBundle } from '../../metadata_browser/LightningComponentBundle';
-import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
-import { LwcMetadataRuleset } from '../../ruleset/LwcMetadataRuleset';
+import { LightningComponentBundle } from '../../metadata_browser/lightningComponentBundle';
+import { SfdxProjectBrowser } from '../../metadata_browser/sfdxProjectBrowser';
+import { LwcMetadataRuleset } from '../../ruleset/lwcMetadataRuleset';
 
 describe('LwcMetadataRuleset', () => {
   // Regression test. Uses carefully crafted sample XML files to test the object at a high level.

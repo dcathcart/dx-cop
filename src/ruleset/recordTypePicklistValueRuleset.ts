@@ -1,7 +1,7 @@
-import { PicklistField } from '../metadata_browser/PicklistField';
-import { RecordType } from '../metadata_browser/RecordType';
-import { MetadataError, MetadataProblem } from './MetadataProblem';
-import { MetadataRuleset } from './MetadataRuleset';
+import { PicklistField } from '../metadata_browser/picklistField';
+import { RecordType } from '../metadata_browser/recordType';
+import { MetadataError, MetadataProblem } from './metadataProblem';
+import { MetadataRuleset } from './metadataRuleset';
 
 export class RecordTypePicklistValueRuleset extends MetadataRuleset {
   public displayName = 'Record type picklist values';
