@@ -5,14 +5,14 @@ import { SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxProject } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 
-import { CheckerBase } from '../../../check/CheckerBase';
-import { EmailToCaseSettingsChecker } from '../../../check/EmailToCaseSettingsChecker';
-import { LwcMetadataChecker } from '../../../check/LwcMetadataChecker';
-import { MetadataProblem } from '../../../check/MetadataProblem';
-import { RecordTypePicklistChecker } from '../../../check/RecordTypePicklistChecker';
-import { RecordTypePicklistValueChecker } from '../../../check/RecordTypePicklistValueChecker';
-import defaultConfig from '../../../config/DefaultConfig';
-import { SfdxProjectBrowser } from '../../../metadata_browser/SfdxProjectBrowser';
+import defaultConfig from '../../../config/defaultConfig';
+import { SfdxProjectBrowser } from '../../../metadata_browser/sfdxProjectBrowser';
+import { EmailToCaseSettingsRuleset } from '../../../ruleset/emailToCaseSettingsRuleset';
+import { LwcMetadataRuleset } from '../../../ruleset/lwcMetadataRuleset';
+import { MetadataProblem } from '../../../ruleset/metadataProblem';
+import { MetadataRuleset } from '../../../ruleset/metadataRuleset';
+import { RecordTypePicklistRuleset } from '../../../ruleset/recordTypePicklistRuleset';
+import { RecordTypePicklistValueRuleset } from '../../../ruleset/recordTypePicklistValueRuleset';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -59,23 +59,23 @@ export default class Check extends SfdxCommand {
     return { problems: metadataProblems.map((p) => p.jsonOutput()) };
   }
 
-  private rulesetsToRun(sfdxProject: SfdxProject): CheckerBase[] {
+  private rulesetsToRun(sfdxProject: SfdxProject): MetadataRuleset[] {
     const config = this.loadConfig();
 
     const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
-    const rulesets: CheckerBase[] = [];
+    const rulesets: MetadataRuleset[] = [];
 
     if (config.ruleSets.emailToCaseSettings.enabled) {
-      rulesets.push(new EmailToCaseSettingsChecker(sfdxProjectBrowser));
+      rulesets.push(new EmailToCaseSettingsRuleset(sfdxProjectBrowser));
     }
     if (config.ruleSets.lightningWebComponents.enabled) {
-      rulesets.push(new LwcMetadataChecker(sfdxProjectBrowser));
+      rulesets.push(new LwcMetadataRuleset(sfdxProjectBrowser));
     }
     if (config.ruleSets.recordTypePicklists.enabled) {
-      rulesets.push(new RecordTypePicklistChecker(sfdxProjectBrowser));
+      rulesets.push(new RecordTypePicklistRuleset(sfdxProjectBrowser));
     }
     if (config.ruleSets.recordTypePicklistValues.enabled) {
-      rulesets.push(new RecordTypePicklistValueChecker(sfdxProjectBrowser));
+      rulesets.push(new RecordTypePicklistValueRuleset(sfdxProjectBrowser));
     }
 
     return rulesets;
