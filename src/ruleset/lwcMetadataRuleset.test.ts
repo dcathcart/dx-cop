@@ -2,9 +2,9 @@ import 'mocha';
 import * as path from 'path';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { LightningComponentBundle } from '../../metadata_browser/lightningComponentBundle';
-import { SfdxProjectBrowser } from '../../metadata_browser/sfdxProjectBrowser';
-import { LwcMetadataRuleset } from '../../ruleset/lwcMetadataRuleset';
+import { LightningComponentBundle } from '../metadata_browser/lightningComponentBundle';
+import { SfdxProjectBrowser } from '../metadata_browser/sfdxProjectBrowser';
+import { LwcMetadataRuleset } from './lwcMetadataRuleset';
 
 describe('LwcMetadataRuleset', () => {
   // Regression test. Uses carefully crafted sample XML files to test the object at a high level.
@@ -12,8 +12,8 @@ describe('LwcMetadataRuleset', () => {
   describe('.run() method', () => {
     it('should return an array of metadata problems', () => {
       const lwcBundles = [
-        new LightningComponentBundle('src/test/fixtures/lwc/BadExample'),
-        new LightningComponentBundle('src/test/fixtures/lwc/GoodExample'),
+        new LightningComponentBundle('src/test/metadata/lwc/BadExample'),
+        new LightningComponentBundle('src/test/metadata/lwc/GoodExample'),
       ];
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
@@ -26,7 +26,7 @@ describe('LwcMetadataRuleset', () => {
     });
 
     it('should return an empty array when there are no problems', () => {
-      const lwcBundles = [new LightningComponentBundle('src/test/fixtures/lwc/GoodExample')];
+      const lwcBundles = [new LightningComponentBundle('src/test/metadata/lwc/GoodExample')];
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
       mockProjectBrowser.expects('lwcBundles').once().returns(lwcBundles);
@@ -41,8 +41,8 @@ describe('LwcMetadataRuleset', () => {
   describe('.trailingWhitespaceWarnings()', () => {
     it('should return a metadata warning when there is trailing whitespace', () => {
       const lwcBundles = [
-        new LightningComponentBundle('src/test/fixtures/lwc/GoodExample'),
-        new LightningComponentBundle('src/test/fixtures/lwc/BadExample'),
+        new LightningComponentBundle('src/test/metadata/lwc/GoodExample'),
+        new LightningComponentBundle('src/test/metadata/lwc/BadExample'),
       ];
       const ruleset = new LwcMetadataRuleset(null);
       // mock out the calls to .fileHasTrailingWhitespace(); make it look like one no, one yes
@@ -56,7 +56,7 @@ describe('LwcMetadataRuleset', () => {
       expect(results.length).to.equal(1);
       expect(results[0].componentName).to.equal('BadExample');
       expect(results[0].componentType).to.equal('LightningComponentBundle');
-      expect(results[0].fileName).to.equal(path.normalize('src/test/fixtures/lwc/BadExample/BadExample.js-meta.xml'));
+      expect(results[0].fileName).to.equal(path.normalize('src/test/metadata/lwc/BadExample/BadExample.js-meta.xml'));
       expect(results[0].problem).to.equal(
         'Whitespace characters detected at the end of one or more lines in .js-meta.xml'
       );
@@ -68,13 +68,13 @@ describe('LwcMetadataRuleset', () => {
   describe('.fileHasTrailingWhitespace()', () => {
     it('should return true when there is whitespace at the end of one or more lines', () => {
       const ruleset = new LwcMetadataRuleset(null);
-      const result = ruleset['fileHasTrailingWhitespace']('src/test/fixtures/lwc/BadExample/BadExample.js-meta.xml');
+      const result = ruleset['fileHasTrailingWhitespace']('src/test/metadata/lwc/BadExample/BadExample.js-meta.xml');
       expect(result).to.equal(true);
     });
 
     it('should return false when there is no trailing whitespace', () => {
       const ruleset = new LwcMetadataRuleset(null);
-      const result = ruleset['fileHasTrailingWhitespace']('src/test/fixtures/lwc/GoodExample/GoodExample.js-meta.xml');
+      const result = ruleset['fileHasTrailingWhitespace']('src/test/metadata/lwc/GoodExample/GoodExample.js-meta.xml');
       expect(result).to.equal(false);
     });
   });

@@ -2,15 +2,15 @@ import 'mocha';
 import * as path from 'path';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../../metadata_browser/emailToCaseSettings';
-import { SfdxProjectBrowser } from '../../metadata_browser/sfdxProjectBrowser';
-import { EmailToCaseSettingsRuleset } from '../../ruleset/emailToCaseSettingsRuleset';
+import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../metadata_browser/emailToCaseSettings';
+import { SfdxProjectBrowser } from '../metadata_browser/sfdxProjectBrowser';
+import { EmailToCaseSettingsRuleset } from './emailToCaseSettingsRuleset';
 
 describe('EmailToCaseSettingsRuleset', () => {
   // Regression test. Uses carefully crafted sample XML files to test the object at a high level.
   describe('.run()', () => {
     it('should return an array of metadata problems', () => {
-      const emailToCaseSettings = new EmailToCaseSettings('src/test/fixtures/settings/Case-errors.settings-meta.xml');
+      const emailToCaseSettings = new EmailToCaseSettings('src/test/metadata/settings/Case-errors.settings-meta.xml');
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
       mockProjectBrowser.expects('emailToCaseSettings').once().returns(emailToCaseSettings);
@@ -22,7 +22,7 @@ describe('EmailToCaseSettingsRuleset', () => {
     });
 
     it('should return an empty array when there are no problems', () => {
-      const emailToCaseSettings = new EmailToCaseSettings('src/test/fixtures/settings/Case.settings-meta.xml');
+      const emailToCaseSettings = new EmailToCaseSettings('src/test/metadata/settings/Case.settings-meta.xml');
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
       mockProjectBrowser.expects('emailToCaseSettings').once().returns(emailToCaseSettings);
@@ -36,7 +36,7 @@ describe('EmailToCaseSettingsRuleset', () => {
 
   describe('.emailServicesAddressErrors()', () => {
     it('should return a metadata error when an <emailServicesAddress> field exists', () => {
-      const fileName = path.normalize('src/test/fixtures/settings/Case-errors.settings-meta.xml');
+      const fileName = path.normalize('src/test/metadata/settings/Case-errors.settings-meta.xml');
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
       const ruleset = new EmailToCaseSettingsRuleset(null);
       const result = ruleset['emailServicesAddressErrors'](emailToCaseSettings);
@@ -49,7 +49,7 @@ describe('EmailToCaseSettingsRuleset', () => {
     });
 
     it('should return an empty array when there are no errors', () => {
-      const emailToCaseSettings = new EmailToCaseSettings('src/test/fixtures/settings/Case.settings-meta.xml');
+      const emailToCaseSettings = new EmailToCaseSettings('src/test/metadata/settings/Case.settings-meta.xml');
       const ruleset = new EmailToCaseSettingsRuleset(null);
       const result = ruleset['emailServicesAddressErrors'](emailToCaseSettings);
       expect(result.length).to.equal(0);
@@ -58,7 +58,7 @@ describe('EmailToCaseSettingsRuleset', () => {
 
   describe('.isVerifiedErrors()', () => {
     it('should return a metadata error when an <isVerified> field exists', () => {
-      const fileName = path.normalize('src/test/fixtures/settings/Case-errors.settings-meta.xml');
+      const fileName = path.normalize('src/test/metadata/settings/Case-errors.settings-meta.xml');
       const emailToCaseSettings = new EmailToCaseSettings(fileName);
       const ruleset = new EmailToCaseSettingsRuleset(null);
       const result = ruleset['isVerifiedErrors'](emailToCaseSettings);
@@ -71,7 +71,7 @@ describe('EmailToCaseSettingsRuleset', () => {
     });
 
     it('should return an empty array when there are no errors', () => {
-      const emailToCaseSettings = new EmailToCaseSettings('src/test/fixtures/settings/Case.settings-meta.xml');
+      const emailToCaseSettings = new EmailToCaseSettings('src/test/metadata/settings/Case.settings-meta.xml');
       const ruleset = new EmailToCaseSettingsRuleset(null);
       const result = ruleset['isVerifiedErrors'](emailToCaseSettings);
       expect(result.length).to.equal(0);
@@ -116,7 +116,7 @@ describe('EmailToCaseSettingsRuleset', () => {
     });
 
     it('should return an empty array when there are no errors', () => {
-      const emailToCaseSettings = new EmailToCaseSettings('src/test/fixtures/settings/Case.settings-meta.xml');
+      const emailToCaseSettings = new EmailToCaseSettings('src/test/metadata/settings/Case.settings-meta.xml');
       const ruleset = new EmailToCaseSettingsRuleset(null);
       const result = ruleset['sortOrderWarnings'](emailToCaseSettings);
       expect(result.length).to.equal(0);
