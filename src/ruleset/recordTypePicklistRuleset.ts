@@ -1,8 +1,8 @@
-import { RecordType } from '../metadata_browser/RecordType';
-import { CheckerBase } from './CheckerBase';
-import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
+import { RecordType } from '../metadata_browser/recordType';
+import { MetadataError, MetadataProblem, MetadataWarning } from './metadataProblem';
+import { MetadataRuleset } from './metadataRuleset';
 
-export class RecordTypePicklistChecker extends CheckerBase {
+export class RecordTypePicklistRuleset extends MetadataRuleset {
   public displayName = 'Record type picklists';
 
   private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];

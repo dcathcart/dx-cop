@@ -1,13 +1,13 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { AdminProfileChecker } from '../../check/AdminProfileChecker';
-import { CustomField } from '../../metadata_browser/CustomField';
-import { CustomObject } from '../../metadata_browser/CustomObject';
-import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../../metadata_browser/Profile';
-import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
+import { CustomField } from '../metadata_browser/customField';
+import { CustomObject } from '../metadata_browser/customObject';
+import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../metadata_browser/profile';
+import { SfdxProjectBrowser } from '../metadata_browser/sfdxProjectBrowser';
+import { AdminProfileRuleset } from './adminProfileRuleset';
 
-describe('AdminProfileChecker', () => {
+describe('AdminProfileRuleset', () => {
   describe('.expectedObjects()', () => {
     it('should only check custom objects', () => {
       // Bit of setup here: Create a mock project with 2 objects: a custom and a standard object.
@@ -23,8 +23,8 @@ describe('AdminProfileChecker', () => {
       const objects = [standardObject, customObject];
       mockProjectBrowser.expects('objects').once().returns(objects);
 
-      const checker = new AdminProfileChecker(sfdxProjectBrowser);
-      const results = checker['expectedObjects']();
+      const ruleset = new AdminProfileRuleset(sfdxProjectBrowser);
+      const results = ruleset['expectedObjects']();
       expect(results.length).to.equal(1);
       expect(results[0].name).to.equal('Object2__c');
 
@@ -43,8 +43,8 @@ describe('AdminProfileChecker', () => {
 
       mockProjectBrowser.expects('fields').once().withArgs('Object1').returns([]);
       mockProjectBrowser.expects('fields').once().withArgs('Object2__c').returns([]);
-      const checker = new AdminProfileChecker(sfdxProjectBrowser);
-      checker['expectedFields'](objects);
+      const ruleset = new AdminProfileRuleset(sfdxProjectBrowser);
+      ruleset['expectedFields'](objects);
       mockProjectBrowser.verify();
     });
     it('only checks custom fields that are not required', () => {
@@ -61,8 +61,8 @@ describe('AdminProfileChecker', () => {
       sinon.stub(field2, 'isRequired').returns(false);
 
       mockProjectBrowser.expects('fields').once().withArgs('Object1').returns([field1, field2]);
-      const checker = new AdminProfileChecker(sfdxProjectBrowser);
-      const results = checker['expectedFields'](objects);
+      const ruleset = new AdminProfileRuleset(sfdxProjectBrowser);
+      const results = ruleset['expectedFields'](objects);
       expect(results.length).to.equal(1);
       expect(results[0]).to.equal(field2);
       mockProjectBrowser.verify();
@@ -84,8 +84,8 @@ describe('AdminProfileChecker', () => {
         new CustomField('path/to/objects/Object1/fields/Field3.field-meta.xml'),
       ];
 
-      const checker = new AdminProfileChecker(null);
-      const results = checker['missingFields'](profile, expectedFields);
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['missingFields'](profile, expectedFields);
       expect(results.length).to.equal(1);
       expect(results[0].componentName).to.equal('Admin');
       expect(results[0].componentType).to.equal('Profile');
@@ -103,8 +103,8 @@ describe('AdminProfileChecker', () => {
       ];
       sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
-      const checker = new AdminProfileChecker(null);
-      const results = checker['missingFieldPermissions'](profile);
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['missingFieldPermissions'](profile);
       expect(results.length).to.equal(2);
 
       expect(results[0].componentName).to.equal('Admin');
@@ -127,8 +127,8 @@ describe('AdminProfileChecker', () => {
       ];
       sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
-      const checker = new AdminProfileChecker(null);
-      const results = checker['fieldSortOrderWarnings'](profile);
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['fieldSortOrderWarnings'](profile);
       expect(results.length).to.equal(1);
       expect(results[0].componentName).to.equal('Admin');
       expect(results[0].componentType).to.equal('Profile');
@@ -150,8 +150,8 @@ describe('AdminProfileChecker', () => {
         new CustomObject('Object2.object-meta.xml'),
       ];
 
-      const checker = new AdminProfileChecker(null);
-      const results = checker['missingObjects'](profile, expectedObjects);
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['missingObjects'](profile, expectedObjects);
       expect(results.length).to.equal(1);
       expect(results[0].componentName).to.equal('Admin');
       expect(results[0].componentType).to.equal('Profile');
@@ -177,8 +177,8 @@ describe('AdminProfileChecker', () => {
       ];
       sinon.stub(profile, 'objectPermissions').returns(objectPermissions);
 
-      const checker = new AdminProfileChecker(null);
-      const results = checker['missingObjectPermissions'](profile);
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['missingObjectPermissions'](profile);
       expect(results.length).to.equal(6);
 
       expect(results[0].componentName).to.equal('Admin');
@@ -205,8 +205,8 @@ describe('AdminProfileChecker', () => {
       ];
       sinon.stub(profile, 'objectPermissions').returns(objectPermissions);
 
-      const checker = new AdminProfileChecker(null);
-      const results = checker['objectSortOrderWarnings'](profile);
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['objectSortOrderWarnings'](profile);
       expect(results.length).to.equal(1);
       expect(results[0].componentName).to.equal('Admin');
       expect(results[0].componentType).to.equal('Profile');
