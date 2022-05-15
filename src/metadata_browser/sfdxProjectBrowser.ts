@@ -1,11 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { SfdxProject } from '@salesforce/core';
-import { CustomField } from './CustomField';
-import { EmailToCaseSettings } from './EmailToCaseSettings';
-import { LightningComponentBundle } from './LightningComponentBundle';
-import { PicklistField } from './PicklistField';
-import { RecordType } from './RecordType';
+import { CustomField } from './customField';
+import { CustomObject } from './customObject';
+import { EmailToCaseSettings } from './emailToCaseSettings';
+import { LightningComponentBundle } from './lightningComponentBundle';
+import { PicklistField } from './picklistField';
+import { Profile } from './profile';
+import { RecordType } from './recordType';
 
 // Tools for browsing/navigating the metadata in an SFDX project
 export class SfdxProjectBrowser {
@@ -15,9 +17,37 @@ export class SfdxProjectBrowser {
     this.sfdxProject = sfdxProject;
   }
 
+  // Provide a list of objects. Includes both standard and custom objects.
+  public objects(): CustomObject[] {
+    const results: CustomObject[] = [];
+
+    const baseDir = this.objectsBaseDir();
+    const objectDirs = fs.readdirSync(baseDir);
+
+    for (const objectDir of objectDirs) {
+      const fileName = path.join(baseDir, objectDir, objectDir + '.object-meta.xml');
+
+      // Ignore objects that don't have a *.object-meta.xml file.
+      // These are likely to be packaged objects that have been modified in some way (e.g. a custom field was added).
+      // TODO: Revisit this thinking. Is it valid for all scenarios?
+      if (fs.existsSync(fileName)) {
+        results.push(new CustomObject(fileName));
+      }
+    }
+
+    return results;
+  }
+
   public emailToCaseSettings(): EmailToCaseSettings {
     const fileName = path.join(this.settingsBaseDir(), 'Case.settings-meta.xml');
     return new EmailToCaseSettings(fileName);
+  }
+
+  // Return the list of fields for a given object
+  public fields(objectName: string): CustomField[] {
+    const dir = this.customFieldsBaseDir(objectName);
+    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    return fileNames.map((f) => new CustomField(path.join(dir, f)));
   }
 
   // Return a map of all LWCs. key = LWC name, value = full path to the folder that contains all the components for that LWC
@@ -34,8 +64,13 @@ export class SfdxProjectBrowser {
 
   // Return all picklist fields in a map (picklist name -> PicklistField object)
   public picklistFields(objectName: string): PicklistField[] {
-    const picklists: CustomField[] = this.customFields(objectName).filter((f) => f.isPicklist());
+    const picklists: CustomField[] = this.fields(objectName).filter((f) => f.isPicklist());
     return picklists.map((f) => new PicklistField(f.fileName));
+  }
+
+  public profileByName(profileName: string): Profile {
+    const fileName = path.join(this.profilesBaseDir(), profileName + '.profile-meta.xml');
+    return new Profile(fileName);
   }
 
   // Return a list of record types for the given object
@@ -45,13 +80,6 @@ export class SfdxProjectBrowser {
     return fileNames.map((f) => new RecordType(path.join(dir, f)));
   }
 
-  // Return a list of fields for the given object
-  private customFields(objectName: string): CustomField[] {
-    const dir = this.customFieldsBaseDir(objectName);
-    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
-    return fileNames.map((f) => new CustomField(path.join(dir, f)));
-  }
-
   // Directory containing fields for a given object
   private customFieldsBaseDir(objectName: string): string {
     return path.join(this.objectDir(objectName), 'fields');
@@ -59,6 +87,10 @@ export class SfdxProjectBrowser {
 
   private lwcBaseDir(): string {
     return path.join(this.defaultDir(), 'lwc');
+  }
+
+  private profilesBaseDir(): string {
+    return path.join(this.defaultDir(), 'profiles');
   }
 
   // Directory containing all the record types for a given object

@@ -1,7 +1,7 @@
 {
   "name": "dx-cop",
   "description": "Static analysis for your Salesforce git repository",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "David Cathcart",
   "bugs": "https://github.com/dcathcart/dx-cop/issues",
   "dependencies": {
@@ -84,7 +84,7 @@
     "postpack": "rimraf oclif.manifest.json",
     "posttest": "eslint src/**/*.ts",
     "prepack": "rimraf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "nyc --check-coverage --lines 80 --extension .ts --require ts-node/register mocha --forbid-only \"src/test/**/*.test.ts\"",
+    "test": "nyc --check-coverage --lines 80 --extension .ts --require ts-node/register mocha --forbid-only \"src/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
   }
 }

@@ -9,7 +9,7 @@ import {
   JsonArray,
   JsonMap,
 } from '@salesforce/ts-types';
-import { ObjectSubComponent } from './MetadataComponent';
+import { ObjectSubComponent } from './metadataComponent';
 
 export class RecordType extends ObjectSubComponent {
   protected readonly fileExtension = 'recordType';
