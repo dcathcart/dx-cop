@@ -2,7 +2,7 @@ import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { JsonMap } from '@salesforce/ts-types';
-import { CustomField } from '../../metadata_browser/CustomField';
+import { CustomField } from './customField';
 
 describe('CustomField', () => {
   describe('.dataType property', () => {

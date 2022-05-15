@@ -1,8 +1,8 @@
-import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../metadata_browser/EmailToCaseSettings';
-import { CheckerBase } from './CheckerBase';
-import { MetadataError, MetadataProblem, MetadataWarning } from './MetadataProblem';
+import { EmailToCaseRoutingAddress, EmailToCaseSettings } from '../metadata_browser/emailToCaseSettings';
+import { MetadataError, MetadataProblem, MetadataWarning } from './metadataProblem';
+import { MetadataRuleset } from './metadataRuleset';
 
-export class EmailToCaseSettingsChecker extends CheckerBase {
+export class EmailToCaseSettingsRuleset extends MetadataRuleset {
   public displayName = 'Email-to-Case settings';
 
   public run(): MetadataProblem[] {

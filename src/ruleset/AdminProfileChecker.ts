@@ -1,10 +1,10 @@
-import { CustomField } from '../metadata_browser/CustomField';
-import { CustomObject } from '../metadata_browser/CustomObject';
+import { CustomField } from '../metadata_browser/customField';
+import { CustomObject } from '../metadata_browser/customObject';
 import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../metadata_browser/Profile';
-import { CheckerBase } from './CheckerBase';
-import { MetadataProblem, MetadataWarning } from './MetadataProblem';
+import { MetadataProblem, MetadataWarning } from './metadataProblem';
+import { MetadataRuleset } from './metadataRuleset';
 
-export class AdminProfileChecker extends CheckerBase {
+export class AdminProfileChecker extends MetadataRuleset {
   public displayName = 'Admin profile';
 
   public run(): MetadataProblem[] {

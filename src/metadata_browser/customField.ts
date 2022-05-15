@@ -1,5 +1,5 @@
 import { getBoolean, getString } from '@salesforce/ts-types';
-import { ObjectSubComponent } from './MetadataComponent';
+import { ObjectSubComponent } from './metadataComponent';
 
 // Basic CustomField class
 export class CustomField extends ObjectSubComponent {

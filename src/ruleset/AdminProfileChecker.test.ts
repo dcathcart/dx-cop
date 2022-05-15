@@ -1,11 +1,11 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { AdminProfileChecker } from '../../check/AdminProfileChecker';
-import { CustomField } from '../../metadata_browser/CustomField';
-import { CustomObject } from '../../metadata_browser/CustomObject';
-import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../../metadata_browser/Profile';
-import { SfdxProjectBrowser } from '../../metadata_browser/SfdxProjectBrowser';
+import { CustomField } from '../metadata_browser/customField';
+import { CustomObject } from '../metadata_browser/customObject';
+import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../metadata_browser/Profile';
+import { SfdxProjectBrowser } from '../metadata_browser/sfdxProjectBrowser';
+import { AdminProfileChecker } from './AdminProfileChecker';
 
 describe('AdminProfileChecker', () => {
   describe('.expectedObjects()', () => {

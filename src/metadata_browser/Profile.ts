@@ -1,5 +1,5 @@
 import { AnyJson, getBoolean, getJsonArray, getString } from '@salesforce/ts-types';
-import { MetadataComponent } from './MetadataComponent';
+import { MetadataComponent } from './metadataComponent';
 
 export class Profile extends MetadataComponent {
   protected readonly fileExtension = 'profile';

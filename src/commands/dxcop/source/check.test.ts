@@ -1,17 +1,16 @@
 import * as fs from 'fs';
 import 'mocha';
 import { expect } from 'chai';
-import Check from '../../commands/dxcop/source/check';
+import Check from './check';
 
 describe('dxcop:source:check command', () => {
   describe('.loadConfig()', () => {
     context('when a .dxcoprc config file exists', () => {
       before(() => {
-        fs.copyFileSync('src/test/commands/test.dxcoprc', '.dxcoprc');
+        fs.copyFileSync('src/test/config/test.dxcoprc', '.dxcoprc');
       });
 
       it('should load config from the file', () => {
-        fs.copyFileSync('src/test/commands/test.dxcoprc', '.dxcoprc');
         const checkCommand = new Check([], null);
         const config = checkCommand['loadConfig']();
         expect(config.ruleSets.emailToCaseSettings.enabled).to.equal(false);

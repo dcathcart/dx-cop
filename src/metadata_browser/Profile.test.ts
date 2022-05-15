@@ -2,7 +2,7 @@ import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { JsonMap } from '@salesforce/ts-types';
-import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../../metadata_browser/Profile';
+import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../metadata_browser/Profile';
 
 describe('Profile', () => {
   describe('.fieldPermissions()', () => {

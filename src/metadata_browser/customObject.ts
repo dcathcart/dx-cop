@@ -1,5 +1,5 @@
 import { getString } from '@salesforce/ts-types';
-import { MetadataComponent } from './MetadataComponent';
+import { MetadataComponent } from './metadataComponent';
 
 // Class that represents a Salesforce Object. "Object" being a thing that stores records, like a database table.
 // The naming gets tricky here. There are standard objects which come out of the box, and there are custom objects that you add yourself.

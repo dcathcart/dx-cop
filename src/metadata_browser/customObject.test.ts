@@ -2,7 +2,7 @@ import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { JsonMap } from '@salesforce/ts-types';
-import { CustomObject } from '../../metadata_browser/CustomObject';
+import { CustomObject } from './customObject';
 
 describe('CustomObject', () => {
   describe('.isCustomObject()', () => {

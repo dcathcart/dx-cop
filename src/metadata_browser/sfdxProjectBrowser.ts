@@ -1,13 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { SfdxProject } from '@salesforce/core';
-import { CustomField } from './CustomField';
-import { CustomObject } from './CustomObject';
-import { EmailToCaseSettings } from './EmailToCaseSettings';
-import { LightningComponentBundle } from './LightningComponentBundle';
-import { PicklistField } from './PicklistField';
+import { CustomField } from './customField';
+import { CustomObject } from './customObject';
+import { EmailToCaseSettings } from './emailToCaseSettings';
+import { LightningComponentBundle } from './lightningComponentBundle';
+import { PicklistField } from './picklistField';
 import { Profile } from './Profile';
-import { RecordType } from './RecordType';
+import { RecordType } from './recordType';
 
 // Tools for browsing/navigating the metadata in an SFDX project
 export class SfdxProjectBrowser {

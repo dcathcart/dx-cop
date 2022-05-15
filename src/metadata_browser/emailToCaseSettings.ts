@@ -8,7 +8,7 @@ import {
   hasJsonArray,
   hasJsonMap,
 } from '@salesforce/ts-types';
-import { MetadataComponent } from './MetadataComponent';
+import { MetadataComponent } from './metadataComponent';
 
 export class EmailToCaseSettings extends MetadataComponent {
   protected fileExtension = 'settings';
