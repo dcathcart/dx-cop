@@ -34,11 +34,12 @@ Returns exit code 1 if any metadata problems are found, for easy integration int
 
 ## Configuration
 
-An optional `.dxcoprc` configuration file, in JSON format, can be used to enable/disable individual rulesets. Create in the base folder of your Salesforce project, with the following format:
+An optional `.dxcoprc` configuration file, in JSON format, can be used to enable/disable individual rulesets. Create this file in the base folder of your Salesforce project, with the following format:
 
 ```
 {
     "ruleSets": {
+        "adminProfile": { "enabled": false },
         "emailToCaseSettings": { "enabled": true },
         "lightningWebComponents": { "enabled": true },
         "recordTypePicklists": { "enabled": true },
@@ -47,27 +48,40 @@ An optional `.dxcoprc` configuration file, in JSON format, can be used to enable
 }
 ```
 
+### Default configuration
+
+If the config file doesn't exist, the settings in the example above are used. The config file may also be incomplete; if any rulesets are missing, the default values are substituted in.
+
 ## Rulesets
 
 A ruleset is a collection of closely-related rules that are run together. There are currently a small number of rulesets, but the list is growing.
 
-### Record types: picklist values
+### Admin profile
 
-Examines record types & checks for picklist values that don't exist (or are inactive) in the corresponding picklist field definitions.
-
-### Record types: picklist names
-
-When you add a new picklist field to an object, Salesforce automatically adds a reference to that picklist to the metadata for every record type. This check ensures you remember to add the record type changes to git as well.
-
-### Lightning web components
-
-Checks `*.js-meta.xml` files for extra whitespace at the ends of lines. This can cause unexpected behaviour when you retrieve the same component after deployment; extra lines of whitespace can be inserted resulting in unexpected file differences.
+All objects and fields should be fully accessible to the System Administrator profile, e.g. for debugging & troubleshooting purposes. This ruleset ensures that:
+- there is an `<objectPermissions>` entry in the Admin profile for every custom object
+- there is a `<fieldPermissions>` entry in the Admin profile for every custom object field
+- every `<objectPermissions>` entry and every `<fieldPermissions>` entry has all permissions set to `true`
+- `<objectPermissions>` are sorted alphabetically by object name
+- `<fieldPermissions>` are sorted alphbetically by field name
 
 ### Email-to-Case settings
 
 Ensures you don't have the `<emailServicesAddress>` and `<isVerified>` fields stored in version control. These are specific to each environment and usually cause validation failures if you try to change them in a deployment, so it's best not to store them at all.
 
 Also ensures that `<routingAddresses>` are ordered by `<routingName>`.
+
+### Lightning web components
+
+Checks `*.js-meta.xml` files for extra whitespace at the ends of lines. This can cause unexpected behaviour when you retrieve the same component after deployment; extra lines of whitespace can be inserted resulting in unexpected file differences.
+
+### Record types: picklist names
+
+When you add a new picklist field to an object, Salesforce automatically adds a reference to that picklist to the metadata for every record type. This check ensures you remember to add the record type changes to git as well.
+
+### Record types: picklist values
+
+Examines record types & checks for picklist values that don't exist (or are inactive) in the corresponding picklist field definitions.
 
 ## Problem categories
 
