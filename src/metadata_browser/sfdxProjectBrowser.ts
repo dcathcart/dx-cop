@@ -6,7 +6,7 @@ import { CustomObject } from './customObject';
 import { EmailToCaseSettings } from './emailToCaseSettings';
 import { LightningComponentBundle } from './lightningComponentBundle';
 import { PicklistField } from './picklistField';
-import { Profile } from './Profile';
+import { Profile } from './profile';
 import { RecordType } from './recordType';
 
 // Tools for browsing/navigating the metadata in an SFDX project
