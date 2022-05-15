@@ -1,7 +1,7 @@
 import 'mocha';
 import * as path from 'path';
 import { expect } from 'chai';
-import { LightningComponentBundle } from '../metadata_browser/lightningComponentBundle';
+import { LightningComponentBundle } from './lightningComponentBundle';
 
 describe('LightningComponentBundle', () => {
   describe('.baseFolder property', () => {
@@ -23,7 +23,7 @@ describe('LightningComponentBundle', () => {
     });
   });
 
-  describe('.jsMetaFileName preperty', () => {
+  describe('.jsMetaFileName property', () => {
     it('should return the file name for the *.js-meta.xml file in this bundle', () => {
       const lwc = new LightningComponentBundle('src/test/metadata/lwc/GoodExample');
       const expected = path.normalize('src/test/metadata/lwc/GoodExample/GoodExample.js-meta.xml'); // full path expected

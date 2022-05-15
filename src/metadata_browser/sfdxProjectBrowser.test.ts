@@ -1,14 +1,14 @@
 import 'mocha';
 import * as path from 'path';
 import { expect } from 'chai';
-import Sinon = require('sinon');
-import { SfdxProjectBrowser } from '../metadata_browser/sfdxProjectBrowser';
+import * as sinon from 'sinon';
+import { SfdxProjectBrowser } from './sfdxProjectBrowser';
 
 describe('SfdxProjectBrowser', () => {
   describe('.lwcBundles()', () => {
     it('should return an array of LightningComponentBundle objects; one for each subfolder', () => {
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
-      const mockProjectBrowser = Sinon.mock(sfdxProjectBrowser);
+      const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
       mockProjectBrowser.expects('lwcBaseDir').once().returns('src/test/metadata/lwc');
 
       const results = sfdxProjectBrowser.lwcBundles();

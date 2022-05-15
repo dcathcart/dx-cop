@@ -7,6 +7,7 @@ import { AnyJson } from '@salesforce/ts-types';
 
 import defaultConfig from '../../../config/defaultConfig';
 import { SfdxProjectBrowser } from '../../../metadata_browser/sfdxProjectBrowser';
+import { AdminProfileRuleset } from '../../../ruleset/adminProfileRuleset';
 import { EmailToCaseSettingsRuleset } from '../../../ruleset/emailToCaseSettingsRuleset';
 import { LwcMetadataRuleset } from '../../../ruleset/lwcMetadataRuleset';
 import { MetadataProblem } from '../../../ruleset/metadataProblem';
@@ -65,6 +66,9 @@ export default class Check extends SfdxCommand {
     const sfdxProjectBrowser = new SfdxProjectBrowser(sfdxProject);
     const rulesets: MetadataRuleset[] = [];
 
+    if (config.ruleSets.adminProfile.enabled) {
+      rulesets.push(new AdminProfileRuleset(sfdxProjectBrowser));
+    }
     if (config.ruleSets.emailToCaseSettings.enabled) {
       rulesets.push(new EmailToCaseSettingsRuleset(sfdxProjectBrowser));
     }

@@ -4,6 +4,7 @@
 export default function defaultConfig() {
   return {
     ruleSets: {
+      adminProfile: { enabled: false },
       emailToCaseSettings: { enabled: true },
       lightningWebComponents: { enabled: true },
       recordTypePicklists: { enabled: true },
