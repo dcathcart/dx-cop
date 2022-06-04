@@ -9,36 +9,31 @@ export class AdminProfileRuleset extends MetadataRuleset {
 
   public run(): MetadataProblem[] {
     const adminProfile = this.sfdxProjectBrowser.profileByName('Admin');
-    const expectedObjects = this.expectedObjects();
-    const expectedFields = this.expectedFields(expectedObjects);
+    const objects = this.objectsToCheck();
+    const fields = this.fieldsToCheck(objects);
 
-    return this.checkProfile(adminProfile, expectedObjects, expectedFields);
+    return this.checkProfile(adminProfile, objects, fields);
   }
 
-  private expectedObjects(): CustomObject[] {
-    // Get a list of objects we should 'expect' to see in a profile.
+  private objectsToCheck(): CustomObject[] {
+    // Get a list of objects we should check in the profile.
     // Limit scope to custom objects for now. Don't include standard objects, custom settings etc.
-    const objects = this.sfdxProjectBrowser.objects();
-    return objects.filter((obj) => obj.isCustomObject());
+    return this.sfdxProjectBrowser.objects().filter((obj) => obj.isCustomObject());
   }
 
-  private expectedFields(objects: CustomObject[]): CustomField[] {
-    // For the given list of objects, get a list of fields we should 'expect' to see in a profile.
-    // Required fields do not appear in profiles, so filter them out.
+  private fieldsToCheck(objects: CustomObject[]): CustomField[] {
+    // For the given list of objects, get a list of fields we should check in the profile.
+    // Required fields do not appear in profiles, so don't try to check them.
     // Makes sense if you think about it: they *have* to be readable and editable (regardless of profile, or anything else) if they are to be required.
     const fields = objects.map((obj) => this.sfdxProjectBrowser.fields(obj.name)).flat();
     return fields.filter((f) => !f.isRequired());
   }
 
-  private checkProfile(
-    profile: Profile,
-    expectedObjects: CustomObject[],
-    expectedFields: CustomField[]
-  ): MetadataProblem[] {
-    return this.missingFields(profile, expectedFields)
-      .concat(this.missingFieldPermissions(profile))
+  private checkProfile(profile: Profile, objects: CustomObject[], fields: CustomField[]): MetadataProblem[] {
+    return this.missingFields(profile, fields)
+      .concat(this.missingFieldPermissions(profile, fields))
       .concat(this.fieldSortOrderWarnings(profile))
-      .concat(this.missingObjects(profile, expectedObjects))
+      .concat(this.missingObjects(profile, objects))
       .concat(this.missingObjectPermissions(profile))
       .concat(this.objectSortOrderWarnings(profile));
   }
@@ -56,13 +51,22 @@ export class AdminProfileRuleset extends MetadataRuleset {
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
-  private missingFieldPermissions(profile: Profile): MetadataProblem[] {
+  private missingFieldPermissions(profile: Profile, fieldsToCheck: CustomField[]): MetadataProblem[] {
     const results: MetadataProblem[] = [];
+    const fieldNamesToCheck = fieldsToCheck.map((f) => f.objectFieldName());
 
     for (const fieldPermission of profile.fieldPermissions()) {
-      if (!fieldPermission.editable) {
-        results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'editable'));
+      // Rule: "all fields should be editable"
+      // This is true for the most part, but some standard fields are a kind-of formula field that is mapped from another object
+      // So only check the <editable> property for the supplied list of fields
+      if (fieldNamesToCheck.includes(fieldPermission.objectFieldName)) {
+        if (!fieldPermission.editable) {
+          results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'editable'));
+        }
       }
+
+      // Rule: "all fields should be readable"
+      // Check <readable> property for ALL field permissions, regardless of what fields are supplied
       if (!fieldPermission.readable) {
         results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'readable'));
       }

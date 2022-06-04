@@ -24,7 +24,7 @@ describe('AdminProfileRuleset', () => {
       mockProjectBrowser.expects('objects').once().returns(objects);
 
       const ruleset = new AdminProfileRuleset(sfdxProjectBrowser);
-      const results = ruleset['expectedObjects']();
+      const results = ruleset['objectsToCheck']();
       expect(results.length).to.equal(1);
       expect(results[0].name).to.equal('Object2__c');
 
@@ -44,7 +44,7 @@ describe('AdminProfileRuleset', () => {
       mockProjectBrowser.expects('fields').once().withArgs('Object1').returns([]);
       mockProjectBrowser.expects('fields').once().withArgs('Object2__c').returns([]);
       const ruleset = new AdminProfileRuleset(sfdxProjectBrowser);
-      ruleset['expectedFields'](objects);
+      ruleset['fieldsToCheck'](objects);
       mockProjectBrowser.verify();
     });
     it('only checks custom fields that are not required', () => {
@@ -62,7 +62,7 @@ describe('AdminProfileRuleset', () => {
 
       mockProjectBrowser.expects('fields').once().withArgs('Object1').returns([field1, field2]);
       const ruleset = new AdminProfileRuleset(sfdxProjectBrowser);
-      const results = ruleset['expectedFields'](objects);
+      const results = ruleset['fieldsToCheck'](objects);
       expect(results.length).to.equal(1);
       expect(results[0]).to.equal(field2);
       mockProjectBrowser.verify();
@@ -98,13 +98,14 @@ describe('AdminProfileRuleset', () => {
   describe('.missingFieldPermissions()', () => {
     it('should return a list of warnings for field permissions that are false, but should be true', () => {
       const profile = new Profile('Admin.profile-meta.xml');
+      const fields = [new CustomField('path/to/objects/Object1/fields/Field1.field-meta.xml')];
       const fieldPermissions = [
         new ProfileFieldPermission({ editable: false, field: 'Object1.Field1', readable: false }),
       ];
       sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
       const ruleset = new AdminProfileRuleset(null);
-      const results = ruleset['missingFieldPermissions'](profile);
+      const results = ruleset['missingFieldPermissions'](profile, fields);
       expect(results.length).to.equal(2);
 
       expect(results[0].componentName).to.equal('Admin');
