@@ -57,7 +57,8 @@ export class AdminProfileRuleset extends MetadataRuleset {
 
     for (const fieldPermission of profile.fieldPermissions()) {
       // Rule: "all fields should be editable"
-      // This is true for the most part, but some standard fields are a kind-of formula field that is mapped from another object
+      // This is true for the most part, but some standard fields are a kind-of formula field that is mapped from another object.
+      // When you set <editable> to true for these, Salesforce just ignores it and sets them back to false.
       // So only check the <editable> property for the supplied list of fields
       if (fieldNamesToCheck.includes(fieldPermission.objectFieldName)) {
         if (!fieldPermission.editable) {
