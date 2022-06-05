@@ -96,25 +96,55 @@ describe('AdminProfileRuleset', () => {
   });
 
   describe('.missingFieldPermissions()', () => {
-    it('should return a list of warnings for field permissions that are false, but should be true', () => {
-      const profile = new Profile('Admin.profile-meta.xml');
-      const fields = [new CustomField('path/to/objects/Object1/fields/Field1.field-meta.xml')];
-      const fieldPermissions = [
-        new ProfileFieldPermission({ editable: false, field: 'Object1.Field1', readable: false }),
-      ];
-      sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
+    context('when the field is one of the "fields to check"', () => {
+      it('should return a warning when <editable> or <readable> are false', () => {
+        const profile = new Profile('Admin.profile-meta.xml');
+        const fieldsToCheck = [new CustomField('objects/Object1/fields/Field1.field-meta.xml')];
+        const fieldPermissions = [
+          new ProfileFieldPermission({ editable: false, field: 'Object1.Field1', readable: false }),
+        ];
+        sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
-      const ruleset = new AdminProfileRuleset(null);
-      const results = ruleset['missingFieldPermissions'](profile, fields);
-      expect(results.length).to.equal(2);
+        const ruleset = new AdminProfileRuleset(null);
+        const results = ruleset['missingFieldPermissions'](profile, fieldsToCheck);
+        expect(results.length).to.equal(2);
+        expect(results[0].componentName).to.equal('Admin');
+        expect(results[0].componentType).to.equal('Profile');
+        expect(results[0].fileName).to.equal('Admin.profile-meta.xml');
+        expect(results[0].problem).to.equal('<editable> permission not set for field Object1.Field1');
+        expect(results[0].problemType).to.equal('Warning');
+        expect(results[1].componentName).to.equal('Admin');
+        expect(results[1].componentType).to.equal('Profile');
+        expect(results[1].fileName).to.equal('Admin.profile-meta.xml');
+        expect(results[1].problem).to.equal('<readable> permission not set for field Object1.Field1');
+        expect(results[1].problemType).to.equal('Warning');
+      });
+      it('should not return a warning when <editable> and <readable> are true', () => {
+        const profile = new Profile('Admin.profile-meta.xml');
+        const fieldsToCheck = [new CustomField('objects/Object1/fields/Field1.field-meta.xml')];
+        const fieldPermissions = [
+          new ProfileFieldPermission({ editable: true, field: 'Object1.Field1', readable: true }),
+        ];
+        sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
-      expect(results[0].componentName).to.equal('Admin');
-      expect(results[0].componentType).to.equal('Profile');
-      expect(results[0].fileName).to.equal('Admin.profile-meta.xml');
-      expect(results[0].problem).to.equal('<editable> permission not set for field Object1.Field1');
-      expect(results[0].problemType).to.equal('Warning');
+        const ruleset = new AdminProfileRuleset(null);
+        const results = ruleset['missingFieldPermissions'](profile, fieldsToCheck);
+        expect(results.length).to.equal(0);
+      });
+    });
+    context('when the field is *not* one of the "fields to check"', () => {
+      it('should not check the field and not return a warning', () => {
+        const profile = new Profile('Admin.profile-meta.xml');
+        const fieldsToCheck = [];
+        // No editable or readable property here on purpose
+        // If the method's code tries to access either of these properties an error will occur
+        const fieldPermissions = [new ProfileFieldPermission({ field: 'Object1.Field1' })];
+        sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
-      expect(results[1].problem).to.equal('<readable> permission not set for field Object1.Field1');
+        const ruleset = new AdminProfileRuleset(null);
+        const results = ruleset['missingFieldPermissions'](profile, fieldsToCheck);
+        expect(results.length).to.equal(0);
+      });
     });
   });
 
