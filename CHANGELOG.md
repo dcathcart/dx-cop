@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (or rather, it _will_ once there are enough features to be considered "ready" for version 0.1).
 
+## [0.0.8] - 2022-06-07
+
+Fixes bug in Admin profile ruleset: was trying to enforce `<editable>` to be true for all fields, even standard fields that cannot be made editable. Reduces the scope of the ruleset, to only apply the rule to custom objects for the time being.
+
 ## [0.0.7] - 2022-05-15
 
 Add a new ruleset that checks the System Administrator profile - that it has access to all objects & fields, and that they are sorted correctly. See the [readme](https://github.com/dcathcart/dx-cop/blob/master/README.md) for more details.
