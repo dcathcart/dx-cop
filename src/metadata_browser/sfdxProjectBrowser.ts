@@ -47,7 +47,12 @@ export class SfdxProjectBrowser {
     return new EmailToCaseSettings(fileName);
   }
 
+  // Return the list of fields for a given object
   public fields(objectName: string): CustomField[] {
+    if (objectName === 'Event' || objectName === 'Task') {
+      const fieldsFromActivityObject = this.fieldsForObject('Activity', objectName);
+      return this.fieldsForObject(objectName).concat(fieldsFromActivityObject);
+    }
     return this.fieldsForObject(objectName);
   }
 
