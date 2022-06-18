@@ -33,9 +33,18 @@ export class SfdxProjectBrowser {
       if (fs.existsSync(fileName)) {
         const object = new CustomObject(fileName);
 
-        if (object.name !== 'Activity') {
-          results.push(object);
+        // Not interested in Custom Settings here
+        if (object.isCustomSetting()) {
+          continue;
         }
+
+        // Don't return Activity in the list. It's not an object you can interact with directly in Salesforce.
+        // Instead you use it via the Event and Task objects (sort-of like a abstract parent / concrete child class relationship)
+        if (object.name === 'Activity') {
+          continue;
+        }
+
+        results.push(object);
       }
     }
 
