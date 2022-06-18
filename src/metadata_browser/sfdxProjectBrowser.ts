@@ -31,7 +31,11 @@ export class SfdxProjectBrowser {
       // These are likely to be packaged objects that have been modified in some way (e.g. a custom field was added).
       // TODO: Revisit this thinking. Is it valid for all scenarios?
       if (fs.existsSync(fileName)) {
-        results.push(new CustomObject(fileName));
+        const object = new CustomObject(fileName);
+
+        if (object.name !== 'Activity') {
+          results.push(object);
+        }
       }
     }
 
@@ -43,11 +47,8 @@ export class SfdxProjectBrowser {
     return new EmailToCaseSettings(fileName);
   }
 
-  // Return the list of fields for a given object
   public fields(objectName: string): CustomField[] {
-    const dir = this.customFieldsBaseDir(objectName);
-    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
-    return fileNames.map((f) => new CustomField(path.join(dir, f)));
+    return this.fieldsForObject(objectName);
   }
 
   // Return a map of all LWCs. key = LWC name, value = full path to the folder that contains all the components for that LWC
@@ -83,6 +84,12 @@ export class SfdxProjectBrowser {
   // Directory containing fields for a given object
   private customFieldsBaseDir(objectName: string): string {
     return path.join(this.objectDir(objectName), 'fields');
+  }
+
+  private fieldsForObject(objectName: string, objectNameOverride: string = null): CustomField[] {
+    const dir = this.customFieldsBaseDir(objectName);
+    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    return fileNames.map((f) => new CustomField(path.join(dir, f), objectNameOverride));
   }
 
   private lwcBaseDir(): string {
