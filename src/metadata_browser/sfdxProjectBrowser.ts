@@ -98,7 +98,8 @@ export class SfdxProjectBrowser {
   }
 
   // Given a list of CustomObject objects, return the ones that are _actually_ considered to be objects for most purposes
-  // e.g. don't return Custom Settings, Custom Metadata and the like
+  // e.g. a custom metadata type is considered to be an object, but custom settings aren't
+  // These rules are fairly subjective & are largely driven by what appears in the <objectPermissions> section of a Profile
   private filterObjects(objects: CustomObject[]): CustomObject[] {
     return objects
       .filter(
