@@ -5,7 +5,7 @@ import { MetadataRuleset } from './metadataRuleset';
 export class RecordTypePicklistRuleset extends MetadataRuleset {
   public displayName = 'Record type picklists';
 
-  private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
+  private IGNORE_OBJECTS = ['PersonAccount'];
   private BONUS_EXPECTED_PICKLISTS = ['Name', 'ForecastCategoryName'];
 
   public run(): MetadataProblem[] {

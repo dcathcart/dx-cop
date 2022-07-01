@@ -13,6 +13,10 @@ import { RecordType } from './recordType';
 export class SfdxProjectBrowser {
   private readonly sfdxProject: SfdxProject;
 
+  // Don't return Activity in any lists. It's not an object you can interact with directly in Salesforce.
+  // Instead you use it via the Event and Task objects (sort-of like a abstract parent / concrete child class relationship)
+  private readonly OBJECTS_TO_IGNORE = ['Activity'];
+
   public constructor(sfdxProject: SfdxProject) {
     this.sfdxProject = sfdxProject;
   }
@@ -35,7 +39,7 @@ export class SfdxProjectBrowser {
       }
     }
 
-    return results;
+    return this.filterObjects(results);
   }
 
   public emailToCaseSettings(): EmailToCaseSettings {
@@ -45,9 +49,11 @@ export class SfdxProjectBrowser {
 
   // Return the list of fields for a given object
   public fields(objectName: string): CustomField[] {
-    const dir = this.customFieldsBaseDir(objectName);
-    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
-    return fileNames.map((f) => new CustomField(path.join(dir, f)));
+    if (objectName === 'Event' || objectName === 'Task') {
+      const fieldsFromActivityObject = this.fieldsForObject('Activity', objectName);
+      return this.fieldsForObject(objectName).concat(fieldsFromActivityObject);
+    }
+    return this.fieldsForObject(objectName);
   }
 
   // Return a map of all LWCs. key = LWC name, value = full path to the folder that contains all the components for that LWC
@@ -83,6 +89,27 @@ export class SfdxProjectBrowser {
   // Directory containing fields for a given object
   private customFieldsBaseDir(objectName: string): string {
     return path.join(this.objectDir(objectName), 'fields');
+  }
+
+  private fieldsForObject(objectName: string, objectNameOverride: string = null): CustomField[] {
+    const dir = this.customFieldsBaseDir(objectName);
+    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    return fileNames.map((f) => new CustomField(path.join(dir, f), objectNameOverride));
+  }
+
+  // Given a list of CustomObject objects, return the ones that are _actually_ considered to be objects for most purposes
+  // e.g. a custom metadata type is considered to be an object, but custom settings aren't
+  // These rules are fairly subjective & are largely driven by what appears in the <objectPermissions> section of a Profile
+  private filterObjects(objects: CustomObject[]): CustomObject[] {
+    return objects
+      .filter(
+        (object) =>
+          object.isStandardObject() ||
+          object.isCustomObject() ||
+          object.isCustomMetadataType() ||
+          object.isExternalObject()
+      )
+      .filter((object) => !this.OBJECTS_TO_IGNORE.includes(object.name));
   }
 
   private lwcBaseDir(): string {

@@ -59,8 +59,10 @@ A ruleset is a collection of closely-related rules that are run together. There 
 ### Admin profile
 
 All objects and fields should be fully accessible to the System Administrator profile, e.g. for debugging & troubleshooting purposes. This ruleset ensures that:
-- there is an `<objectPermissions>` entry in the Admin profile for every custom object
-- there is a `<fieldPermissions>` entry in the Admin profile for every custom object field
+- there is an `<objectPermissions>` entry in the Admin profile for every object
+  - includes standard objects, custom objects, custom metadata types and external objects
+- there is a `<fieldPermissions>` entry in the Admin profile for every _custom_ field
+  - note: this rule currently does not check standard fields
 - every `<objectPermissions>` entry and every `<fieldPermissions>` entry has all permissions set to `true`
 - `<objectPermissions>` are sorted alphabetically by object name
 - `<fieldPermissions>` are sorted alphbetically by field name
@@ -108,7 +110,7 @@ Picklists based on **standard value sets** or **global value sets** are currentl
 
 ### Objects &amp; fields
 
-**PersonAccount**, **Event** and **Task** objects are currently ignored. These non-standard objects will require some special handling, which hasn't been built yet.
+The **PersonAccount** object is currently ignored. It will required some specialised rules, which haven't been built yet.
 
 The **Opportunity.ForecastCategoryName** field is also ignored, for similar reasons.
 

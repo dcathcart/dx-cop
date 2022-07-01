@@ -47,7 +47,18 @@ export abstract class MetadataComponent {
 
 // Abstract base class for sub-components of objects, e.g. fields, record types
 export abstract class ObjectSubComponent extends MetadataComponent {
+  private readonly objectNameOverride: string;
+
+  public constructor(fileName: string, objectNameOverride: string = null) {
+    super(fileName);
+    this.objectNameOverride = objectNameOverride;
+  }
+
   public get objectName(): string {
+    return this.objectNameOverride || this.originalObjectName;
+  }
+
+  public get originalObjectName(): string {
     const dir = path.dirname(this.fileName);
     const split = dir.split(path.sep); // assumes fileName is using the appropriate path separator for the platform
     return split[split.length - 2];
