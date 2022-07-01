@@ -101,7 +101,13 @@ export class SfdxProjectBrowser {
   // e.g. don't return Custom Settings, Custom Metadata and the like
   private filterObjects(objects: CustomObject[]): CustomObject[] {
     return objects
-      .filter((object) => object.isStandardObject() || object.isCustomObject())
+      .filter(
+        (object) =>
+          object.isStandardObject() ||
+          object.isCustomObject() ||
+          object.isCustomMetadataType() ||
+          object.isExternalObject()
+      )
       .filter((object) => !this.OBJECTS_TO_IGNORE.includes(object.name));
   }
 
