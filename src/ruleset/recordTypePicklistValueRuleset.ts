@@ -6,7 +6,7 @@ import { MetadataRuleset } from './metadataRuleset';
 export class RecordTypePicklistValueRuleset extends MetadataRuleset {
   public displayName = 'Record type picklist values';
 
-  private IGNORE_OBJECTS = ['Event', 'PersonAccount', 'Task'];
+  private IGNORE_OBJECTS = ['PersonAccount'];
   private IGNORE_PICKLISTS = ['ForecastCategoryName'];
 
   // Run the record type picklist value checks. Returns an array of warning messages.

@@ -9,24 +9,30 @@ export class AdminProfileRuleset extends MetadataRuleset {
 
   public run(): MetadataProblem[] {
     const adminProfile = this.sfdxProjectBrowser.profileByName('Admin');
-    const objects = this.objectsToCheck();
-    const fields = this.fieldsToCheck(objects);
 
-    return this.checkProfile(adminProfile, objects, fields);
+    const objects = this.sfdxProjectBrowser.objects();
+    const objectsToCheck = this.filterObjects(objects);
+
+    const fields = objects.map((obj) => this.sfdxProjectBrowser.fields(obj.name)).flat();
+    const fieldsToCheck = this.filterFields(fields);
+
+    return this.checkProfile(adminProfile, objectsToCheck, fieldsToCheck);
   }
 
-  private objectsToCheck(): CustomObject[] {
+  private filterObjects(objects: CustomObject[]): CustomObject[] {
     // Get a list of objects we should check in the profile.
     // Limit scope to custom objects for now. Don't include standard objects, custom settings etc.
-    return this.sfdxProjectBrowser.objects().filter((obj) => obj.isCustomObject());
+    return objects.filter((obj) => obj.isCustomObject());
   }
 
-  private fieldsToCheck(objects: CustomObject[]): CustomField[] {
-    // For the given list of objects, get a list of fields we should check in the profile.
+  private filterFields(fields: CustomField[]): CustomField[] {
+    // "Filter out" the fields we're not interested in checking
+    // Only check custom fields for now. This means:
+    //   - all fields on custom objects
+    //   - custom fields on standard objects
     // Required fields do not appear in profiles, so don't try to check them.
     // Makes sense if you think about it: they *have* to be readable and editable (regardless of profile, or anything else) if they are to be required.
-    const fields = objects.map((obj) => this.sfdxProjectBrowser.fields(obj.name)).flat();
-    return fields.filter((f) => !f.isRequired());
+    return fields.filter((f) => f.isCustom() && !f.isRequired());
   }
 
   private checkProfile(profile: Profile, objects: CustomObject[], fields: CustomField[]): MetadataProblem[] {

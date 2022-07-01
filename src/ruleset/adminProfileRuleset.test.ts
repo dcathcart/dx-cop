@@ -4,68 +4,55 @@ import * as sinon from 'sinon';
 import { CustomField } from '../metadata_browser/customField';
 import { CustomObject } from '../metadata_browser/customObject';
 import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../metadata_browser/profile';
-import { SfdxProjectBrowser } from '../metadata_browser/sfdxProjectBrowser';
 import { AdminProfileRuleset } from './adminProfileRuleset';
 
 describe('AdminProfileRuleset', () => {
-  describe('.expectedObjects()', () => {
-    it('should only check custom objects', () => {
-      // Bit of setup here: Create a mock project with 2 objects: a custom and a standard object.
-      // We want to demonstrate that only the custom object is selected.
-      const sfdxProjectBrowser = new SfdxProjectBrowser(null);
-      const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
-
-      const standardObject = new CustomObject('Object1.object-meta.xml');
-      sinon.stub(standardObject, 'isCustomObject').returns(false);
-      const customObject = new CustomObject('Object2__c.object-meta.xml');
+  describe('.filterObjects()', () => {
+    it('keeps custom objects', () => {
+      const customObject = new CustomObject('Object1__c.object-meta.xml');
       sinon.stub(customObject, 'isCustomObject').returns(true);
 
-      const objects = [standardObject, customObject];
-      mockProjectBrowser.expects('objects').once().returns(objects);
-
-      const ruleset = new AdminProfileRuleset(sfdxProjectBrowser);
-      const results = ruleset['objectsToCheck']();
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['filterObjects']([customObject]);
       expect(results.length).to.equal(1);
-      expect(results[0].name).to.equal('Object2__c');
+      expect(results[0]).to.equal(customObject);
+    });
 
-      mockProjectBrowser.verify();
+    it('filters out standard objects', () => {
+      const standardObject = new CustomObject('Account.object-meta.xml');
+      sinon.stub(standardObject, 'isCustomObject').returns(false);
+
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['filterObjects']([standardObject]);
+      expect(results.length).to.equal(0);
     });
   });
 
-  describe('.expectedFields()', () => {
-    it('retrieves fields for each of the given objects', () => {
-      const sfdxProjectBrowser = new SfdxProjectBrowser(null);
-      const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
-
-      const standardObject = new CustomObject('Object1.object-meta.xml');
-      const customObject = new CustomObject('Object2__c.object-meta.xml');
-      const objects = [standardObject, customObject];
-
-      mockProjectBrowser.expects('fields').once().withArgs('Object1').returns([]);
-      mockProjectBrowser.expects('fields').once().withArgs('Object2__c').returns([]);
-      const ruleset = new AdminProfileRuleset(sfdxProjectBrowser);
-      ruleset['fieldsToCheck'](objects);
-      mockProjectBrowser.verify();
+  describe('.filterFields()', () => {
+    it('filters out standard fields', () => {
+      const standardField = new CustomField('Name.field-meta.xml');
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['filterFields']([standardField]);
+      expect(results.length).to.equal(0);
     });
-    it('only checks custom fields that are not required', () => {
-      const sfdxProjectBrowser = new SfdxProjectBrowser(null);
-      const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
-      const objects = [new CustomObject('Object1.object-meta.xml')];
 
-      // required field - not expected in results
-      const field1 = new CustomField('path/to/objects/Object1/fields/Field1__c.field-meta.xml');
-      sinon.stub(field1, 'isRequired').returns(true);
+    it('filters out custom, required fields', () => {
+      const customField = new CustomField('Status__c.field-meta.xml');
+      sinon.stub(customField, 'isRequired').returns(true);
 
-      // NON-required field, IS expected in results
-      const field2 = new CustomField('path/to/objects/Object1/fields/Field2__c.field-meta.xml');
-      sinon.stub(field2, 'isRequired').returns(false);
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['filterFields']([customField]);
+      expect(results.length).to.equal(0);
+    });
 
-      mockProjectBrowser.expects('fields').once().withArgs('Object1').returns([field1, field2]);
-      const ruleset = new AdminProfileRuleset(sfdxProjectBrowser);
-      const results = ruleset['fieldsToCheck'](objects);
+    it('keeps custom, non-required fields', () => {
+      const customField = new CustomField('Status__c.field-meta.xml');
+      sinon.stub(customField, 'isRequired').returns(false);
+
+      const ruleset = new AdminProfileRuleset(null);
+      const results = ruleset['filterFields']([customField]);
       expect(results.length).to.equal(1);
-      expect(results[0]).to.equal(field2);
-      mockProjectBrowser.verify();
+      expect(results[0]).to.equal(customField);
     });
   });
 
