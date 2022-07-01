@@ -13,6 +13,10 @@ import { RecordType } from './recordType';
 export class SfdxProjectBrowser {
   private readonly sfdxProject: SfdxProject;
 
+  // Don't return Activity in any lists. It's not an object you can interact with directly in Salesforce.
+  // Instead you use it via the Event and Task objects (sort-of like a abstract parent / concrete child class relationship)
+  private readonly OBJECTS_TO_IGNORE = ['Activity'];
+
   public constructor(sfdxProject: SfdxProject) {
     this.sfdxProject = sfdxProject;
   }
@@ -31,24 +35,11 @@ export class SfdxProjectBrowser {
       // These are likely to be packaged objects that have been modified in some way (e.g. a custom field was added).
       // TODO: Revisit this thinking. Is it valid for all scenarios?
       if (fs.existsSync(fileName)) {
-        const object = new CustomObject(fileName);
-
-        // Not interested in Custom Settings here
-        if (object.isCustomSetting()) {
-          continue;
-        }
-
-        // Don't return Activity in the list. It's not an object you can interact with directly in Salesforce.
-        // Instead you use it via the Event and Task objects (sort-of like a abstract parent / concrete child class relationship)
-        if (object.name === 'Activity') {
-          continue;
-        }
-
-        results.push(object);
+        results.push(new CustomObject(fileName));
       }
     }
 
-    return results;
+    return this.filterObjects(results);
   }
 
   public emailToCaseSettings(): EmailToCaseSettings {
@@ -104,6 +95,14 @@ export class SfdxProjectBrowser {
     const dir = this.customFieldsBaseDir(objectName);
     const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
     return fileNames.map((f) => new CustomField(path.join(dir, f), objectNameOverride));
+  }
+
+  // Given a list of CustomObject objects, return the ones that are _actually_ considered to be objects for most purposes
+  // e.g. don't return Custom Settings, Custom Metadata and the like
+  private filterObjects(objects: CustomObject[]): CustomObject[] {
+    return objects
+      .filter((object) => object.isStandardObject() || object.isCustomObject())
+      .filter((object) => !this.OBJECTS_TO_IGNORE.includes(object.name));
   }
 
   private lwcBaseDir(): string {

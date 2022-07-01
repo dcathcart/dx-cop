@@ -19,6 +19,11 @@ export class CustomObject extends MetadataComponent {
     return this.customSettingsType !== undefined;
   }
 
+  public isStandardObject(): boolean {
+    // assumption: standard Salesforce objects don't have a double-underscore anywhere in their name
+    return !this.name.includes('__');
+  }
+
   private get customSettingsType(): string {
     return getString(this.metadata, 'customSettingsType');
   }
