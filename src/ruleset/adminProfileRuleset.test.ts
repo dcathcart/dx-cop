@@ -56,7 +56,7 @@ describe('AdminProfileRuleset', () => {
     });
   });
 
-  describe('.missingFields()', () => {
+  describe('.fieldNotFoundWarnings()', () => {
     it("should return a list of warnings for fields that are expected to exist in the profile, but don't", () => {
       const profile = new Profile('Admin.profile-meta.xml');
       const fieldPermissions = [
@@ -72,7 +72,7 @@ describe('AdminProfileRuleset', () => {
       ];
 
       const ruleset = new AdminProfileRuleset(null);
-      const results = ruleset['missingFields'](profile, expectedFields);
+      const results = ruleset['fieldNotFoundWarnings'](profile, expectedFields);
       expect(results.length).to.equal(1);
       expect(results[0].componentName).to.equal('Admin');
       expect(results[0].componentType).to.equal('Profile');
@@ -82,7 +82,7 @@ describe('AdminProfileRuleset', () => {
     });
   });
 
-  describe('.missingFieldPermissions()', () => {
+  describe('.fieldPermissionWarnings()', () => {
     context('when the field is one of the "fields to check"', () => {
       it('should return a warning when <editable> or <readable> are false', () => {
         const profile = new Profile('Admin.profile-meta.xml');
@@ -93,7 +93,7 @@ describe('AdminProfileRuleset', () => {
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
         const ruleset = new AdminProfileRuleset(null);
-        const results = ruleset['missingFieldPermissions'](profile, fieldsToCheck);
+        const results = ruleset['fieldPermissionWarnings'](profile, fieldsToCheck);
         expect(results.length).to.equal(2);
         expect(results[0].componentName).to.equal('Admin');
         expect(results[0].componentType).to.equal('Profile');
@@ -115,7 +115,7 @@ describe('AdminProfileRuleset', () => {
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
         const ruleset = new AdminProfileRuleset(null);
-        const results = ruleset['missingFieldPermissions'](profile, fieldsToCheck);
+        const results = ruleset['fieldPermissionWarnings'](profile, fieldsToCheck);
         expect(results.length).to.equal(0);
       });
     });
@@ -129,7 +129,7 @@ describe('AdminProfileRuleset', () => {
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
         const ruleset = new AdminProfileRuleset(null);
-        const results = ruleset['missingFieldPermissions'](profile, fieldsToCheck);
+        const results = ruleset['fieldPermissionWarnings'](profile, fieldsToCheck);
         expect(results.length).to.equal(0);
       });
     });
@@ -157,7 +157,7 @@ describe('AdminProfileRuleset', () => {
       expect(results[0].problemType).to.equal('Warning');
     });
   });
-  describe('.missingObjects()', () => {
+  describe('.objectNotFoundWarnings()', () => {
     it("should return a list of warnings for objects that are expected to exist in the profile, but don't", () => {
       const profile = new Profile('Admin.profile-meta.xml');
       const objectPermissions = [new ProfileObjectPermission({ object: 'Object1' })];
@@ -169,7 +169,7 @@ describe('AdminProfileRuleset', () => {
       ];
 
       const ruleset = new AdminProfileRuleset(null);
-      const results = ruleset['missingObjects'](profile, expectedObjects);
+      const results = ruleset['objectNotFoundWarnings'](profile, expectedObjects);
       expect(results.length).to.equal(1);
       expect(results[0].componentName).to.equal('Admin');
       expect(results[0].componentType).to.equal('Profile');
@@ -196,7 +196,7 @@ describe('AdminProfileRuleset', () => {
       sinon.stub(profile, 'objectPermissions').returns(objectPermissions);
 
       const ruleset = new AdminProfileRuleset(null);
-      const results = ruleset['missingObjectPermissions'](profile);
+      const results = ruleset['objectPermissionWarnings'](profile);
       expect(results.length).to.equal(6);
 
       expect(results[0].componentName).to.equal('Admin');

@@ -36,28 +36,28 @@ export class AdminProfileRuleset extends MetadataRuleset {
   }
 
   private checkProfile(profile: Profile, objects: CustomObject[], fields: CustomField[]): MetadataProblem[] {
-    return this.missingFields(profile, fields)
-      .concat(this.missingFieldPermissions(profile, fields))
+    return this.fieldNotFoundWarnings(profile, fields)
+      .concat(this.fieldPermissionWarnings(profile, fields))
       .concat(this.fieldSortOrderWarnings(profile))
-      .concat(this.missingObjects(profile, objects))
-      .concat(this.missingObjectPermissions(profile))
+      .concat(this.objectNotFoundWarnings(profile, objects))
+      .concat(this.objectPermissionWarnings(profile))
       .concat(this.objectSortOrderWarnings(profile));
   }
 
   // Given a profile and a list of fields that are expected to be in that profile, return a collection of warnings for the fields that are not there.
   // Note this method does not decide what fields are "expected"; it simply checks and reports the missing ones.
-  private missingFields(profile: Profile, expectedFields: CustomField[]): MetadataProblem[] {
+  private fieldNotFoundWarnings(profile: Profile, expectedFields: CustomField[]): MetadataProblem[] {
     const fieldNamesInProfile = profile.fieldPermissions().map((p) => p.objectFieldName); // objectFieldName denotes a composite name "Object.Field"
-    const missingFields = expectedFields.filter((f) => !fieldNamesInProfile.includes(f.objectFieldName()));
-    return missingFields.map((f) => this.missingFieldWarning(profile, f));
+    const results = expectedFields.filter((f) => !fieldNamesInProfile.includes(f.objectFieldName()));
+    return results.map((f) => this.fieldNotFoundWarning(profile, f));
   }
 
-  private missingFieldWarning(profile: Profile, customField: CustomField): MetadataWarning {
+  private fieldNotFoundWarning(profile: Profile, customField: CustomField): MetadataWarning {
     const message = `<fieldPermissions> not found for ${customField.objectFieldName()}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
-  private missingFieldPermissions(profile: Profile, fieldsToCheck: CustomField[]): MetadataProblem[] {
+  private fieldPermissionWarnings(profile: Profile, fieldsToCheck: CustomField[]): MetadataProblem[] {
     const results: MetadataProblem[] = [];
     const fieldNamesToCheck = fieldsToCheck.map((f) => f.objectFieldName());
 
@@ -66,10 +66,10 @@ export class AdminProfileRuleset extends MetadataRuleset {
       // This restriction is in place for now, mainly because some standard fields can't be editable
       if (fieldNamesToCheck.includes(fieldPermission.objectFieldName)) {
         if (!fieldPermission.editable) {
-          results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'editable'));
+          results.push(this.fieldPermissionWarning(profile, fieldPermission, 'editable'));
         }
         if (!fieldPermission.readable) {
-          results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'readable'));
+          results.push(this.fieldPermissionWarning(profile, fieldPermission, 'readable'));
         }
       }
     }
@@ -77,7 +77,7 @@ export class AdminProfileRuleset extends MetadataRuleset {
     return results;
   }
 
-  private missingFieldPermissionWarning(
+  private fieldPermissionWarning(
     profile: Profile,
     fieldPermission: ProfileFieldPermission,
     permissionName: string
@@ -111,45 +111,45 @@ export class AdminProfileRuleset extends MetadataRuleset {
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
-  private missingObjects(profile: Profile, expectedObjects: CustomObject[]): MetadataProblem[] {
+  private objectNotFoundWarnings(profile: Profile, expectedObjects: CustomObject[]): MetadataProblem[] {
     const objectNamesInProfile = profile.objectPermissions().map((p) => p.objectName);
-    const missingObjects = expectedObjects.filter((obj) => !objectNamesInProfile.includes(obj.name));
-    return missingObjects.map((obj) => this.missingObjectWarning(profile, obj));
+    const results = expectedObjects.filter((obj) => !objectNamesInProfile.includes(obj.name));
+    return results.map((obj) => this.objectNotFoundWarning(profile, obj));
   }
 
-  private missingObjectWarning(profile: Profile, customObject: CustomObject): MetadataWarning {
+  private objectNotFoundWarning(profile: Profile, customObject: CustomObject): MetadataWarning {
     const message = `<objectPermissions> not found for ${customObject.name}`;
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
-  private missingObjectPermissions(profile: Profile): MetadataProblem[] {
+  private objectPermissionWarnings(profile: Profile): MetadataProblem[] {
     const results: MetadataProblem[] = [];
 
     for (const objectPermission of profile.objectPermissions()) {
       if (!objectPermission.allowCreate) {
-        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'allowCreate'));
+        results.push(this.objectPermissionWarning(profile, objectPermission, 'allowCreate'));
       }
       if (!objectPermission.allowDelete) {
-        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'allowDelete'));
+        results.push(this.objectPermissionWarning(profile, objectPermission, 'allowDelete'));
       }
       if (!objectPermission.allowEdit) {
-        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'allowEdit'));
+        results.push(this.objectPermissionWarning(profile, objectPermission, 'allowEdit'));
       }
       if (!objectPermission.allowRead) {
-        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'allowRead'));
+        results.push(this.objectPermissionWarning(profile, objectPermission, 'allowRead'));
       }
       if (!objectPermission.modifyAllRecords) {
-        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'modifyAllRecords'));
+        results.push(this.objectPermissionWarning(profile, objectPermission, 'modifyAllRecords'));
       }
       if (!objectPermission.viewAllRecords) {
-        results.push(this.missingObjectPermissionWarning(profile, objectPermission, 'viewAllRecords'));
+        results.push(this.objectPermissionWarning(profile, objectPermission, 'viewAllRecords'));
       }
     }
 
     return results;
   }
 
-  private missingObjectPermissionWarning(
+  private objectPermissionWarning(
     profile: Profile,
     objectPermission: ProfileObjectPermission,
     permissionName: string
