@@ -86,14 +86,16 @@ describe('AdminProfileRuleset', () => {
     context('when the field is one of the "fields to check"', () => {
       it('should return a warning when <editable> or <readable> are false', () => {
         const profile = new Profile('Admin.profile-meta.xml');
-        const fieldsToCheck = [new CustomField('objects/Object1/fields/Field1.field-meta.xml')];
+        const field = new CustomField('objects/Object1/fields/Field1.field-meta.xml');
+        sinon.stub(field, 'isFormula').returns(false);
+
         const fieldPermissions = [
           new ProfileFieldPermission({ editable: false, field: 'Object1.Field1', readable: false }),
         ];
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
         const ruleset = new AdminProfileRuleset(null);
-        const results = ruleset['missingFieldPermissions'](profile, fieldsToCheck);
+        const results = ruleset['missingFieldPermissions'](profile, [field]);
         expect(results.length).to.equal(2);
         expect(results[0].componentName).to.equal('Admin');
         expect(results[0].componentType).to.equal('Profile');

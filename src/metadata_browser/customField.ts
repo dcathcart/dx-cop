@@ -1,4 +1,4 @@
-import { getBoolean, getString } from '@salesforce/ts-types';
+import { getBoolean, getString, hasString } from '@salesforce/ts-types';
 import { ObjectSubComponent } from './metadataComponent';
 
 // Basic CustomField class
@@ -14,6 +14,10 @@ export class CustomField extends ObjectSubComponent {
 
   public isCustom(): boolean {
     return this.name.endsWith('__c');
+  }
+
+  public isFormula(): boolean {
+    return hasString(this.metadata, 'formula');
   }
 
   public isPicklist(): boolean {
