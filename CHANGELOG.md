@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (or rather, it _will_ once there are enough features to be considered "ready" for version 0.1).
 
+## [0.0.10] - 2022-11-16
+
+Relax the `<fieldPermissions>` checks in the Admin profile ruleset, so that formula fields do not require `<editable>` to be true.
+
 ## [0.0.9] - 2022-07-02
 
 Extends the Admin profile ruleset to cover more objects. Now includes standard objects (custom fields only), custom metadata types and external objects.
