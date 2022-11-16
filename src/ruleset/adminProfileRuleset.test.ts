@@ -84,29 +84,57 @@ describe('AdminProfileRuleset', () => {
 
   describe('.fieldPermissionWarnings()', () => {
     context('when the field is one of the "fields to check"', () => {
-      it('should return a warning when <editable> or <readable> are false', () => {
+      it('should return a warning when <editable> is false', () => {
         const profile = new Profile('Admin.profile-meta.xml');
-        const field = new CustomField('objects/Object1/fields/Field1.field-meta.xml');
+        const field = new CustomField('objects/Object1/fields/Field1__c.field-meta.xml');
         sinon.stub(field, 'isFormula').returns(false);
 
         const fieldPermissions = [
-          new ProfileFieldPermission({ editable: false, field: 'Object1.Field1', readable: false }),
+          new ProfileFieldPermission({ editable: false, field: 'Object1.Field1__c', readable: true }),
         ];
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
         const ruleset = new AdminProfileRuleset(null);
         const results = ruleset['fieldPermissionWarnings'](profile, [field]);
-        expect(results.length).to.equal(2);
+        expect(results.length).to.equal(1);
         expect(results[0].componentName).to.equal('Admin');
         expect(results[0].componentType).to.equal('Profile');
         expect(results[0].fileName).to.equal('Admin.profile-meta.xml');
-        expect(results[0].problem).to.equal('<editable> permission not set for field Object1.Field1');
+        expect(results[0].problem).to.equal('<editable> permission not set for field Object1.Field1__c');
         expect(results[0].problemType).to.equal('Warning');
-        expect(results[1].componentName).to.equal('Admin');
-        expect(results[1].componentType).to.equal('Profile');
-        expect(results[1].fileName).to.equal('Admin.profile-meta.xml');
-        expect(results[1].problem).to.equal('<readable> permission not set for field Object1.Field1');
-        expect(results[1].problemType).to.equal('Warning');
+      });
+      it('should not return a warning when <editable> is false, but the field is a formula field', () => {
+        const profile = new Profile('Admin.profile-meta.xml');
+        const field = new CustomField('objects/Object1/fields/Field1__c.field-meta.xml');
+        sinon.stub(field, 'isFormula').returns(true);
+
+        const fieldPermissions = [
+          new ProfileFieldPermission({ editable: false, field: 'Object1.Field1__c', readable: true }),
+        ];
+        sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
+
+        const ruleset = new AdminProfileRuleset(null);
+        const results = ruleset['fieldPermissionWarnings'](profile, [field]);
+        expect(results.length).to.equal(0);
+      });
+      it('should return a warning when <readable> is false', () => {
+        const profile = new Profile('Admin.profile-meta.xml');
+        const field = new CustomField('objects/Object1/fields/Field1.field-meta.xml');
+        sinon.stub(field, 'isFormula').returns(false);
+
+        const fieldPermissions = [
+          new ProfileFieldPermission({ editable: true, field: 'Object1.Field1', readable: false }),
+        ];
+        sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
+
+        const ruleset = new AdminProfileRuleset(null);
+        const results = ruleset['fieldPermissionWarnings'](profile, [field]);
+        expect(results.length).to.equal(1);
+        expect(results[0].componentName).to.equal('Admin');
+        expect(results[0].componentType).to.equal('Profile');
+        expect(results[0].fileName).to.equal('Admin.profile-meta.xml');
+        expect(results[0].problem).to.equal('<readable> permission not set for field Object1.Field1');
+        expect(results[0].problemType).to.equal('Warning');
       });
       it('should not return a warning when <editable> and <readable> are true', () => {
         const profile = new Profile('Admin.profile-meta.xml');
@@ -122,7 +150,7 @@ describe('AdminProfileRuleset', () => {
       });
     });
     context('when the field is *not* one of the "fields to check"', () => {
-      it('should not check the field and not return a warning', () => {
+      it('should not check the field and should not return a warning', () => {
         const profile = new Profile('Admin.profile-meta.xml');
         const fieldsToCheck = [];
         // No editable or readable property here on purpose
