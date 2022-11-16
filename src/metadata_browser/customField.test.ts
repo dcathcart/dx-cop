@@ -15,13 +15,28 @@ describe('CustomField', () => {
   });
 
   describe('.isCustom()', () => {
-    it('should return true for custom objects', () => {
+    it('should return true for custom fields', () => {
       const customField = new CustomField('FieldName__c');
       expect(customField.isCustom()).to.equal(true);
     });
-    it('should return false for standard objects', () => {
+    it('should return false for standard fields', () => {
       const customField = new CustomField('Account');
       expect(customField.isCustom()).to.equal(false);
+    });
+  });
+
+  describe('.isFormula()', () => {
+    it('should return true if there is a <formula> string in the metadata', () => {
+      const customField = new CustomField('');
+      const json: JsonMap = { formula: 'some_formula' };
+      sinon.stub(customField, 'metadata').get(() => json);
+      expect(customField.isFormula()).to.equal(true);
+    });
+    it('should return false otherwise', () => {
+      const customField = new CustomField('');
+      const json: JsonMap = {};
+      sinon.stub(customField, 'metadata').get(() => json);
+      expect(customField.isFormula()).to.equal(false);
     });
   });
 

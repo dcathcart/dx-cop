@@ -26,18 +26,15 @@ export class AdminProfileRuleset extends MetadataRuleset {
   }
 
   private filterFields(fields: CustomField[]): CustomField[] {
-    // "Filter out" the fields we're not interested in checking
-    // Only check custom fields for now. This means:
-    //   - all fields on custom objects
-    //   - custom fields on standard objects
+    // "Filter out" the fields we're not interested in checking.
+    // Only check custom fields for now. i.e. (1) all fields on custom objects, and (2) custom fields on standard objects.
     // Required fields do not appear in profiles, so don't try to check them.
-    // Makes sense if you think about it: they *have* to be readable and editable (regardless of profile, or anything else) if they are to be required.
     return fields.filter((f) => f.isCustom() && !f.isRequired());
   }
 
   private checkProfile(profile: Profile, objects: CustomObject[], fields: CustomField[]): MetadataProblem[] {
     return this.missingFields(profile, fields)
-      .concat(this.missingFieldPermissions(profile, fields))
+      .concat(this.fieldPermissionWarnings(profile, fields))
       .concat(this.fieldSortOrderWarnings(profile))
       .concat(this.missingObjects(profile, objects))
       .concat(this.missingObjectPermissions(profile))
@@ -49,6 +46,7 @@ export class AdminProfileRuleset extends MetadataRuleset {
   private missingFields(profile: Profile, expectedFields: CustomField[]): MetadataProblem[] {
     const fieldNamesInProfile = profile.fieldPermissions().map((p) => p.objectFieldName); // objectFieldName denotes a composite name "Object.Field"
     const missingFields = expectedFields.filter((f) => !fieldNamesInProfile.includes(f.objectFieldName()));
+
     return missingFields.map((f) => this.missingFieldWarning(profile, f));
   }
 
@@ -57,19 +55,21 @@ export class AdminProfileRuleset extends MetadataRuleset {
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
-  private missingFieldPermissions(profile: Profile, fieldsToCheck: CustomField[]): MetadataProblem[] {
+  private fieldPermissionWarnings(profile: Profile, fieldsToCheck: CustomField[]): MetadataProblem[] {
     const results: MetadataProblem[] = [];
-    const fieldNamesToCheck = fieldsToCheck.map((f) => f.objectFieldName());
+    const fieldMap = new Map<string, CustomField>(fieldsToCheck.map((f) => [f.objectFieldName(), f]));
 
     for (const fieldPermission of profile.fieldPermissions()) {
-      // Only check field permissions for the supplied list of fields
-      // This restriction is in place for now, mainly because some standard fields can't be editable
-      if (fieldNamesToCheck.includes(fieldPermission.objectFieldName)) {
-        if (!fieldPermission.editable) {
-          results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'editable'));
+      // Only check field permissions for the supplied list of fields.
+      // This restriction is in place for now, mainly because some standard fields can't be editable.
+      if (fieldMap.has(fieldPermission.objectFieldName)) {
+        const field = fieldMap.get(fieldPermission.objectFieldName);
+
+        if (!fieldPermission.editable && this.shouldBeEditable(field)) {
+          results.push(this.fieldPermissionWarning(profile, fieldPermission, 'editable'));
         }
         if (!fieldPermission.readable) {
-          results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'readable'));
+          results.push(this.fieldPermissionWarning(profile, fieldPermission, 'readable'));
         }
       }
     }
@@ -77,7 +77,11 @@ export class AdminProfileRuleset extends MetadataRuleset {
     return results;
   }
 
-  private missingFieldPermissionWarning(
+  private shouldBeEditable(field: CustomField): boolean {
+    return field.isCustom() && !field.isFormula();
+  }
+
+  private fieldPermissionWarning(
     profile: Profile,
     fieldPermission: ProfileFieldPermission,
     permissionName: string
