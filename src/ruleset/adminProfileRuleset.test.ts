@@ -82,7 +82,7 @@ describe('AdminProfileRuleset', () => {
     });
   });
 
-  describe('.missingFieldPermissions()', () => {
+  describe('.fieldPermissionWarnings()', () => {
     context('when the field is one of the "fields to check"', () => {
       it('should return a warning when <editable> or <readable> are false', () => {
         const profile = new Profile('Admin.profile-meta.xml');
@@ -95,7 +95,7 @@ describe('AdminProfileRuleset', () => {
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
         const ruleset = new AdminProfileRuleset(null);
-        const results = ruleset['missingFieldPermissions'](profile, [field]);
+        const results = ruleset['fieldPermissionWarnings'](profile, [field]);
         expect(results.length).to.equal(2);
         expect(results[0].componentName).to.equal('Admin');
         expect(results[0].componentType).to.equal('Profile');
@@ -117,7 +117,7 @@ describe('AdminProfileRuleset', () => {
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
         const ruleset = new AdminProfileRuleset(null);
-        const results = ruleset['missingFieldPermissions'](profile, fieldsToCheck);
+        const results = ruleset['fieldPermissionWarnings'](profile, fieldsToCheck);
         expect(results.length).to.equal(0);
       });
     });
@@ -131,7 +131,7 @@ describe('AdminProfileRuleset', () => {
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
         const ruleset = new AdminProfileRuleset(null);
-        const results = ruleset['missingFieldPermissions'](profile, fieldsToCheck);
+        const results = ruleset['fieldPermissionWarnings'](profile, fieldsToCheck);
         expect(results.length).to.equal(0);
       });
     });

@@ -34,7 +34,7 @@ export class AdminProfileRuleset extends MetadataRuleset {
 
   private checkProfile(profile: Profile, objects: CustomObject[], fields: CustomField[]): MetadataProblem[] {
     return this.missingFields(profile, fields)
-      .concat(this.missingFieldPermissions(profile, fields))
+      .concat(this.fieldPermissionWarnings(profile, fields))
       .concat(this.fieldSortOrderWarnings(profile))
       .concat(this.missingObjects(profile, objects))
       .concat(this.missingObjectPermissions(profile))
@@ -55,7 +55,7 @@ export class AdminProfileRuleset extends MetadataRuleset {
     return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
   }
 
-  private missingFieldPermissions(profile: Profile, fieldsToCheck: CustomField[]): MetadataProblem[] {
+  private fieldPermissionWarnings(profile: Profile, fieldsToCheck: CustomField[]): MetadataProblem[] {
     const results: MetadataProblem[] = [];
     const fieldMap = new Map<string, CustomField>(fieldsToCheck.map((f) => [f.objectFieldName(), f]));
 
@@ -65,11 +65,11 @@ export class AdminProfileRuleset extends MetadataRuleset {
       if (fieldMap.has(fieldPermission.objectFieldName)) {
         const field = fieldMap.get(fieldPermission.objectFieldName);
 
-        if (!fieldPermission.editable && !field.isFormula()) {
-          results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'editable'));
+        if (!fieldPermission.editable && this.shouldBeEditable(field)) {
+          results.push(this.fieldPermissionWarning(profile, fieldPermission, 'editable'));
         }
         if (!fieldPermission.readable) {
-          results.push(this.missingFieldPermissionWarning(profile, fieldPermission, 'readable'));
+          results.push(this.fieldPermissionWarning(profile, fieldPermission, 'readable'));
         }
       }
     }
@@ -77,7 +77,11 @@ export class AdminProfileRuleset extends MetadataRuleset {
     return results;
   }
 
-  private missingFieldPermissionWarning(
+  private shouldBeEditable(field: CustomField): boolean {
+    return field.isCustom() && !field.isFormula();
+  }
+
+  private fieldPermissionWarning(
     profile: Profile,
     fieldPermission: ProfileFieldPermission,
     permissionName: string
