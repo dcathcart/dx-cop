@@ -7,12 +7,12 @@ export class Profile extends MetadataComponent {
 
   public fieldPermissions(): ProfileFieldPermission[] {
     const permissions = getJsonArray(this.metadata, 'fieldPermissions');
-    return permissions.map((p) => new ProfileFieldPermission(p));
+    return permissions.map((p) => new ProfileFieldPermission(this, p));
   }
 
   public objectPermissions(): ProfileObjectPermission[] {
     const permissions = getJsonArray(this.metadata, 'objectPermissions');
-    return permissions.map((p) => new ProfileObjectPermission(p));
+    return permissions.map((op) => new ProfileObjectPermission(this, op));
   }
 }
 
@@ -24,9 +24,11 @@ export class Profile extends MetadataComponent {
 // </fieldPermissions>
 // --> converted to JSON this would look like { editable: false, field: 'Account.AccountNumber', readable: true }
 export class ProfileFieldPermission {
+  public readonly profile: Profile;
   private readonly json: AnyJson;
 
-  public constructor(json: AnyJson) {
+  public constructor(profile: Profile, json: AnyJson) {
+    this.profile = profile;
     this.json = json;
   }
 
@@ -63,9 +65,11 @@ export class ProfileFieldPermission {
 // </objectPermissions>
 // --> converted to JSON this would look like { allowCreate: true, allowDelete: true, ... }
 export class ProfileObjectPermission {
+  public readonly profile: Profile;
   private readonly json: AnyJson;
 
-  public constructor(json: AnyJson) {
+  public constructor(profile: Profile, json: AnyJson) {
+    this.profile = profile;
     this.json = json;
   }
 

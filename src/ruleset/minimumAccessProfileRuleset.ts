@@ -11,70 +11,72 @@ export class MinimumAccessProfileRuleset extends MetadataRuleset {
   }
 
   private checkProfile(profile: Profile): MetadataProblem[] {
-    return this.fieldPermissionWarnings(profile).concat(this.objectPermissionWarnings(profile));
+    const fieldwarnings = profile
+      .fieldPermissions()
+      .map((fp) => this.fieldPermissionWarnings(fp))
+      .flat();
+
+    const objectWarnings = profile
+      .objectPermissions()
+      .map((op) => this.objectPermissionWarnings(op))
+      .flat();
+
+    return fieldwarnings.concat(objectWarnings);
   }
 
   // Rule 1:
   // In a Minimum Access profile, no <fieldPermission> may be editable or readable
-  private fieldPermissionWarnings(profile: Profile): MetadataWarning[] {
+  private fieldPermissionWarnings(fieldPermission: ProfileFieldPermission): MetadataWarning[] {
     const results: MetadataWarning[] = [];
 
-    for (const fieldPermission of profile.fieldPermissions()) {
-      if (fieldPermission.editable) {
-        results.push(this.newFieldPermissionWarning(profile, fieldPermission, 'editable'));
-      }
-      if (fieldPermission.readable) {
-        results.push(this.newFieldPermissionWarning(profile, fieldPermission, 'readable'));
-      }
+    if (fieldPermission.editable) {
+      results.push(this.newFieldPermissionWarning(fieldPermission, 'editable'));
+    }
+
+    if (fieldPermission.readable) {
+      results.push(this.newFieldPermissionWarning(fieldPermission, 'readable'));
     }
 
     return results;
   }
 
-  private newFieldPermissionWarning(
-    profile: Profile,
-    fieldPermission: ProfileFieldPermission,
-    permissionName: string
-  ): MetadataWarning {
-    const message = `<${permissionName}> permission should not be true for field ${fieldPermission.objectFieldName}`;
-    return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
+  private newFieldPermissionWarning(fieldPermission: ProfileFieldPermission, permissionName: string): MetadataWarning {
+    const message = `<${permissionName}> permission should not be true for ${fieldPermission.objectFieldName} field`;
+    return new MetadataWarning(fieldPermission.profile.name, 'Profile', fieldPermission.profile.fileName, message);
   }
 
   // Rule 2:
   // In a Minimum Access profile, no <objectPermissions> may be true
-  private objectPermissionWarnings(profile: Profile): MetadataWarning[] {
+  private objectPermissionWarnings(objectPermission: ProfileObjectPermission): MetadataWarning[] {
     const results: MetadataWarning[] = [];
 
-    for (const objectPermission of profile.objectPermissions()) {
-      if (objectPermission.allowCreate) {
-        results.push(this.newObjectPermissionWarning(profile, objectPermission, 'allowCreate'));
-      }
-      if (objectPermission.allowDelete) {
-        results.push(this.newObjectPermissionWarning(profile, objectPermission, 'allowDelete'));
-      }
-      if (objectPermission.allowEdit) {
-        results.push(this.newObjectPermissionWarning(profile, objectPermission, 'allowEdit'));
-      }
-      if (objectPermission.allowRead) {
-        results.push(this.newObjectPermissionWarning(profile, objectPermission, 'allowRead'));
-      }
-      if (objectPermission.modifyAllRecords) {
-        results.push(this.newObjectPermissionWarning(profile, objectPermission, 'modifyAllRecords'));
-      }
-      if (objectPermission.viewAllRecords) {
-        results.push(this.newObjectPermissionWarning(profile, objectPermission, 'viewAllRecords'));
-      }
+    if (objectPermission.allowCreate) {
+      results.push(this.newObjectPermissionWarning(objectPermission, 'allowCreate'));
+    }
+    if (objectPermission.allowDelete) {
+      results.push(this.newObjectPermissionWarning(objectPermission, 'allowDelete'));
+    }
+    if (objectPermission.allowEdit) {
+      results.push(this.newObjectPermissionWarning(objectPermission, 'allowEdit'));
+    }
+    if (objectPermission.allowRead) {
+      results.push(this.newObjectPermissionWarning(objectPermission, 'allowRead'));
+    }
+    if (objectPermission.modifyAllRecords) {
+      results.push(this.newObjectPermissionWarning(objectPermission, 'modifyAllRecords'));
+    }
+    if (objectPermission.viewAllRecords) {
+      results.push(this.newObjectPermissionWarning(objectPermission, 'viewAllRecords'));
     }
 
     return results;
   }
 
   private newObjectPermissionWarning(
-    profile: Profile,
     objectPermission: ProfileObjectPermission,
     permissionName: string
   ): MetadataWarning {
-    const message = `<${permissionName}> permission should not be true for object ${objectPermission.objectName}`;
-    return new MetadataWarning(profile.name, 'Profile', profile.fileName, message);
+    const message = `<${permissionName}> permission should not be true for ${objectPermission.objectName} object`;
+    return new MetadataWarning(objectPermission.profile.name, 'Profile', objectPermission.profile.fileName, message);
   }
 }

@@ -60,8 +60,8 @@ describe('AdminProfileRuleset', () => {
     it("should return a list of warnings for fields that are expected to exist in the profile, but don't", () => {
       const profile = new Profile('Admin.profile-meta.xml');
       const fieldPermissions = [
-        new ProfileFieldPermission({ field: 'Object1.Field1' }),
-        new ProfileFieldPermission({ field: 'Object1.Field2' }),
+        new ProfileFieldPermission(profile, { field: 'Object1.Field1' }),
+        new ProfileFieldPermission(profile, { field: 'Object1.Field2' }),
       ];
       sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
@@ -90,7 +90,7 @@ describe('AdminProfileRuleset', () => {
         sinon.stub(field, 'isFormula').returns(false);
 
         const fieldPermissions = [
-          new ProfileFieldPermission({ editable: false, field: 'Object1.Field1__c', readable: true }),
+          new ProfileFieldPermission(profile, { editable: false, field: 'Object1.Field1__c', readable: true }),
         ];
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
@@ -109,7 +109,7 @@ describe('AdminProfileRuleset', () => {
         sinon.stub(field, 'isFormula').returns(true);
 
         const fieldPermissions = [
-          new ProfileFieldPermission({ editable: false, field: 'Object1.Field1__c', readable: true }),
+          new ProfileFieldPermission(profile, { editable: false, field: 'Object1.Field1__c', readable: true }),
         ];
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
@@ -123,7 +123,7 @@ describe('AdminProfileRuleset', () => {
         sinon.stub(field, 'isFormula').returns(false);
 
         const fieldPermissions = [
-          new ProfileFieldPermission({ editable: true, field: 'Object1.Field1', readable: false }),
+          new ProfileFieldPermission(profile, { editable: true, field: 'Object1.Field1', readable: false }),
         ];
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
@@ -140,7 +140,7 @@ describe('AdminProfileRuleset', () => {
         const profile = new Profile('Admin.profile-meta.xml');
         const fieldsToCheck = [new CustomField('objects/Object1/fields/Field1.field-meta.xml')];
         const fieldPermissions = [
-          new ProfileFieldPermission({ editable: true, field: 'Object1.Field1', readable: true }),
+          new ProfileFieldPermission(profile, { editable: true, field: 'Object1.Field1', readable: true }),
         ];
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
@@ -155,7 +155,7 @@ describe('AdminProfileRuleset', () => {
         const fieldsToCheck = [];
         // No editable or readable property here on purpose
         // If the method's code tries to access either of these properties an error will occur
-        const fieldPermissions = [new ProfileFieldPermission({ field: 'Object1.Field1' })];
+        const fieldPermissions = [new ProfileFieldPermission(profile, { field: 'Object1.Field1' })];
         sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
         const ruleset = new AdminProfileRuleset(null);
@@ -169,9 +169,9 @@ describe('AdminProfileRuleset', () => {
     it("should return a list of warnings for field permissions that aren't sorted by object/field name", () => {
       const profile = new Profile('Admin.profile-meta.xml');
       const fieldPermissions = [
-        new ProfileFieldPermission({ field: 'Object1.Field2' }),
-        new ProfileFieldPermission({ field: 'Object1.Field3' }),
-        new ProfileFieldPermission({ field: 'Object1.Field1' }),
+        new ProfileFieldPermission(profile, { field: 'Object1.Field2' }),
+        new ProfileFieldPermission(profile, { field: 'Object1.Field3' }),
+        new ProfileFieldPermission(profile, { field: 'Object1.Field1' }),
       ];
       sinon.stub(profile, 'fieldPermissions').returns(fieldPermissions);
 
@@ -190,7 +190,7 @@ describe('AdminProfileRuleset', () => {
   describe('.missingObjects()', () => {
     it("should return a list of warnings for objects that are expected to exist in the profile, but don't", () => {
       const profile = new Profile('Admin.profile-meta.xml');
-      const objectPermissions = [new ProfileObjectPermission({ object: 'Object1' })];
+      const objectPermissions = [new ProfileObjectPermission(profile, { object: 'Object1' })];
       sinon.stub(profile, 'objectPermissions').returns(objectPermissions);
 
       const expectedObjects = [
@@ -213,7 +213,7 @@ describe('AdminProfileRuleset', () => {
     it('should return a list of warnings for object permissions that are false, but should be true', () => {
       const profile = new Profile('Admin.profile-meta.xml');
       const objectPermissions = [
-        new ProfileObjectPermission({
+        new ProfileObjectPermission(profile, {
           allowCreate: false,
           allowDelete: false,
           allowEdit: false,
@@ -247,9 +247,9 @@ describe('AdminProfileRuleset', () => {
     it("should return a list of warnings for object permissions that aren't sorted by object", () => {
       const profile = new Profile('Admin.profile-meta.xml');
       const objectPermissions = [
-        new ProfileObjectPermission({ object: 'Object1' }),
-        new ProfileObjectPermission({ object: 'Object5' }),
-        new ProfileObjectPermission({ object: 'Object4' }),
+        new ProfileObjectPermission(profile, { object: 'Object1' }),
+        new ProfileObjectPermission(profile, { object: 'Object5' }),
+        new ProfileObjectPermission(profile, { object: 'Object4' }),
       ];
       sinon.stub(profile, 'objectPermissions').returns(objectPermissions);
 

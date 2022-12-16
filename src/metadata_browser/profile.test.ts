@@ -44,7 +44,7 @@ describe('Profile', () => {
 
 describe('ProfileFieldPermission', () => {
   it('should return correct values for all properties', () => {
-    const fieldPerm = new ProfileFieldPermission({
+    const fieldPerm = new ProfileFieldPermission(null, {
       editable: false,
       field: 'TestObject.TestField__c',
       readable: true,
@@ -54,18 +54,18 @@ describe('ProfileFieldPermission', () => {
     expect(fieldPerm.readable).to.equal(true, 'readable');
   });
   it('should derive the object name from the composite object/field property', () => {
-    const fieldPerm = new ProfileFieldPermission({ field: 'ObjectName.FieldName' });
+    const fieldPerm = new ProfileFieldPermission(null, { field: 'ObjectName.FieldName' });
     expect(fieldPerm.objectName()).to.equal('ObjectName');
   });
   it('should derive the field name from the composite object/field property', () => {
-    const fieldPerm = new ProfileFieldPermission({ field: 'ObjectName.FieldName' });
+    const fieldPerm = new ProfileFieldPermission(null, { field: 'ObjectName.FieldName' });
     expect(fieldPerm.fieldName()).to.equal('FieldName');
   });
 });
 
 describe('ProfileObjectPermission', () => {
   it('should return correct values for all properties', () => {
-    const objPerm = new ProfileObjectPermission({
+    const objPerm = new ProfileObjectPermission(null, {
       allowCreate: false,
       allowDelete: false,
       allowEdit: true,
