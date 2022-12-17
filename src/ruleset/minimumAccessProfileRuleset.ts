@@ -32,7 +32,6 @@ export class MinimumAccessProfileRuleset extends MetadataRuleset {
     if (fieldPermission.editable) {
       results.push(this.newFieldPermissionWarning(fieldPermission, 'editable'));
     }
-
     if (fieldPermission.readable) {
       results.push(this.newFieldPermissionWarning(fieldPermission, 'readable'));
     }
