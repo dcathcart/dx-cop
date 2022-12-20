@@ -6,7 +6,7 @@ export class MinimumAccessProfileRuleset extends MetadataRuleset {
   public displayName = 'Minimum Access profile';
 
   public run(): MetadataProblem[] {
-    const minAccessProfile = this.sfdxProjectBrowser.profileByName('Minimum Access');
+    const minAccessProfile = this.sfdxProjectBrowser.profileByName('Minimum Access - Salesforce');
     return this.checkProfile(minAccessProfile);
   }
 
@@ -40,7 +40,7 @@ export class MinimumAccessProfileRuleset extends MetadataRuleset {
   }
 
   private newFieldPermissionWarning(fieldPermission: ProfileFieldPermission, permissionName: string): MetadataWarning {
-    const message = `<${permissionName}> permission should not be true for ${fieldPermission.objectFieldName} field`;
+    const message = `<${permissionName}> permission should not be true for ${fieldPermission.objectFieldName}`;
     return new MetadataWarning(fieldPermission.profile.name, 'Profile', fieldPermission.profile.fileName, message);
   }
 

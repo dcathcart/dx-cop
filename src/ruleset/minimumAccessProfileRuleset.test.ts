@@ -32,7 +32,7 @@ describe('MinimumAccessProfileRuleset', () => {
       expect(results[0].componentName).to.equal('MinimumAccess');
       expect(results[0].componentType).to.equal('Profile');
       expect(results[0].fileName).to.equal('MinimumAccess.profile-meta.xml');
-      expect(results[0].problem).to.equal('<editable> permission should not be true for Object1.Field1 field');
+      expect(results[0].problem).to.equal('<editable> permission should not be true for Object1.Field1');
       expect(results[0].problemType).to.equal('Warning');
     });
 
@@ -40,7 +40,7 @@ describe('MinimumAccessProfileRuleset', () => {
       const fieldPermission = new ProfileFieldPermission(profile, { field: 'Object1.Field1', readable: true });
       const results = ruleset['fieldPermissionWarnings'](fieldPermission);
       expect(results.length).to.equal(1);
-      expect(results[0].problem).to.equal('<readable> permission should not be true for Object1.Field1 field');
+      expect(results[0].problem).to.equal('<readable> permission should not be true for Object1.Field1');
     });
 
     it('should not return any warnings when all field permissions are false', () => {

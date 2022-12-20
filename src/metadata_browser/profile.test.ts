@@ -1,43 +1,66 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { JsonMap } from '@salesforce/ts-types';
 import { Profile, ProfileFieldPermission, ProfileObjectPermission } from './profile';
 
 describe('Profile', () => {
+  const profile = new Profile('');
+
   describe('.fieldPermissions()', () => {
     it('should return an array of ProfileFieldPermission objects', () => {
-      const json: JsonMap = {
+      const metadata = {
         fieldPermissions: [
           { editable: false, field: 'TestObject.Field1__c', readable: true },
           { editable: false, field: 'TestObject.Field2__c', readable: true },
         ],
       };
-      const profile = new Profile('');
-      sinon.stub(profile, 'metadata').get(() => json);
-
+      sinon.stub(profile, 'metadata').get(() => metadata);
       const results = profile.fieldPermissions();
       expect(results.length).to.equal(2);
       expect(results[0].objectFieldName).to.equal('TestObject.Field1__c');
       expect(results[1].objectFieldName).to.equal('TestObject.Field2__c');
     });
+
+    it('should return an array containing a single ProfileFieldPermission object', () => {
+      const metadata = { fieldPermissions: { editable: false, readable: true, field: 'TestObject.Field1__c' } };
+      sinon.stub(profile, 'metadata').get(() => metadata);
+      expect(profile.fieldPermissions().length).to.equal(1);
+      expect(profile.fieldPermissions()[0].objectFieldName).to.equal('TestObject.Field1__c');
+    });
+
+    it('should return an empty array', () => {
+      const metadata = {};
+      sinon.stub(profile, 'metadata').get(() => metadata);
+      expect(profile.fieldPermissions().length).to.equal(0);
+    });
   });
 
   describe('.objectPermissions()', () => {
     it('should return an array of ProfileObjectPermission objects', () => {
-      const json: JsonMap = {
+      const metadata = {
         objectPermissions: [
           { allowEdit: false, allowRead: true, object: 'TestObject1__c' },
           { allowEdit: false, allowRead: true, object: 'TestObject2__c' },
         ],
       };
-      const profile = new Profile('');
-      sinon.stub(profile, 'metadata').get(() => json);
-
+      sinon.stub(profile, 'metadata').get(() => metadata);
       const results = profile.objectPermissions();
       expect(results.length).to.equal(2);
       expect(results[0].objectName).to.equal('TestObject1__c');
       expect(results[1].objectName).to.equal('TestObject2__c');
+    });
+
+    it('should return an array containing a single ProfileObjectPermission object', () => {
+      const metadata = { objectPermissions: { allowEdit: false, allowRead: true, object: 'Object1__c' } };
+      sinon.stub(profile, 'metadata').get(() => metadata);
+      expect(profile.objectPermissions().length).to.equal(1);
+      expect(profile.objectPermissions()[0].objectName).to.equal('Object1__c');
+    });
+
+    it('should return an empty array', () => {
+      const metadata = {};
+      sinon.stub(profile, 'metadata').get(() => metadata);
+      expect(profile.objectPermissions().length).to.equal(0);
     });
   });
 });
