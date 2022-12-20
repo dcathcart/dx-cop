@@ -42,6 +42,7 @@ An optional `.dxcoprc` configuration file, in JSON format, can be used to enable
         "adminProfile": { "enabled": false },
         "emailToCaseSettings": { "enabled": true },
         "lightningWebComponents": { "enabled": true },
+        "minimumAccessProfile": { "enabled": false, "profileName": "Minimum Access - Salesforce" },
         "recordTypePicklists": { "enabled": true },
         "recordTypePicklistValues": { "enabled": true }
     }
@@ -76,6 +77,12 @@ Also ensures that `<routingAddresses>` are ordered by `<routingName>`.
 ### Lightning web components
 
 Checks `*.js-meta.xml` files for extra whitespace at the ends of lines. This can cause unexpected behaviour when you retrieve the same component after deployment; extra lines of whitespace can be inserted resulting in unexpected file differences.
+
+### Minimum Access profile
+
+The Minimum Access profile should not have access (read, edit, delete, etc) to _any_ objects or fields. Access should be controlled via permission sets instead. This ruleset will raise a warning if any `<fieldPermissions>` or `<objectPermissions>` elements in the Minimum Access profile are true.
+
+By default the "Minimum Access - Salesforce" profile will be examined. This can be changed in the config file.
 
 ### Record types: picklist names
 
