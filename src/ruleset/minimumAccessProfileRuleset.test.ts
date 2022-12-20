@@ -6,7 +6,7 @@ import { MinimumAccessProfileRuleset } from './minimumAccessProfileRuleset';
 
 describe('MinimumAccessProfileRuleset', () => {
   const profile = new Profile('MinimumAccess.profile-meta.xml');
-  const ruleset = new MinimumAccessProfileRuleset(null);
+  const ruleset = new MinimumAccessProfileRuleset(null, null);
 
   describe('.checkProfile()', () => {
     it('combines all warnings into a single list', () => {

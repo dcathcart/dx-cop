@@ -7,7 +7,7 @@ export default function defaultConfig() {
       adminProfile: { enabled: false },
       emailToCaseSettings: { enabled: true },
       lightningWebComponents: { enabled: true },
-      minimumAccessProfile: { enabled: false },
+      minimumAccessProfile: { enabled: false, profileName: 'Minimum Access - Salesforce' },
       recordTypePicklists: { enabled: true },
       recordTypePicklistValues: { enabled: true },
     },

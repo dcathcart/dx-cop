@@ -77,7 +77,9 @@ export default class Check extends SfdxCommand {
       rulesets.push(new LwcMetadataRuleset(sfdxProjectBrowser));
     }
     if (config.ruleSets.minimumAccessProfile.enabled) {
-      rulesets.push(new MinimumAccessProfileRuleset(sfdxProjectBrowser));
+      rulesets.push(
+        new MinimumAccessProfileRuleset(sfdxProjectBrowser, config.ruleSets.minimumAccessProfile.profileName)
+      );
     }
     if (config.ruleSets.recordTypePicklists.enabled) {
       rulesets.push(new RecordTypePicklistRuleset(sfdxProjectBrowser));

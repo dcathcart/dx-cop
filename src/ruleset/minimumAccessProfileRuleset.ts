@@ -1,12 +1,19 @@
 import { Profile, ProfileFieldPermission, ProfileObjectPermission } from '../metadata_browser/profile';
+import { SfdxProjectBrowser } from '../metadata_browser/sfdxProjectBrowser';
 import { MetadataProblem, MetadataWarning } from './metadataProblem';
 import { MetadataRuleset } from './metadataRuleset';
 
 export class MinimumAccessProfileRuleset extends MetadataRuleset {
   public displayName = 'Minimum Access profile';
+  public profileName: string;
+
+  public constructor(sfdxProjectBrowser: SfdxProjectBrowser, profileName: string) {
+    super(sfdxProjectBrowser);
+    this.profileName = profileName;
+  }
 
   public run(): MetadataProblem[] {
-    const minAccessProfile = this.sfdxProjectBrowser.profileByName('Minimum Access - Salesforce');
+    const minAccessProfile = this.sfdxProjectBrowser.profileByName(this.profileName);
     return this.checkProfile(minAccessProfile);
   }
 
