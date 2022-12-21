@@ -12,6 +12,7 @@ import { EmailToCaseSettingsRuleset } from '../../../ruleset/emailToCaseSettings
 import { LwcMetadataRuleset } from '../../../ruleset/lwcMetadataRuleset';
 import { MetadataProblem } from '../../../ruleset/metadataProblem';
 import { MetadataRuleset } from '../../../ruleset/metadataRuleset';
+import { MinimumAccessProfileRuleset } from '../../../ruleset/minimumAccessProfileRuleset';
 import { RecordTypePicklistRuleset } from '../../../ruleset/recordTypePicklistRuleset';
 import { RecordTypePicklistValueRuleset } from '../../../ruleset/recordTypePicklistValueRuleset';
 
@@ -74,6 +75,11 @@ export default class Check extends SfdxCommand {
     }
     if (config.ruleSets.lightningWebComponents.enabled) {
       rulesets.push(new LwcMetadataRuleset(sfdxProjectBrowser));
+    }
+    if (config.ruleSets.minimumAccessProfile.enabled) {
+      rulesets.push(
+        new MinimumAccessProfileRuleset(sfdxProjectBrowser, config.ruleSets.minimumAccessProfile.profileName)
+      );
     }
     if (config.ruleSets.recordTypePicklists.enabled) {
       rulesets.push(new RecordTypePicklistRuleset(sfdxProjectBrowser));
