@@ -15,6 +15,7 @@ import { MetadataRuleset } from '../../../ruleset/metadataRuleset';
 import { MinimumAccessProfileRuleset } from '../../../ruleset/minimumAccessProfileRuleset';
 import { RecordTypePicklistRuleset } from '../../../ruleset/recordTypePicklistRuleset';
 import { RecordTypePicklistValueRuleset } from '../../../ruleset/recordTypePicklistValueRuleset';
+import { QueueRuleset } from '../../../ruleset/queueRuleset';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -80,6 +81,9 @@ export default class Check extends SfdxCommand {
       rulesets.push(
         new MinimumAccessProfileRuleset(sfdxProjectBrowser, config.ruleSets.minimumAccessProfile.profileName)
       );
+    }
+    if (config.ruleSets.queues.enabled) {
+      rulesets.push(new QueueRuleset(sfdxProjectBrowser));
     }
     if (config.ruleSets.recordTypePicklists.enabled) {
       rulesets.push(new RecordTypePicklistRuleset(sfdxProjectBrowser));

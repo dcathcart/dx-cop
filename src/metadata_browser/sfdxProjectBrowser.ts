@@ -8,6 +8,7 @@ import { LightningComponentBundle } from './lightningComponentBundle';
 import { PicklistField } from './picklistField';
 import { Profile } from './profile';
 import { RecordType } from './recordType';
+import { Queue } from './queue';
 
 // Tools for browsing/navigating the metadata in an SFDX project
 export class SfdxProjectBrowser {
@@ -79,6 +80,12 @@ export class SfdxProjectBrowser {
     return new Profile(fileName);
   }
 
+  public queues(): Queue[] {
+    const dir = this.queuesBaseDir();
+    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    return fileNames.map((f) => new Queue(path.join(dir, f)));
+  }
+
   // Return a list of record types for the given object
   public recordTypes(objectName: string): RecordType[] {
     const dir = this.recordTypesBaseDir(objectName);
@@ -134,6 +141,10 @@ export class SfdxProjectBrowser {
   // Directory containing custom objects
   private objectsBaseDir(): string {
     return path.join(this.defaultDir(), 'objects');
+  }
+
+  private queuesBaseDir(): string {
+    return path.join(this.defaultDir(), 'queues');
   }
 
   private settingsBaseDir(): string {
