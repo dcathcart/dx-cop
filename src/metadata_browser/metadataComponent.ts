@@ -6,6 +6,7 @@ import { JsonMap, ensureJsonMap } from '@salesforce/ts-types';
 // Abstract base class for all metadata components
 export abstract class MetadataComponent {
   public readonly fileName: string;
+  private readonly injectedFileContents: string;
   private parsedMetadata: JsonMap;
 
   // The part of the file extension that is specific to each metadata type, e.g. the 'field' in '.field-meta.xml'.
@@ -16,14 +17,19 @@ export abstract class MetadataComponent {
   // This is the name of the 'top level' node in the metadata XML.
   protected abstract readonly metadataType: string;
 
-  public constructor(fileName: string) {
+  public constructor(fileName: string, fileContents?: string) {
     this.fileName = path.normalize(fileName); // smooth away any rough edges, forward/backslash issues etc
+    this.injectedFileContents = fileContents; // allow file contents to be injected (useful for testing)
   }
 
   // The name (aka Developer Name) of this metadata component
   public get name(): string {
     const ext = `.${this.fileExtension}-meta.xml`;
     return path.basename(this.fileName, ext);
+  }
+
+  public get fileContents(): string | Buffer {
+    return this.injectedFileContents || fs.readFileSync(this.fileName);
   }
 
   // Accessor for the metadata XML (parsed into JSON)
@@ -39,8 +45,7 @@ export abstract class MetadataComponent {
       numberParseOptions: { leadingZeros: false, hex: false },
     });
 
-    const file: Buffer = fs.readFileSync(this.fileName);
-    const parsed: JsonMap = ensureJsonMap(xmlParser.parse(file));
+    const parsed = ensureJsonMap(xmlParser.parse(this.fileContents));
     return ensureJsonMap(parsed[this.metadataType]);
   }
 }
