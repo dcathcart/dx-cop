@@ -9,7 +9,7 @@ describe('SfdxProjectBrowser', () => {
     it('returns an array of LightningComponentBundle objects', () => {
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
-      mockProjectBrowser.expects('lwcBaseDir').once().returns('src/test/metadata/lwc');
+      mockProjectBrowser.expects('defaultDir').once().returns('src/test/metadata');
 
       const results = sfdxProjectBrowser.lwcBundles();
       expect(results.length).to.equal(2);
@@ -21,16 +21,30 @@ describe('SfdxProjectBrowser', () => {
     });
   });
 
-  describe('.objects', () => {
+  describe('.objects()', () => {
     it('returns an array of CustomObject objects', () => {
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
       const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
-      mockProjectBrowser.expects('objectsBaseDir').once().returns('src/test/metadata/objects');
+      mockProjectBrowser.expects('defaultDir').once().returns('src/test/metadata');
 
       const results = sfdxProjectBrowser.objects();
       expect(results.length).to.equal(2);
       expect(results[0].name).to.equal('TestObject1');
       expect(results[1].name).to.equal('TestObject2');
+      mockProjectBrowser.verify();
+    });
+  });
+
+  describe('.queues()', () => {
+    it('returns an array of Queue objects', () => {
+      const sfdxProjectBrowser = new SfdxProjectBrowser(null);
+      const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
+      mockProjectBrowser.expects('defaultDir').once().returns('src/test/metadata');
+
+      const results = sfdxProjectBrowser.queues();
+      expect(results.length).to.equal(2);
+      expect(results[0].name).to.equal('Queue_With_No_Members');
+      expect(results[1].name).to.equal('Queue_With_Users');
       mockProjectBrowser.verify();
     });
   });

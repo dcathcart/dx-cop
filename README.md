@@ -92,6 +92,10 @@ When you add a new picklist field to an object, Salesforce automatically adds a 
 
 Examines record types & checks for picklist values that don't exist (or are inactive) in the corresponding picklist field definitions.
 
+### Queues
+
+Examines queues & raises warnings if any contain users as direct members. This can lead to deployment failures if users don't exist in target environments. Preferred approach is to use public groups or roles for queue membership.
+
 ## Problem categories
 
 ### Errors
