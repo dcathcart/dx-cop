@@ -43,6 +43,7 @@ An optional `.dxcoprc` configuration file, in JSON format, can be used to enable
         "emailToCaseSettings": { "enabled": true },
         "lightningWebComponents": { "enabled": true },
         "minimumAccessProfile": { "enabled": false, "profileName": "Minimum Access - Salesforce" },
+        "queues": { "enabled": false },
         "recordTypePicklists": { "enabled": true },
         "recordTypePicklistValues": { "enabled": true }
     }
