@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (or rather, it _will_ once there are enough features to be considered "ready" for version 0.1).
 
+## [0.0.11] - 2023-01-01
+
+New Year's Day Sale edition: 2 for the price of 1!
+
+This release includes 2 new rulesets:
+
+### Minimum Access Profile ruleset
+Ensure the Minimum Access profiles remains a _true_ minimum access profile (i.e. no access to any objects or fields). Forces the preferred approach of using permission sets.
+
+### Queues ruleset
+Warns if any users are found to be direct members of queues. Forces use of public groups or roles instead.
+
+### Configuration
+Both rulesets are **disabled** by default; they can be enabled by adding to the `.dxcoprc` file:
+
+```
+      "minimumAccessProfile": { "enabled": true, "profileName": "Minimum Access - Salesforce" },
+      "queues": { "enabled": false },
+```
+
 ## [0.0.10] - 2022-11-16
 
 Relax the `<fieldPermissions>` checks in the Admin profile ruleset, so that formula fields do not require `<editable>` to be true.

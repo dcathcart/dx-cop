@@ -1,4 +1,12 @@
-import { AnyJson, getBoolean, getJsonArray, getString } from '@salesforce/ts-types';
+import {
+  AnyJson,
+  getBoolean,
+  getJsonArray,
+  getJsonMap,
+  getString,
+  hasJsonArray,
+  hasJsonMap,
+} from '@salesforce/ts-types';
 import { MetadataComponent } from './metadataComponent';
 
 export class Profile extends MetadataComponent {
@@ -6,13 +14,29 @@ export class Profile extends MetadataComponent {
   protected readonly metadataType = 'Profile';
 
   public fieldPermissions(): ProfileFieldPermission[] {
-    const permissions = getJsonArray(this.metadata, 'fieldPermissions');
-    return permissions.map((p) => new ProfileFieldPermission(p));
+    if (hasJsonArray(this.metadata, 'fieldPermissions')) {
+      const permissions = getJsonArray(this.metadata, 'fieldPermissions');
+      return permissions.map((p) => new ProfileFieldPermission(this, p));
+    } else if (hasJsonMap(this.metadata, 'fieldPermissions')) {
+      const permissionsMap = getJsonMap(this.metadata, 'fieldPermissions');
+      const permissions = new ProfileFieldPermission(this, permissionsMap);
+      return [permissions];
+    } else {
+      return [];
+    }
   }
 
   public objectPermissions(): ProfileObjectPermission[] {
-    const permissions = getJsonArray(this.metadata, 'objectPermissions');
-    return permissions.map((p) => new ProfileObjectPermission(p));
+    if (hasJsonArray(this.metadata, 'objectPermissions')) {
+      const permissions = getJsonArray(this.metadata, 'objectPermissions');
+      return permissions.map((op) => new ProfileObjectPermission(this, op));
+    } else if (hasJsonMap(this.metadata, 'objectPermissions')) {
+      const permissionsMap = getJsonMap(this.metadata, 'objectPermissions');
+      const permissions = new ProfileObjectPermission(this, permissionsMap);
+      return [permissions];
+    } else {
+      return [];
+    }
   }
 }
 
@@ -24,9 +48,11 @@ export class Profile extends MetadataComponent {
 // </fieldPermissions>
 // --> converted to JSON this would look like { editable: false, field: 'Account.AccountNumber', readable: true }
 export class ProfileFieldPermission {
+  public readonly profile: Profile;
   private readonly json: AnyJson;
 
-  public constructor(json: AnyJson) {
+  public constructor(profile: Profile, json: AnyJson) {
+    this.profile = profile;
     this.json = json;
   }
 
@@ -63,9 +89,11 @@ export class ProfileFieldPermission {
 // </objectPermissions>
 // --> converted to JSON this would look like { allowCreate: true, allowDelete: true, ... }
 export class ProfileObjectPermission {
+  public readonly profile: Profile;
   private readonly json: AnyJson;
 
-  public constructor(json: AnyJson) {
+  public constructor(profile: Profile, json: AnyJson) {
+    this.profile = profile;
     this.json = json;
   }
 
