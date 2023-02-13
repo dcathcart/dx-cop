@@ -75,6 +75,10 @@ Ensures you don't have the `<emailServicesAddress>` and `<isVerified>` fields st
 
 Also ensures that `<routingAddresses>` are ordered by `<routingName>`.
 
+### Installed Packages
+
+A common problem when retrieving Installed Packages is that they contain `<activateRSS xsi:nil="true"/>`, which fails to deploy since `<activateRSS>` is a required field. It must be explicity set e.g. to `<activateRSS>false</activateRSS>`. This ruleset will report the problem early, to avoid failed deployments.
+
 ### Lightning web components
 
 Checks `*.js-meta.xml` files for extra whitespace at the ends of lines. This can cause unexpected behaviour when you retrieve the same component after deployment; extra lines of whitespace can be inserted resulting in unexpected file differences.

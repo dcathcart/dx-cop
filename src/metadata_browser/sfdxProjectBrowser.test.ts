@@ -5,6 +5,21 @@ import * as sinon from 'sinon';
 import { SfdxProjectBrowser } from './sfdxProjectBrowser';
 
 describe('SfdxProjectBrowser', () => {
+  describe('.installedPackages()', () => {
+    it('returns an array of InstalledPackage objects', () => {
+      const sfdxProjectBrowser = new SfdxProjectBrowser(null);
+      const mockProjectBrowser = sinon.mock(sfdxProjectBrowser);
+      mockProjectBrowser.expects('installedPackageDir').once().returns('src/test/metadata/installedPackages');
+
+      const results = sfdxProjectBrowser.installedPackages();
+      expect(results.length).to.equal(3);
+      expect(results[0].name).to.equal('TestPackageA');
+      expect(results[1].name).to.equal('TestPackageB');
+      expect(results[2].name).to.equal('TestPackageC');
+      mockProjectBrowser.verify();
+    });
+  });
+
   describe('.lwcBundles()', () => {
     it('returns an array of LightningComponentBundle objects', () => {
       const sfdxProjectBrowser = new SfdxProjectBrowser(null);
