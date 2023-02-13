@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (or rather, it _will_ once there are enough features to be considered "ready" for version 0.1).
 
+## [0.0.12] - 2023-02-13
+
+### Installed Packages ruleset
+
+New ruleset to check installed packages. Detects the common issue where installed packages retrieved from an environment contain an empty element `<activateRSS xsi:nil="true"/>`, which will not deploy.
+
+This ruleset is enabled by default. If you wish to explicity enable or disable, add the following to your `.dxcoprc` config file:
+
+```
+      "installedPackages": { "enabled": true },
+```
+
+### Security updates
+
+Dependent packages `minimatch` and `json5` have been updated to address recently-discovered security vulnerabilities.
+
 ## [0.0.11] - 2023-01-01
 
 New Year's Day Sale edition: 2 for the price of 1!

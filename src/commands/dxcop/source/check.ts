@@ -16,6 +16,7 @@ import { MinimumAccessProfileRuleset } from '../../../ruleset/minimumAccessProfi
 import { RecordTypePicklistRuleset } from '../../../ruleset/recordTypePicklistRuleset';
 import { RecordTypePicklistValueRuleset } from '../../../ruleset/recordTypePicklistValueRuleset';
 import { QueueRuleset } from '../../../ruleset/queueRuleset';
+import { InstalledPackageRuleset } from '../../../ruleset/installedPackageRuleset';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -73,6 +74,9 @@ export default class Check extends SfdxCommand {
     }
     if (config.ruleSets.emailToCaseSettings.enabled) {
       rulesets.push(new EmailToCaseSettingsRuleset(sfdxProjectBrowser));
+    }
+    if (config.ruleSets.installedPackages.enabled) {
+      rulesets.push(new InstalledPackageRuleset(sfdxProjectBrowser));
     }
     if (config.ruleSets.lightningWebComponents.enabled) {
       rulesets.push(new LwcMetadataRuleset(sfdxProjectBrowser));

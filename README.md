@@ -41,6 +41,7 @@ An optional `.dxcoprc` configuration file, in JSON format, can be used to enable
     "ruleSets": {
         "adminProfile": { "enabled": false },
         "emailToCaseSettings": { "enabled": true },
+        "installedPackages": { "enabled": true },
         "lightningWebComponents": { "enabled": true },
         "minimumAccessProfile": { "enabled": false, "profileName": "Minimum Access - Salesforce" },
         "queues": { "enabled": false },
@@ -52,7 +53,7 @@ An optional `.dxcoprc` configuration file, in JSON format, can be used to enable
 
 ### Default configuration
 
-If the config file doesn't exist, the settings in the example above are used. The config file may also be incomplete; if any rulesets are missing, the default values are substituted in.
+If the config file doesn't exist, the settings in the example above are used. The config file may also be incomplete; if any parts of it are missing, the default values are substituted in.
 
 ## Rulesets
 
@@ -74,6 +75,10 @@ All objects and fields should be fully accessible to the System Administrator pr
 Ensures you don't have the `<emailServicesAddress>` and `<isVerified>` fields stored in version control. These are specific to each environment and usually cause validation failures if you try to change them in a deployment, so it's best not to store them at all.
 
 Also ensures that `<routingAddresses>` are ordered by `<routingName>`.
+
+### Installed Packages
+
+A common problem when retrieving Installed Packages is that they contain `<activateRSS xsi:nil="true"/>`, which fails to deploy since `<activateRSS>` is a required field. It must be explicity set e.g. to `<activateRSS>false</activateRSS>`. This ruleset will report the problem early, to avoid failed deployments.
 
 ### Lightning web components
 
