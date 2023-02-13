@@ -4,6 +4,7 @@ import { SfdxProject } from '@salesforce/core';
 import { CustomField } from './customField';
 import { CustomObject } from './customObject';
 import { EmailToCaseSettings } from './emailToCaseSettings';
+import { InstalledPackage } from './installedPackage';
 import { LightningComponentBundle } from './lightningComponentBundle';
 import { PicklistField } from './picklistField';
 import { Profile } from './profile';
@@ -55,6 +56,12 @@ export class SfdxProjectBrowser {
       return this.fieldsForObject(objectName).concat(fieldsFromActivityObject);
     }
     return this.fieldsForObject(objectName);
+  }
+
+  public installedPackages(): InstalledPackage[] {
+    const dir = this.installedPackageDir();
+    const fileNames = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    return fileNames.map((f) => new InstalledPackage(path.join(dir, f)));
   }
 
   // Return a map of all LWCs. key = LWC name, value = full path to the folder that contains all the components for that LWC
@@ -117,6 +124,10 @@ export class SfdxProjectBrowser {
           object.isExternalObject()
       )
       .filter((object) => !this.OBJECTS_TO_IGNORE.includes(object.name));
+  }
+
+  private installedPackageDir(): string {
+    return path.join(this.defaultDir(), 'installedPackages');
   }
 
   private lwcBaseDir(): string {

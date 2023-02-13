@@ -35,7 +35,7 @@ describe('dxcop:source:check command', () => {
     it('should create a ruleset object for each ruleset enabled in the (default) config', () => {
       const checkCommand = new Check([], null);
       const ruleSets = checkCommand['rulesetsToRun'](null);
-      expect(ruleSets.length).to.equal(4);
+      expect(ruleSets.length).to.equal(5);
     });
   });
 });
