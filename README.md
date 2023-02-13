@@ -41,6 +41,7 @@ An optional `.dxcoprc` configuration file, in JSON format, can be used to enable
     "ruleSets": {
         "adminProfile": { "enabled": false },
         "emailToCaseSettings": { "enabled": true },
+        "installedPackages": { "enabled": true },
         "lightningWebComponents": { "enabled": true },
         "minimumAccessProfile": { "enabled": false, "profileName": "Minimum Access - Salesforce" },
         "queues": { "enabled": false },
@@ -52,7 +53,7 @@ An optional `.dxcoprc` configuration file, in JSON format, can be used to enable
 
 ### Default configuration
 
-If the config file doesn't exist, the settings in the example above are used. The config file may also be incomplete; if any rulesets are missing, the default values are substituted in.
+If the config file doesn't exist, the settings in the example above are used. The config file may also be incomplete; if any parts of it are missing, the default values are substituted in.
 
 ## Rulesets
 
